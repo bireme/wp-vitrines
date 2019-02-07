@@ -39,7 +39,7 @@ function create_post_vitrine() {
  
             'public' => true,
             'menu_position' => 15,
-            'supports' => array( 'title', 'editor', 'thumbnail', 'custom-fields' ),
+            'supports' => array( 'title', 'editor', 'thumbnail', 'revisions', 'custom-fields' ),
             'taxonomies' => array( '' ),
 			'menu_icon' => 'dashicons-lightbulb',
             /*'menu_icon' => plugins_url( 'images/image.png', __FILE__ ),*/
