@@ -10,15 +10,31 @@ $site_lang = substr($current_language, 0,2);
 if ( defined( 'POLYLANG_VERSION' ) ) {
     $default_language = pll_default_language();
     if ( $default_language == $site_lang ) $site_lang = '';
+} else {
+	$site_lang = '';
 }
 
+if ($site_lang == 'en') {
+	$vitrines_breadcrumb = "Knowledge Windows";
+} elseif ($site_lang == 'es') {
+	$vitrines_breadcrumb = "Vitrinas del Conocimiento";	
+} else {
+	$vitrines_breadcrumb = "Vitrines do Conhecimento";		
+}
 ?>
 
 <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
 
 
 <div class="vitrine">
-    <div class="breadcrumb"><a href="<?php bloginfo('url'); ?>/<?php echo ($site_lang);?>" title="<?php bloginfo('name'); ?>">Home</a> / </div>
+    <div class="breadcrumb">
+		<a href="<?php bloginfo('url'); ?>/<?php echo ($site_lang);?>" title="<?php bloginfo('name'); ?>">Home</a>
+		/ 
+		<a href="../">
+			<?php echo($vitrines_breadcrumb); ?>
+		</a>
+		
+	</div>
 <div class="vitrineTitle">
 	<h2><?php the_title(); ?></h2>
 </div>

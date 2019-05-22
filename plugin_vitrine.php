@@ -358,6 +358,15 @@ function add_post_vitrine_fields( $post_vitrine_id, $post_vitrine ) {
                 $template_path = plugin_dir_path( __FILE__ ) . '/templates/single_vitrines.php';
             // }
         }
+		if ( is_archive() ) {
+            // checks if the file exists in the theme first,
+            // otherwise serve the file from the plugin
+            //if ( $theme_file = locate_template( array ( 'archive_vitrines.php' ) ) ) {
+            //    $template_path = $theme_file;
+            //} else {
+                $template_path = plugin_dir_path( __FILE__ ) . '/templates/archive_vitrines.php';
+            // }
+        }
     }
     return $template_path;
 }
