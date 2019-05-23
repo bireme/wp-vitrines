@@ -11,9 +11,11 @@ $site_lang = substr($current_language, 0,2);
 if ( defined( 'POLYLANG_VERSION' ) ) {
     $default_language = pll_default_language();
     if ( $default_language == $site_lang ) $site_lang = '';
-} 
+} else {
+	$site_lang = '';
+}
 
-if ($site_lang == 'en' || $default_language =='') {
+if ($site_lang == 'en') {
 	$vitrines_title = "Windows of Knowledge";
 	$vitrine_link = "Collection of Windows Knowledge in the VHL Network";
 } elseif ($site_lang == 'es' || $default_language =='_e') {
