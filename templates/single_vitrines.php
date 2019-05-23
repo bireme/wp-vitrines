@@ -15,7 +15,7 @@ if ( defined( 'POLYLANG_VERSION' ) ) {
 }
 
 if ($site_lang == 'en') {
-	$vitrines_breadcrumb = "Knowledge Windows";
+	$vitrines_breadcrumb = "Windows of Knowledge";
 } elseif ($site_lang == 'es') {
 	$vitrines_breadcrumb = "Vitrinas del Conocimiento";	
 } else {

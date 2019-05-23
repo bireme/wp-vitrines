@@ -11,22 +11,31 @@ $site_lang = substr($current_language, 0,2);
 if ( defined( 'POLYLANG_VERSION' ) ) {
     $default_language = pll_default_language();
     if ( $default_language == $site_lang ) $site_lang = '';
+} 
+
+if ($site_lang == 'en' || $default_language =='') {
+	$vitrines_title = "Windows of Knowledge";
+	$vitrine_link = "Collection of Windows Knowledge in the VHL Network";
+} elseif ($site_lang == 'es' || $default_language =='_e') {
+	$vitrines_title = "Vitrinas del Conocimiento";	
+	$vitrine_link = " Colección de las Vitrinas del Conocimiento en la Red BVS";
+} elseif ($site_lang == 'pt' || $default_language =='_p') {
+	$vitrines_title = "Vitrines do Conhecimento";
+	$vitrine_link = "Coleção das Vitrines do Conhecimento na Rede BVS";
 } else {
+	$vitrines_title = "Vitrines do Conhecimento";
+	$vitrine_link = "Coleção das Vitrines do Conhecimento na Rede BVS";
 	$site_lang = '';
 }
-if ($site_lang == 'en') {
-	$vitrines_title = "Knowledge Windows";
-} elseif ($site_lang == 'es') {
-	$vitrines_title = "Vitrinas del Conocimiento";	
-} else {
-	$vitrines_title = "Vitrines do Conhecimento";		
-}
+
 ?>
 <style>
 .vitrine_thumb img {
     border-radius: 50%;
-    width: 150px;
-    height: 150px;
+    width: 150px !important;
+    height: 150px !important;
+    max-width: none !important;
+    border: 2px solid #d3e8fb;
 }
 
 .vitrine_data {
@@ -41,7 +50,12 @@ if ($site_lang == 'en') {
     margin-bottom: 10px;
     line-height: 110%;
 }
-
+.vitrine_links {
+    text-align: right;
+    margin: 0px 30px 30px 0px;
+    font-weight: bold;
+    text-decoration: underline;
+}
 .info {
     margin-left: 15px;
 }	
@@ -73,6 +87,9 @@ if ($site_lang == 'en') {
 			<?php endwhile; else: ?>
 			<p><?php _e('Sorry, no posts matched your criteria.'); ?></p>
 		<?php endif; ?>
+	</div>
+	<div class="vitrine_links">
+		<a href="https://bvsalud.org/vitrinas" target="_blank"><?php echo ($vitrine_link);?></a>
 	</div>
 </div>
 <?php get_footer(); ?>
