@@ -17,16 +17,16 @@ if ( defined( 'POLYLANG_VERSION' ) ) {
 
 if ($site_lang == 'en') {
 	$vitrines_title = "Windows of Knowledge";
-	$vitrine_link = "Collection of Windows Knowledge in the VHL Network";
+	$vitrine_link = "Collection of Windows Knowledge of the VHL Network";
 } elseif ($site_lang == 'es' || $default_language =='_e') {
 	$vitrines_title = "Vitrinas del Conocimiento";	
-	$vitrine_link = " Colección de las Vitrinas del Conocimiento en la Red BVS";
+	$vitrine_link = " Colección de Vitrinas del Conocimiento de la Red BVS";
 } elseif ($site_lang == 'pt' || $default_language =='_p') {
 	$vitrines_title = "Vitrines do Conhecimento";
-	$vitrine_link = "Coleção das Vitrines do Conhecimento na Rede BVS";
+	$vitrine_link = "Coleção de Vitrines do Conhecimento da Rede BVS";
 } else {
 	$vitrines_title = "Vitrines do Conhecimento";
-	$vitrine_link = "Coleção das Vitrines do Conhecimento na Rede BVS";
+	$vitrine_link = "Coleção de Vitrines do Conhecimento da Rede BVS";
 	$site_lang = '';
 }
 
