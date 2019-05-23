@@ -17,16 +17,20 @@ if ( defined( 'POLYLANG_VERSION' ) ) {
 
 if ($site_lang == 'en') {
 	$vitrines_title = "Windows of Knowledge";
-	$vitrine_link = "Collection of Windows Knowledge of the VHL Network";
+	$vitrine_link = "Windows of Knowledge Collection of the VHL Network";
+	$vitrine_link_url = "https://bvsalud.org/en/vitrinas";
 } elseif ($site_lang == 'es' || $default_language =='_e') {
 	$vitrines_title = "Vitrinas del Conocimiento";	
 	$vitrine_link = " Colección de Vitrinas del Conocimiento de la Red BVS";
+	$vitrine_link_url = "https://bvsalud.org/es/vitrinas";
 } elseif ($site_lang == 'pt' || $default_language =='_p') {
 	$vitrines_title = "Vitrines do Conhecimento";
 	$vitrine_link = "Coleção de Vitrines do Conhecimento da Rede BVS";
+	$vitrine_link_url = "https://bvsalud.org/vitrinas";
 } else {
 	$vitrines_title = "Vitrines do Conhecimento";
 	$vitrine_link = "Coleção de Vitrines do Conhecimento da Rede BVS";
+	$vitrine_link_url = "https://bvsalud.org/vitrinas";
 	$site_lang = '';
 }
 
@@ -91,7 +95,7 @@ if ($site_lang == 'en') {
 		<?php endif; ?>
 	</div>
 	<div class="vitrine_links">
-		<a href="https://bvsalud.org/vitrinas" target="_blank"><?php echo ($vitrine_link);?></a>
+		<a href="<?php echo ($vitrine_link_url);?>" target="_blank"><?php echo ($vitrine_link);?></a>
 	</div>
 </div>
 <?php get_footer(); ?>
