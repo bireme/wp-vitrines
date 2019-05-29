@@ -65,6 +65,16 @@ if ($site_lang == 'en') {
 .info {
     margin-left: 15px;
 }	
+	
+@media screen and (max-width: 990px) {
+	.vitrine_data {
+		margin: 2%;
+		width: 94%;
+		display: inline-block;
+		text-align: center;
+	}
+}
+	
 </style>
 <div class="middle">
 	<div class="breadcrumb"><a href="<?php bloginfo('url'); ?>/<?php echo ($site_lang);?>" title="<?php bloginfo('name'); ?>">Home</a> /  </div>
