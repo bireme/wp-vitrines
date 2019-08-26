@@ -150,7 +150,7 @@ function display_post_vitrine_meta_box( $post_vitrine ) {
 			</div>
 			<div class="row">
 				<div class="col-100 icon_select">
-					<label>Ícone: <b><? echo ${"vitrine_icon_0$metaboxID"}; ?></b></label><br>
+					<label>Ícone: <b><?php echo ${"vitrine_icon_0$metaboxID"}; ?></b></label><br>
 					<span class="comp_info">Selecione o ícone que representa o componente criado:</span><br>
 					<?php 
 						$dir = plugin_dir_url( __FILE__ );
@@ -169,18 +169,18 @@ function display_post_vitrine_meta_box( $post_vitrine ) {
 						foreach ($icones as $value) {
 							?>
 							<div class="select_icon">
-								<? 
+								<?php 
 									if (${"vitrine_icon_0$metaboxID"} == $value) {
 										$ifChecked = 'checked="checked"';
 									} else {
 										$ifChecked = '';
 									}
 								?>
-								<input type="radio" name="icon_0<?php echo $metaboxID; ?>_vitrine" id="icon_0<?php echo $metaboxID; ?>_vitrine" value="<? echo $value; ?>" <? echo $ifChecked; ?> />
-									<label><span><? echo $value; ?></span><br><img src="<?php echo $dir; ?>/icones/<? echo $value; ?>.png" alt="ícone" /></label>
+								<input type="radio" name="icon_0<?php echo $metaboxID; ?>_vitrine" id="icon_0<?php echo $metaboxID; ?>_vitrine" value="<?php echo $value; ?>" <?php echo $ifChecked; ?> />
+									<label><span><?php echo $value; ?></span><br><img src="<?php echo $dir; ?>/icones/<?php echo $value; ?>.png" alt="ícone" /></label>
 							</div>
 
-							<?
+							<?php
 							}
 							?>		
 				</div>
@@ -197,7 +197,7 @@ function display_post_vitrine_meta_box( $post_vitrine ) {
 	</div>
 	<!-- Fim dos Componente no Loop -->
 	
-	<?	
+	<?php	
 	} // Fecha Loop dos componentes
 	?>
 <style>
