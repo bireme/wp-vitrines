@@ -12,6 +12,8 @@ O Plugin Vitrine do Conhecimento necessita que o administrator utilize os seguin
 * Conteúdo será criado com PageBuildergeBuilder
 * As caixas são configuradas através dos metaboxes "Componentes da Vitrine"
 * Quanto o apontamento do link for para um anchor na mesma página deve-se utilizar um ID #id em url do link
+
+
 Para facilitar a produção das vitrines recomendamos instalar o plugin duplicate post
 * Comportamento:  em uma instancia que utiliza o plugin polylang, quando é adicionado a edição de outro idioma, automaticamente todo o conteúdo é copiado. 
 * Link do plugin:  https://br.wordpress.org/plugins/duplicate-post/
