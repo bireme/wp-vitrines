@@ -23,8 +23,12 @@ if ($site_lang == 'en') {
 }
 ?>
 
-<?php if (have_posts()) : while (have_posts()) : the_post(); ?>
 
+<?php if (have_posts()) : while (have_posts()) : the_post(); ?>
+<script src="https://kit.fontawesome.com/be0bade886.js" crossorigin="anonymous"></script>
+<?php 
+	$plugin_dir = plugin_dir_url( __FILE__ );
+?>
 
 <div class="vitrine">
     <div class="breadcrumb">
@@ -35,318 +39,61 @@ if ($site_lang == 'en') {
 		</a>
 		
 	</div>
-<div class="vitrineTitle">
-	<h2><?php the_title(); ?></h2>
+	<?php 
+		//Carrega Variaveis da Customização da Vitrine
+		$titleBg_color = esc_html (get_post_meta( get_the_ID(), "titleBg_color", true ) );
+		$titleFont_color = esc_html (get_post_meta( get_the_ID(), "titleFont_color", true ) );
+		$boxBorder_color = esc_html (get_post_meta( get_the_ID(), "boxBorder_color", true ) );
+		$presentation_font_size = esc_html (get_post_meta( get_the_ID(), "presentation_font_size", true ) );
+		$font_size = esc_html (get_post_meta( get_the_ID(), "font_size", true ) );
+	?>
+	<style>
+		.component, .image_background {
+			border-color: <?php echo $boxBorder_color; ?> !important;
+		}
+		.lines {
+			  fill: <?php echo $boxBorder_color; ?> !important; 
+		}
+		.vitrine .entry, 
+		.vitrine .vitrinebyform {
+			font-size: <?php echo $font_size; ?> !important;
+			line-height: 120% !important;
+		}
+		.vitrinebyform .presentation {
+			font-size: <?php echo $presentation_font_size; ?> !important;
+			line-height: 120% !important;			
+		}
+	</style>
+<div class="vitrineTitle" style="background: <?php echo $titleBg_color; ?>">
+	<h2 style="color: <?php echo $titleFont_color; ?>"><?php the_title(); ?></h2>
 </div>
-<div class="vitrine_layout">
-	<div class="image_background" style="background: #ffffff url(<?php the_post_thumbnail_url( 'vitrine_image' ); ?>) no-repeat center center;"></div>
-	<div class="row">
-		<div class="cl cl_desk_5 comp01">
-			<?php 
-				$comp = 1;
-				$onOff = ( get_post_meta( get_the_ID(), 'onOff_vitrine_0'. $comp, true ) );
-				if ( $onOff == 'on' ) { $visibility = "inherit"; } else {  $visibility = "hidden"; };
-			?>
-			<div class="component comp_left" style="visibility: <?php echo  $visibility; ?>; "> 
-				<?php if ( $onOff == 'on') {
-				?>
-					<span class="component_icon">
-						<img src="<?php echo plugin_dir_url( __FILE__ ); ?>../icones/<?php echo esc_html( get_post_meta( get_the_ID(), 'icon_vitrine_0'. $comp, true ) ); ?>.png" />
-					</span>
-					<span class="component_content">
-						<span class="component_title">
-							<?php echo ( get_post_meta( get_the_ID(), 'title_vitrine_0'. $comp, true ) ); ?>
-						</span>
-						<span class="component_text">
-							<?php echo ( get_post_meta( get_the_ID(), 'text_vitrine_0'. $comp, true ) ); ?>
-						</span>
-						<div class="component_link seta-direita">
-							<?php
-								$linkTarget = ( get_post_meta( get_the_ID(), 'linkTarget_vitrine_0'. $comp, true ) );
-								if ( $linkTarget == 'on' ) { $target = "_blank"; } else {  $target = "_self"; };
-							?>
-							<a target="<?php echo $target; ?>" href="<?php echo ( get_post_meta( get_the_ID(), 'linkUrl_vitrine_0'. $comp, true ) ); ?>">
-								<?php echo ( get_post_meta( get_the_ID(), 'linkText_vitrine_0'. $comp, true ) ); ?>
-							</a>
-						</div>
-					</span>	
-				<?
-				}
-				?>
-							
-			</div>
-		</div>
-		<div class="cl cl_desk_1 point_comp01" style="visibility: <?php echo  $visibility; ?>; "></div>
-		<?php 
-				$comp = 2;
-				$onOff = ( get_post_meta( get_the_ID(), 'onOff_vitrine_0'. $comp, true ) );
-				if ( $onOff == 'on' ) { $visibility = "inherit"; } else {  $visibility = "hidden"; };
-		?>
-		<div class="cl cl_desk_1 point_comp02" style="visibility: <?php echo  $visibility; ?>; "></div>
-		<div class="cl cl_desk_5 comp02">
-			<div class="component comp_right" style="visibility: <?php echo  $visibility; ?>; "> 
-				<?php if ( $onOff == 'on') {
-				?>
-					<span class="component_content">
-						<span class="component_title">
-							<?php echo ( get_post_meta( get_the_ID(), 'title_vitrine_0'. $comp, true ) ); ?>
-						</span>
-						<span class="component_text">
-							<?php echo ( get_post_meta( get_the_ID(), 'text_vitrine_0'. $comp, true ) ); ?>
-						</span>
-						<div class="component_link seta-direita">
-							<?php
-								$linkTarget = ( get_post_meta( get_the_ID(), 'linkTarget_vitrine_0'. $comp, true ) );
-								if ( $linkTarget == 'on' ) { $target = "_blank"; } else {  $target = "_self"; };
-							?>
-							<a target="<?php echo $target; ?>" href="<?php echo ( get_post_meta( get_the_ID(), 'linkUrl_vitrine_0'. $comp, true ) ); ?>">
-								<?php echo ( get_post_meta( get_the_ID(), 'linkText_vitrine_0'. $comp, true ) ); ?>
-							</a>
-						</div>
-					</span>	
-					<span class="component_icon">
-						<img src="<?php echo plugin_dir_url( __FILE__ ); ?>../icones/<?php echo esc_html( get_post_meta( get_the_ID(), 'icon_vitrine_0'. $comp, true ) ); ?>.png" />
-					</span>
-				<?
-				}
-				?>
-							
-			</div>
-		</div>
-	</div>
-	<div class="row">
-		<div class="cl cl_desk_4 comp03">
-			<?php 
-				$comp = 5;
-				$onOff = ( get_post_meta( get_the_ID(), 'onOff_vitrine_0'. $comp, true ) );
-				if ( $onOff == 'on' ) { $visibility = "inherit"; } else {  $visibility = "hidden"; };
-			?>
-			<div class="component comp_left" style="visibility: <?php echo  $visibility; ?>; "> 
-				<?php if ( $onOff == 'on') {
-				?>
-					<span class="component_icon">
-						<img src="<?php echo plugin_dir_url( __FILE__ ); ?>../icones/<?php echo esc_html( get_post_meta( get_the_ID(), 'icon_vitrine_0'. $comp, true ) ); ?>.png" />
-					</span>
-					<span class="component_content">
-						<span class="component_title">
-							<?php echo ( get_post_meta( get_the_ID(), 'title_vitrine_0'. $comp, true ) ); ?>
-						</span>
-						<span class="component_text">
-							<?php echo ( get_post_meta( get_the_ID(), 'text_vitrine_0'. $comp, true ) ); ?>
-						</span>
-						<div class="component_link seta-direita">
-							<?php
-								$linkTarget = ( get_post_meta( get_the_ID(), 'linkTarget_vitrine_0'. $comp, true ) );
-								if ( $linkTarget == 'on' ) { $target = "_blank"; } else {  $target = "_self"; };
-							?>
-							<a target="<?php echo $target; ?>" href="<?php echo ( get_post_meta( get_the_ID(), 'linkUrl_vitrine_0'. $comp, true ) ); ?>">
-								<?php echo ( get_post_meta( get_the_ID(), 'linkText_vitrine_0'. $comp, true ) ); ?>
-							</a>
-						</div>
-					</span>	
-				<?
-				}
-				?>
-							
-			</div>
-		</div>
-		<div class="cl cl_desk_1 point_comp03" style="visibility: <?php echo  $visibility; ?>; "></div>
-		<div class="cl cl_desk_1 blank"></div>
-		<div class="cl cl_desk_1 blank"></div>
-			<?php 
-				$comp = 7;
-				$onOff = ( get_post_meta( get_the_ID(), 'onOff_vitrine_0'. $comp, true ) );
-				if ( $onOff == 'on' ) { $visibility = "inherit"; } else {  $visibility = "hidden"; };
-			?>
-		<div class="cl cl_desk_1 point_comp04" style="visibility: <?php echo  $visibility; ?>; "></div>
-		<div class="cl cl_desk_4 comp04">
-			<div class="component comp_right" style="visibility: <?php echo  $visibility; ?>; "> 
-				<?php if ( $onOff == 'on') {
-				?>
-					<span class="component_content">
-						<span class="component_title">
-							<?php echo ( get_post_meta( get_the_ID(), 'title_vitrine_0'. $comp, true ) ); ?>
-						</span>
-						<span class="component_text">
-							<?php echo ( get_post_meta( get_the_ID(), 'text_vitrine_0'. $comp, true ) ); ?>
-						</span>
-						<div class="component_link seta-direita">
-							<?php
-								$linkTarget = ( get_post_meta( get_the_ID(), 'linkTarget_vitrine_0'. $comp, true ) );
-								if ( $linkTarget == 'on' ) { $target = "_blank"; } else {  $target = "_self"; };
-							?>
-							<a target="<?php echo $target; ?>" href="<?php echo ( get_post_meta( get_the_ID(), 'linkUrl_vitrine_0'. $comp, true ) ); ?>">
-								<?php echo ( get_post_meta( get_the_ID(), 'linkText_vitrine_0'. $comp, true ) ); ?>
-							</a>
-						</div>
-					</span>	
-					<span class="component_icon">
-						<img src="<?php echo plugin_dir_url( __FILE__ ); ?>../icones/<?php echo esc_html( get_post_meta( get_the_ID(), 'icon_vitrine_0'. $comp, true ) ); ?>.png" />
-					</span>
-				<?
-				}
-				?>
-							
-			</div>
-		</div>
-	</div>
-	<div class="row">
-		<div class="cl cl_desk_4 comp05">
-			<?php 
-				$comp = 8;
-				$onOff = ( get_post_meta( get_the_ID(), 'onOff_vitrine_0'. $comp, true ) );
-				if ( $onOff == 'on' ) { $visibility = "inherit"; } else {  $visibility = "hidden"; };
-			?>
-			<div class="component comp_left" style="visibility: <?php echo  $visibility; ?>; "> 
-				<?php if ( $onOff == 'on') {
-				?>
-					<span class="component_icon">
-						<img src="<?php echo plugin_dir_url( __FILE__ ); ?>../icones/<?php echo esc_html( get_post_meta( get_the_ID(), 'icon_vitrine_0'. $comp, true ) ); ?>.png" />
-					</span>
-					<span class="component_content">
-						<span class="component_title">
-							<?php echo ( get_post_meta( get_the_ID(), 'title_vitrine_0'. $comp, true ) ); ?>
-						</span>
-						<span class="component_text">
-							<?php echo ( get_post_meta( get_the_ID(), 'text_vitrine_0'. $comp, true ) ); ?>
-						</span>
-						<div class="component_link seta-direita">
-							<?php
-								$linkTarget = ( get_post_meta( get_the_ID(), 'linkTarget_vitrine_0'. $comp, true ) );
-								if ( $linkTarget == 'on' ) { $target = "_blank"; } else {  $target = "_self"; };
-							?>
-							<a target="<?php echo $target; ?>" href="<?php echo ( get_post_meta( get_the_ID(), 'linkUrl_vitrine_0'. $comp, true ) ); ?>">
-								<?php echo ( get_post_meta( get_the_ID(), 'linkText_vitrine_0'. $comp, true ) ); ?>
-							</a>
-						</div>
-					</span>	
-				<?
-				}
-				?>
-							
-			</div>
-		</div>
-		<div class="cl cl_desk_1 point_comp05" style="visibility: <?php echo  $visibility; ?>; "></div>
-		<div class="cl cl_desk_1 blank"></div>
-		<div class="cl cl_desk_1 blank"></div>
-			<?php 
-				$comp = 6;
-				$onOff = ( get_post_meta( get_the_ID(), 'onOff_vitrine_0'. $comp, true ) );
-				if ( $onOff == 'on' ) { $visibility = "inherit"; } else {  $visibility = "hidden"; };
-			?>
-		<div class="cl cl_desk_1 point_comp06" style="visibility: <?php echo  $visibility; ?>; "></div>
-		<div class="cl cl_desk_4 comp06">
-			<div class="component comp_right" style="visibility: <?php echo  $visibility; ?>; "> 
-				<?php if ( $onOff == 'on') {
-				?>
-					<span class="component_content">
-						<span class="component_title">
-							<?php echo ( get_post_meta( get_the_ID(), 'title_vitrine_0'. $comp, true ) ); ?>
-						</span>
-						<span class="component_text">
-							<?php echo ( get_post_meta( get_the_ID(), 'text_vitrine_0'. $comp, true ) ); ?>
-						</span>
-						<div class="component_link seta-direita">
-							<?php
-								$linkTarget = ( get_post_meta( get_the_ID(), 'linkTarget_vitrine_0'. $comp, true ) );
-								if ( $linkTarget == 'on' ) { $target = "_blank"; } else {  $target = "_self"; };
-							?>
-							<a target="<?php echo $target; ?>" href="<?php echo ( get_post_meta( get_the_ID(), 'linkUrl_vitrine_0'. $comp, true ) ); ?>">
-								<?php echo ( get_post_meta( get_the_ID(), 'linkText_vitrine_0'. $comp, true ) ); ?>
-							</a>
-						</div>
-					</span>	
-					<span class="component_icon">
-						<img src="<?php echo plugin_dir_url( __FILE__ ); ?>../icones/<?php echo esc_html( get_post_meta( get_the_ID(), 'icon_vitrine_0'. $comp, true ) ); ?>.png" />
-					</span>
-				<?
-				}
-				?>
-							
-			</div>
-		</div>
-	</div>
-	<div class="row">
-		<div class="cl cl_desk_5 comp07">
-			<?php 
-				$comp = 3;
-				$onOff = ( get_post_meta( get_the_ID(), 'onOff_vitrine_0'. $comp, true ) );
-				if ( $onOff == 'on' ) { $visibility = "inherit"; } else {  $visibility = "hidden"; };
-			?>
-			<div class="component comp_left" style="visibility: <?php echo  $visibility; ?>; "> 
-				<?php if ( $onOff == 'on') {
-				?>
-					<span class="component_icon">
-						<img src="<?php echo plugin_dir_url( __FILE__ ); ?>../icones/<?php echo esc_html( get_post_meta( get_the_ID(), 'icon_vitrine_0'. $comp, true ) ); ?>.png" />
-					</span>
-					<span class="component_content">
-						<span class="component_title">
-							<?php echo ( get_post_meta( get_the_ID(), 'title_vitrine_0'. $comp, true ) ); ?>
-						</span>
-						<span class="component_text">
-							<?php echo ( get_post_meta( get_the_ID(), 'text_vitrine_0'. $comp, true ) ); ?>
-						</span>
-						<div class="component_link seta-direita">
-							<?php
-								$linkTarget = ( get_post_meta( get_the_ID(), 'linkTarget_vitrine_0'. $comp, true ) );
-								if ( $linkTarget == 'on' ) { $target = "_blank"; } else {  $target = "_self"; };
-							?>
-							<a target="<?php echo $target; ?>" href="<?php echo ( get_post_meta( get_the_ID(), 'linkUrl_vitrine_0'. $comp, true ) ); ?>">
-								<?php echo ( get_post_meta( get_the_ID(), 'linkText_vitrine_0'. $comp, true ) ); ?>
-							</a>
-						</div>
-					</span>	
-				<?
-				}
-				?>
-							
-			</div>
-		</div>
-		<div class="cl cl_desk_1 point_comp07" style="visibility: <?php echo  $visibility; ?>; "></div>
-			<?php 
-				$comp = 4;
-				$onOff = ( get_post_meta( get_the_ID(), 'onOff_vitrine_0'. $comp, true ) );
-				if ( $onOff == 'on' ) { $visibility = "inherit"; } else {  $visibility = "hidden"; };
-			?>
-		<div class="cl cl_desk_1 point_comp08" style="visibility: <?php echo  $visibility; ?>; "></div>
-		<div class="cl cl_desk_5 comp08">
-			<div class="component comp_right" style="visibility: <?php echo  $visibility; ?>; "> 
-				<?php if ( $onOff == 'on') {
-				?>
-					<span class="component_content">
-						<span class="component_title">
-							<?php echo ( get_post_meta( get_the_ID(), 'title_vitrine_0'. $comp, true ) ); ?>
-						</span>
-						<span class="component_text">
-							<?php echo ( get_post_meta( get_the_ID(), 'text_vitrine_0'. $comp, true ) ); ?>
-						</span>
-						<div class="component_link seta-direita">
-							<?php
-								$linkTarget = ( get_post_meta( get_the_ID(), 'linkTarget_vitrine_0'. $comp, true ) );
-								if ( $linkTarget == 'on' ) { $target = "_blank"; } else {  $target = "_self"; };
-							?>
-							<a target="<?php echo $target; ?>" href="<?php echo ( get_post_meta( get_the_ID(), 'linkUrl_vitrine_0'. $comp, true ) ); ?>">
-								<?php echo ( get_post_meta( get_the_ID(), 'linkText_vitrine_0'. $comp, true ) ); ?>
-							</a>
-						</div>
-					</span>	
-					<span class="component_icon">
-						<img src="<?php echo plugin_dir_url( __FILE__ ); ?>../icones/<?php echo esc_html( get_post_meta( get_the_ID(), 'icon_vitrine_0'. $comp, true ) ); ?>.png" />
-					</span>
-				<?
-				}
-				?>
-							
-			</div>
-		</div>
-	</div>
-	<div class="spacer"></div>
+<div class="dateBox">
+	<?php 
+		$dataA = esc_html (get_post_meta( get_the_ID(), "data", true ) );
+		$data = new DateTime($dataA);
+	?>
+	<span>Conteúdo atualizado em: <?php echo $data->format('d/m/Y'); ?></span>
 </div>
+<?php 
+	$countBoxes = 0;
+	for ($boxes=1; $boxes<=8; $boxes ++) {
+		$onOff = ( get_post_meta( get_the_ID(), 'onOff_vitrine_0'. $boxes, true ) );
+		if ( $onOff == 'on' ) { 
+			$countBoxes ++; }
+			else {  
+			};
+	}
+	//echo $countBoxes;
+	include ("vitrinelayout".$countBoxes.".php");
+?>
+
       
 <div class="entry">
 	<?php the_content(); ?>
 </div>
-    
+<div class="vitrinebyform">
+	<?php include ("form-vitrine.php"); ?>
+</div>    
     
 </div>
 <?php endwhile; else: ?>
