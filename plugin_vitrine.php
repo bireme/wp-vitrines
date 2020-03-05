@@ -353,7 +353,7 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
 			<div class="row">
 				<div class="col-100">
 					<div class="helper">
-						<i class="fas fa-info-circle"></i> <?php _e( 'Add the Embed code for the graphic element, you can also add text if necessary.', 'wp-vitrines-master' ) ?>', 'wp-vitrines-master' ) ?>
+						<i class="fas fa-info-circle"></i> <?php _e( 'Add the Embed code for the graphic element, you can also add text if necessary.', 'wp-vitrines-master' ) ?>
 					</div>
 				</div>
 			</div>
@@ -634,7 +634,7 @@ function display_post_vitrine_meta_box( $post_vitrine ) {
 		 });
 	</script>
 	<div class="vitrine_description">
-		<p><?php echo esc_html( __( "In the fields below we can create the highlighted components of the Window, at least 4 and at most 8 components, the system will organize the best display of the highlighted components and  images.", 'plugin_vitrine' ) ); ?></p>
+		<p><?php echo esc_html( __( "In the fields below we can create the highlighted components of the Window, at least 4 and at most 8 components, the system will organize the best display of the highlighted components and  images.", 'wp-vitrines-master' ) ); ?></p>
 	</div>
 	<?php
 		for ($metaboxID=1; $metaboxID<=8; $metaboxID ++) { //abre o loop dos componentes 

@@ -52,6 +52,9 @@
 	margin: 0.1%;
 }
 
+.contentHighlight {
+	display: inline-block;
+}
 
 .component {
 	border-radius: 10px;
