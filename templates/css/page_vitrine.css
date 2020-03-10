@@ -20,7 +20,9 @@
 	padding: 1%;
 	margin-top: 40px;
 }
-
+.tableauPlaceholder {
+	margin: 0px -20px;
+}
 .cl {
 	float: left;
 	height: 125px;

@@ -50,6 +50,20 @@ function create_post_vitrine() {
         )
     );
 }
+// remove quick edit for custom post type
+// not needed if  Title is removed
+
+add_filter( 'post_row_actions', 'remove_row_actions', 10, 2 );
+
+function remove_row_actions( $unset_actions, $post ) {
+  global $current_screen;
+
+	if ( $current_screen->post_type != 'post_vitrines' ) return $unset_actions;
+  	unset( $unset_actions[ 'inline hide-if-no-js' ] );
+
+	return $unset_actions;
+}
+// edn of remove quick edit for custom post type
 
 add_action( 'admin_init', 'my_admin' );
 
@@ -93,8 +107,9 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
 			//	Start Looop Infográficos 01 até 6
 			for ($number_of_infographics=1; $number_of_infographics<=6; $number_of_infographics ++) {
 				${'title_infografico_0'.$number_of_infographics} = esc_html (get_post_meta( $post_vitrine->ID, "title_infografico_0".$number_of_infographics, true ) );
-				${'code_infografico_0'.$number_of_infographics} = esc_html (get_post_meta( $post_vitrine->ID, "code_infografico_0".$number_of_infographics, true ) );
-				${'text_infografico_0'.$number_of_infographics} = esc_html (get_post_meta( $post_vitrine->ID, "text_infografico_0".$number_of_infographics, true ) );
+				//${'code_infografico_0'.$number_of_infographics} = esc_html (get_post_meta( $post_vitrine->ID, "code_infografico_0".$number_of_infographics, true ) );
+				//${'text_infografico_0'.$number_of_infographics} = esc_html (get_post_meta( $post_vitrine->ID, "text_infografico_0".$number_of_infographics, true ) );
+				${'text_infografico_0'.$number_of_infographics} = get_post_meta( $post_vitrine->ID, "text_infografico_0".$number_of_infographics, true );
 				${'basic_vitrine_infografico_color_0'.$number_of_infographics} = esc_html (get_post_meta( $post_vitrine->ID, "basic_vitrine_infografico_color_0".$number_of_infographics, true ) );
 				${'basic_vitrine_infografico_id_0'.$number_of_infographics} = esc_html (get_post_meta( $post_vitrine->ID, "basic_vitrine_infografico_id_0".$number_of_infographics, true ) );
 				${'basic_vitrine_infografico_bg_0'.$number_of_infographics} = esc_html (get_post_meta( $post_vitrine->ID, "basic_vitrine_infografico_bg_0".$number_of_infographics, true ) );
@@ -377,12 +392,16 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
 						<input type="text" class="title_infografico input100" name="title_infografico_0<?php echo $number_of_infographics; ?>" value="<?php echo ${'title_infografico_0'.$number_of_infographics}; ?>" />	<br>
 						<?php 
 							$content   = html_entity_decode(${'text_infografico_0'.$number_of_infographics}); 
+							//$content_html   = htmlspecialchars(${'text_infografico_0'.$number_of_infographics}); 
+							//$content = html_entity_decode($content_html);
+							//$content   = ${'text_infografico_0'.$number_of_infographics}; 
 							$editor_id = 'text_infografico_0' . $number_of_infographics;
 							$settings  = array( 
 								'media_buttons' => true,
-								'wpautop'=> true,
+								'wpautop'=> false,
+								'default_editor'=> false,
 								'editor_height' => 100
-							);
+							);	
 							wp_editor($content, $editor_id, $settings);
 						?>
 					</div>
@@ -1322,7 +1341,7 @@ function add_post_vitrine_fields( $post_vitrine_id, $post_vitrine ) {
 			update_post_meta( $post_vitrine_id, 'infographic_collumns', $_POST['infographic_collumns'] );
 			for ($number_of_infographics=1; $number_of_infographics<=6; $number_of_infographics ++) { //abre o loop de update dos componentes
 				update_post_meta( $post_vitrine_id, 'title_infografico_0' . $number_of_infographics, $_POST['title_infografico_0' . $number_of_infographics] );
-				update_post_meta( $post_vitrine_id, 'code_infografico_0' . $number_of_infographics, $_POST['code_infografico_0' . $number_of_infographics] );
+				//update_post_meta( $post_vitrine_id, 'code_infografico_0' . $number_of_infographics, $_POST['code_infografico_0' . $number_of_infographics] );
 				update_post_meta( $post_vitrine_id, 'text_infografico_0' . $number_of_infographics, $_POST['text_infografico_0' . $number_of_infographics] );
 				update_post_meta( $post_vitrine_id, 'basic_vitrine_infografico_color_0' . $number_of_infographics, $_POST['basic_vitrine_infografico_color_0' . $number_of_infographics] );
 				update_post_meta( $post_vitrine_id, 'basic_vitrine_infografico_bg_0' . $number_of_infographics, $_POST['basic_vitrine_infografico_bg_0' . $number_of_infographics] );

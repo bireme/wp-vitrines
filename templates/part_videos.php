@@ -38,7 +38,7 @@
 		<?php if (!empty($more_videos)) {
 		?>
 			<div class="row morevideos">
-				<span class=""><a style="<?php if (isset($fontcolor)) { echo " color: $fontcolor !important;"; };?>" href="<?php echo $video ?>">Mais vídeos</a></span>
+				<span class=""><a style="<?php if (isset($fontcolor)) { echo " color: $fontcolor !important;"; };?>" href="<?php echo $more_videos ?>">Mais vídeos</a></span>
 			</div>
 		<?php
 		};?>
