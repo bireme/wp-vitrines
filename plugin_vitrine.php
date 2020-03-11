@@ -218,10 +218,11 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
 					$content   = html_entity_decode($basic_vitrine_presentation); 
 					$editor_id = 'basic_vitrine_presentation';
 					$settings  = array( 
-						'media_buttons' => true ,
-						'wpautop'=> true,
+						'media_buttons' => true,
+						'wpautop'=> false,
+						'default_editor'=> false,
 						'editor_height' => 100
-					 );
+					);	
 					wp_editor($content, $editor_id, $settings);
 				?>
 				</div>
@@ -301,10 +302,11 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
 						$content   = html_entity_decode(${'basic_vitrine_content_0'.$number_of_fields}); 
 						$editor_id = 'basic_vitrine_content_0' . $number_of_fields;
 						$settings  = array( 
-							'media_buttons' => true,
-							'wpautop'=> true,
-							'editor_height' => 100
-						);
+								'media_buttons' => true,
+								'wpautop'=> false,
+								'default_editor'=> false,
+								'editor_height' => 100
+							);	
 						wp_editor($content, $editor_id, $settings);
 					?>
 				</div>
@@ -401,7 +403,7 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
 								'wpautop'=> false,
 								'default_editor'=> false,
 								'editor_height' => 100
-							);	
+							);		
 							wp_editor($content, $editor_id, $settings);
 						?>
 					</div>
@@ -535,10 +537,11 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
 						$content   = html_entity_decode(${'texts_vitrine_content_0'.$number_of_texts}); 
 						$editor_id = 'texts_vitrine_content_0' . $number_of_texts;
 						$settings  = array( 
-							'media_buttons' => true,
-							'wpautop'=> true,
-							'editor_height' => 100
-						);
+								'media_buttons' => true,
+								'wpautop'=> false,
+								'default_editor'=> false,
+								'editor_height' => 100
+							);	
 						wp_editor($content, $editor_id, $settings);
 					?>
 				</div>
@@ -602,9 +605,10 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
 							$editor_id = 'responsibility';
 							$settings  = array( 
 								'media_buttons' => true,
-								'wpautop'=> true,
+								'wpautop'=> false,
+								'default_editor'=> false,
 								'editor_height' => 100
-							);
+							);	
 							wp_editor($content, $editor_id, $settings);
 						?>
 			</div>
@@ -737,10 +741,11 @@ function display_post_vitrine_meta_box( $post_vitrine ) {
 						$content   = html_entity_decode(${"vitrine_text_0$metaboxID"}); 
 						$editor_id = 'text_0'. $metaboxID .'_vitrine';
 						$settings  = array( 
-							'media_buttons' => true,
-							'wpautop'=> true,
-							'editor_height' => 100
-						);
+								'media_buttons' => true,
+								'wpautop'=> false,
+								'default_editor'=> false,
+								'editor_height' => 100
+							);	
 						wp_editor($content, $editor_id, $settings);
 					?>
 					
