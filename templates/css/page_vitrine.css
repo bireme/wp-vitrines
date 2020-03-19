@@ -429,87 +429,6 @@ div.comp08 {
     100% {left:0px; top:0px;}
 }
 
-
-@media screen and (max-width: 990px) {
-	.container {
-		width: 100% !important;
-		min-width: 100px !important;
-	}
-	.tableauPlaceholder {
-		display: none !important;
-	}
-	.cl_desk_1,
-	.cl_desk_2,
-	.cl_desk_3,
-	.cl_desk_4,
-	.cl_desk_5,
-	.cl_desk_6,
-	.cl_desk_7,
-	.cl_desk_8,
-	.cl_desk_9,
-	.cl_desk_10,
-	.cl_desk_11,
-	.cl_desk_12 {
-		float: left;
-		width: 48%;
-	}
-	.row {
-		width: 100%;
-	}
-	.cl_desk_1 {
-		display: none;
-	}
-	.component {
-		height: auto;
-	}
-	.component_content {
-		width: 70% !important;
-		display: block;
-	}
-	.component_icon { 
-		width: 20% !important;
-	}
-	
-	.image_background {
-		border: none;
-		width: 100%;
-		position: relative;
-		display: inline-block;
-		margin: 0px;
-		border-radius: 0%;
-	}
-	
-	.vitrine .mobile {
-		display: block;
-	}
-	.vitrine {
-		display: inline-block;
-	}
-	.vitrine .vitrineTitle h2 {
-		font-size: 25px;
-	}	
-
-}
-
-@media screen and (max-width: 560px) {
-	.cl_desk_1,
-	.cl_desk_2,
-	.cl_desk_22,
-	.cl_desk_3,
-	.cl_desk_4,
-	.cl_desk_44,
-	.cl_desk_5,
-	.cl_desk_6,
-	.cl_desk_7,
-	.cl_desk_8,
-	.cl_desk_9,
-	.cl_desk_10,
-	.cl_desk_11,
-	.cl_desk_12 {
-		float: left;
-		width: 98%;
-	}
-}
  /* LAYOUT VITRINE COM 1 COMPONENTE*/
 	.vitrine_layout.boxes_1 {
 		height: 320px;
@@ -806,4 +725,104 @@ div.comp08 {
 
 .icoimage{
 	font-size: 10px;
+}
+
+@media screen and (max-width: 990px) {
+	.container {
+		width: 100% !important;
+		min-width: 100px !important;
+	}
+	.vitrine_layout {
+		margin-top: 0px;
+	}
+	.tableauPlaceholder {
+		display: inline-block;
+		width: 100% !important;
+		height: 30px !important;
+		position: inherit !important;
+		margin: 10px;
+		text-align: center;
+	}
+	.tableauPlaceholder iframe {
+		display: none !important;
+	}
+	.tableauPlaceholder div {
+		display: none !important;
+	}
+	.tableauPlaceholder:before {
+		content: "Tableau not display in mobile devices"; 
+		display: block !important;
+	}
+	.cl_desk_1,
+	.cl_desk_2,
+	.cl_desk_3,
+	.cl_desk_4,
+	.cl_desk_5,
+	.cl_desk_6,
+	.cl_desk_7,
+	.cl_desk_8,
+	.cl_desk_9,
+	.cl_desk_10,
+	.cl_desk_11,
+	.cl_desk_12 {
+		float: left;
+		width: 98% !important;
+	}
+	.row {
+		width: 100%;
+	}
+	.cl_desk_1 {
+		display: none;
+	}
+	.component {
+		height: auto;
+	}
+	.component_content {
+		width: 70% !important;
+		display: block;
+	}
+	.component_icon { 
+		width: 20% !important;
+	}
+	
+	.image_background {
+		border: none;
+		width: 100%;
+		position: relative;
+		display: inline-block;
+		margin: 0px !important;
+		border-radius: 0%;
+	}
+	
+	.vitrine .mobile {
+		display: block;
+	}
+	.vitrine {
+		display: inline-block;
+	}
+	.vitrine .vitrineTitle h2 {
+		font-size: 25px;
+	}
+	.checkDIV, .infographics_flex, .videos_2, .videos_3 {
+		display: inline !important;
+	}
+	.highlightBox, .infographicBox, .textsBox {
+		display: inline-table !important;
+		padding: 0px !important;
+	}
+	.contentvideos {
+		width: 100% !important;
+	}
+	.contentvideos {
+		padding: 10px 0px 0px 0px !important;
+	}
+	.vitrinebyform h2 {
+		margin: 10px !important;
+	}
+	.contentHighlight, .video-player, .contenttexts {
+		margin: 10px !important;
+	}
+	.contentinfographic {
+		padding: 10px !important;
+	}
 }
