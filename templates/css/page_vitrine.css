@@ -771,7 +771,7 @@ div.comp08 {
 	.row {
 		width: 100%;
 	}
-	.cl_desk_1 {
+	.cl_desk_1, .mobile_none {
 		display: none;
 	}
 	.component {

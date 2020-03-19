@@ -12,7 +12,7 @@
 				<?php include ("component_content.php"); ?>	
 			</div>
 		</div>
-		<div class="cl cl_desk_2" style="visibility: <?php echo  $visibility; ?>; ">
+		<div class="cl cl_desk_2 mobile_none" style="visibility: <?php echo  $visibility; ?>; ">
 		<svg class="lines horizontal lineleft" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="20mm" height="1mm" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
 		viewBox="0 0 1333.33 66.67"
 		 xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -28,7 +28,7 @@
 				$onOff = ( get_post_meta( get_the_ID(), 'onOff_vitrine_0'. $comp, true ) );
 				if ( $onOff == 'on' ) { $visibility = "inherit"; } else {  $visibility = "hidden"; };
 		?>
-		<div class="cl cl_desk_2" style="visibility: <?php echo  $visibility; ?>; ">
+		<div class="cl cl_desk_2 mobile_none" style="visibility: <?php echo  $visibility; ?>; ">
 		<svg class="lines horizontal h06 lineright" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="20mm" height="1mm" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
 		viewBox="0 0 1333.33 66.67"
 		 xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -56,7 +56,7 @@
 				<?php include ("component_content.php"); ?>	
 			</div>
 		</div>
-		<div class="cl cl_desk_1" style="visibility: <?php echo  $visibility; ?>; ">
+		<div class="cl cl_desk_1 mobile_none" style="visibility: <?php echo  $visibility; ?>; ">
 		<svg class="lines horizontal lineleft" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="20mm" height="1mm" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
 		viewBox="0 0 1333.33 66.67"
 		 xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -74,7 +74,7 @@
 				$onOff = ( get_post_meta( get_the_ID(), 'onOff_vitrine_0'. $comp, true ) );
 				if ( $onOff == 'on' ) { $visibility = "inherit"; } else {  $visibility = "hidden"; };
 			?>
-		<div class="cl cl_desk_1" style="visibility: <?php echo  $visibility; ?>; ">
+		<div class="cl cl_desk_1 mobile_none" style="visibility: <?php echo  $visibility; ?>; ">
 		<svg class="lines horizontal lineright" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="20mm" height="1mm" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
 		viewBox="0 0 1333.33 66.67"
 		 xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -102,7 +102,7 @@
 				<?php include ("component_content.php"); ?>	
 			</div>
 		</div>
-		<div class="cl cl_desk_2">
+		<div class="cl cl_desk_2 mobile_none">
 		<svg class="lines horizontal lineleft" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="20mm" height="1mm" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
 		viewBox="0 0 1333.33 66.67"
 		 xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -113,7 +113,7 @@
 		</svg>
 
 		</div>
-		<div class="cl cl_desk_2">
+		<div class="cl cl_desk_2 mobile_none">
 		<svg class="lines horizontal lineright" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="20mm" height="1mm" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
 		viewBox="0 0 1333.33 66.67"
 		 xmlns:xlink="http://www.w3.org/1999/xlink">
