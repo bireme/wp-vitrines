@@ -25,3 +25,7 @@ Foi testado com Page Builder by SiteOrigin 2.6.2 e SiteOrigin Widgets Bundle v 1
 ## Autor
 
 * **Ricardo de Castro** - *Consultor WordPress* - BIREME | OPAS | OMS - 2020
+
+## Manual de uso
+Português
+* http://red.bvsalud.org/vitrines-do-conhecimento/
