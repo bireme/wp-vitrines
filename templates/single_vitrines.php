@@ -5,6 +5,7 @@
 get_header();
 //$template_path = plugin_dir_path( __FILE__ ) . '/templates/single_vitrines.php'
 wp_enqueue_style ('theme-style', plugin_dir_url( __FILE__ ) .'css/page_vitrine.css');
+$current_language = strtolower(get_bloginfo('language'));
 $site_lang = substr($current_language, 0,2);
 
 if ( defined( 'POLYLANG_VERSION' ) ) {
