@@ -601,14 +601,14 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
 		<div class="row">
 			<div class="col-100">
 						<?php 
-							$content   = html_entity_decode($responsibility); 
+							$content   = html_entity_decode($responsibility, ENT_COMPAT, 'UTF-8');
 							$editor_id = 'responsibility';
-							$settings  = array( 
+							$settings  = array(
 								'media_buttons' => true,
 								'wpautop'=> false,
 								'default_editor'=> false,
 								'editor_height' => 100
-							);	
+							);
 							wp_editor($content, $editor_id, $settings);
 						?>
 			</div>
