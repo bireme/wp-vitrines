@@ -9,8 +9,12 @@ Text Domain: wp-vitrines-master
 Domain Path: /languages
 License:  .
 _e( 'TEXTO', 'wp-vitrines-master' );
-
 */
+
+define( 'WP_VITRINES_PLUGIN_PATH',  plugin_dir_path(__FILE__) );
+
+require_once(WP_VITRINES_PLUGIN_PATH . '/settings.php');
+require_once(WP_VITRINES_PLUGIN_PATH . '/plugin_functions.php');
 
 add_thickbox();
 
@@ -19,7 +23,6 @@ add_action( 'plugins_loaded', 'myplugin_load_textdomain' );
 function myplugin_load_textdomain() {
     load_plugin_textdomain( 'wp-vitrines-master', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 }
-
 
 add_action( 'init', 'create_post_vitrine' );
 
@@ -456,18 +459,18 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
 				<div class="row">
 					<div class="col-30">
 						<label><?php _e( 'Video Code', 'wp-vitrines-master' ) ?> 01:</label><br>
-						<input type="text" class="video_01 input100" name="video_01" value="<?php echo $video_01; ?>" />	<br>
-						<img src="https://img.youtube.com/vi/<?php echo $video_01; ?>/default.jpg"><br>
+						<input type="url" class="video_01 input100" name="video_01" value="<?php echo $video_01; ?>" />	<br>
+						<img src="https://img.youtube.com/vi/<?php echo get_video_code($video_01); ?>/default.jpg"><br>
 					</div>
 					<div class="col-30">
 						<label><?php _e( 'Video Code', 'wp-vitrines-master' ) ?> 02:</label><br>
-						<input type="text" class="video_02 input100" name="video_02" value="<?php echo $video_02; ?>" />	<br>
-						<img src="https://img.youtube.com/vi/<?php echo $video_02; ?>/default.jpg"><br>
+						<input type="url" class="video_02 input100" name="video_02" value="<?php echo $video_02; ?>" />	<br>
+						<img src="https://img.youtube.com/vi/<?php echo get_video_code($video_02); ?>/default.jpg"><br>
 					</div>
 					<div class="col-30">
 						<label><?php _e( 'Video Code', 'wp-vitrines-master' ) ?> 03:</label><br>
-						<input type="text" class="video_03 input100" name="video_03" value="<?php echo $video_03; ?>" />	<br>
-							<img src="https://img.youtube.com/vi/<?php echo $video_03; ?>/default.jpg"><br>
+						<input type="url" class="video_03 input100" name="video_03" value="<?php echo $video_03; ?>" />	<br>
+							<img src="https://img.youtube.com/vi/<?php echo get_video_code($video_03); ?>/default.jpg"><br>
 					</div>
 				</div>
 				<div class="spacer"></div>
@@ -1328,7 +1331,7 @@ function display_order_meta_box( $post_vitrine ) {
 
 <?php
 
- add_action( 'save_post', 'add_post_vitrine_fields', 10, 2 );
+add_action( 'save_post', 'add_post_vitrine_fields', 10, 2 );
 
 function add_post_vitrine_fields( $post_vitrine_id, $post_vitrine ) {
     // Check post type for post_vitrines
@@ -1454,8 +1457,6 @@ if (function_exists('add_theme_support')) {
 	add_image_size('vitrine_highlight', 225, 140, true);
 }
 load_plugin_textdomain( 'vitrine_conhecimento_bvs', false, basename( dirname( __FILE__ ) ) . '/languages' );
-
-require_once(plugin_dir_path(__FILE__) . '/settings.php');
 
 function admin_menu() {
     add_submenu_page( 'options-general.php', __('WP-Vitrines Settings', 'wp-vitrines-master'), __('WP-Vitrines', 'wp-vitrines-master'), 'manage_options', 'wp-vitrines', 'wp_vitrines_page_admin');
