@@ -450,7 +450,7 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
 			<div class="col-100">
 				<div class="helper">
 					<i class="fas fa-info-circle"></i> 
-					<?php _e( 'Include 1 to 3 Youtube videos. Use the video code. Ex: "VyzucTwkrCI" for the video: https://www.youtube.com/watch?v=VyzucTwkrCI', 'wp-vitrines-master' ) ?>
+					<?php _e( 'Include 1 to 3 Youtube videos. Use the video URL. Ex: https://www.youtube.com/watch?v=VyzucTwkrCI or https://youtu.be/VyzucTwkrCI', 'wp-vitrines-master' ) ?>
 					</div>
 			</div>
 		</div>
