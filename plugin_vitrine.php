@@ -120,6 +120,7 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
 		$video_02 = esc_html (get_post_meta( $post_vitrine->ID, "video_02", true ) );
 		$video_03 = esc_html (get_post_meta( $post_vitrine->ID, "video_03", true ) );
 		$more_videos = esc_html (get_post_meta( $post_vitrine->ID, "more_videos", true ) );
+		$more_videos_target = esc_html (get_post_meta( $post_vitrine->ID, "more_videos_target", true ) );
 		$videos_id = esc_html (get_post_meta( $post_vitrine->ID, "videos_id", true ) );
 		$videos_color = esc_html (get_post_meta( $post_vitrine->ID, "videos_color", true ) );
 		$videos_bg = esc_html (get_post_meta( $post_vitrine->ID, "videos_bg", true ) );
@@ -471,8 +472,14 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
 				</div>
 				<div class="spacer"></div>
 				<div class="row">
-					<label><?php _e( 'URL for link See more', 'wp-vitrines-master' ) ?>: </label><br>
-					<input type="text" class="more_videos input100" name="more_videos" value="<?php echo $more_videos; ?>" />	<br>
+					<div class="col-60">
+						<label><?php _e( 'URL for link See more', 'wp-vitrines-master' ) ?>: </label><br>
+						<input type="text" class="more_videos input100" name="more_videos" value="<?php echo $more_videos; ?>" /><br>
+					</div>
+					<div class="col-30">
+						<label><?php _e( 'Open in new window', 'wp-vitrines-master' ) ?>?: </label><br>
+						<input type="checkbox" name="more_videos_target" id="more_videos_target" <?php echo ( $more_videos_target ) ? 'checked' : ''; ?> /><br>
+					</div>
 				</div>
 			</div>
 			<div class="col-20">
@@ -1357,6 +1364,7 @@ function add_post_vitrine_fields( $post_vitrine_id, $post_vitrine ) {
 			update_post_meta( $post_vitrine_id, 'video_02', $_POST['video_02'] );
 			update_post_meta( $post_vitrine_id, 'video_03', $_POST['video_03'] );
 			update_post_meta( $post_vitrine_id, 'more_videos', $_POST['more_videos'] );
+			update_post_meta( $post_vitrine_id, 'more_videos_target', $_POST['more_videos_target'] );
 			update_post_meta( $post_vitrine_id, 'videos_bg', $_POST['videos_bg'] );
 			update_post_meta( $post_vitrine_id, 'videos_color', $_POST['videos_color'] );
 			update_post_meta( $post_vitrine_id, 'videos_id', $_POST['videos_id'] );

@@ -14,6 +14,7 @@
 	$bgcolor = (get_post_meta( get_the_ID(), 'videos_bg', true ) );
 	$id = (get_post_meta( get_the_ID(), 'videos_id', true ) );
 	$more_videos = (get_post_meta( get_the_ID(), 'more_videos', true ) );
+	$more_videos_target = (get_post_meta( get_the_ID(), 'more_videos_target', true ) );
 ?>
 <div class="videos row <?php echo $videos ?>_videos" id="<?php if (empty($id)) { echo 'videos'; } else { echo $id; }; ?>" style="<?php if (isset($bgcolor)) { echo "background-color: $bgcolor !important;"; }; if (isset($fontcolor)) { echo " color: $fontcolor !important;"; };?>">
 			
@@ -38,7 +39,7 @@
 		<?php if (!empty($more_videos)) {
 		?>
 			<div class="row morevideos">
-				<span class=""><a style="<?php if (isset($fontcolor)) { echo " color: $fontcolor !important;"; };?>" href="<?php echo $more_videos ?>">Mais vídeos</a></span>
+				<span class=""><a style="<?php if (isset($fontcolor)) { echo " color: $fontcolor !important;"; };?>" href="<?php echo $more_videos ?>" <?php if ( $more_videos_target ) echo 'target="_blank"'; ?>>Mais vídeos</a></span>
 			</div>
 		<?php
 		};?>
