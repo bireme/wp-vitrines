@@ -6,6 +6,8 @@
  
 get_header();
 wp_enqueue_style ('theme-style', plugin_dir_url( __FILE__ ) .'css/page_vitrine.css');
+$config = get_option('wp_vitrines_config');
+$home_url = ( $config['home_url'] ) ? $config['home_url'] : get_bloginfo('url');
 $current_language = strtolower(get_bloginfo('language'));
 $site_lang = substr($current_language, 0,2);
 
@@ -78,8 +80,7 @@ if ($site_lang == 'en') {
 	
 </style>
 <div class="middle">
-	<div class="breadcrumb"><a href="<?php bloginfo('url'); ?>/<?php echo ($site_lang);?>" title="<?php bloginfo('name'); ?>">Home</a> /  </div>
-
+	<div class="breadcrumb"><a href="<?php echo rtrim($home_url, '/'); ?>/<?php echo ($site_lang);?>" title="<?php bloginfo('name'); ?>">Home</a> /  </div>
 
 	<h2 class="storytitle"><?php echo($vitrines_title);?></h2>
 

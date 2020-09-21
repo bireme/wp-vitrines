@@ -1447,10 +1447,32 @@ function add_post_vitrine_fields( $post_vitrine_id, $post_vitrine ) {
     }
     return $template_path;
 }
+
 if (function_exists('add_theme_support')) {
-        add_theme_support('post-thumbnails');
-		add_image_size('vitrine_image', 320, 320, true);
-		add_image_size('vitrine_highlight', 225, 140, true);
-	}
+    add_theme_support('post-thumbnails');
+	add_image_size('vitrine_image', 320, 320, true);
+	add_image_size('vitrine_highlight', 225, 140, true);
+}
 load_plugin_textdomain( 'vitrine_conhecimento_bvs', false, basename( dirname( __FILE__ ) ) . '/languages' );
+
+require_once(plugin_dir_path(__FILE__) . '/settings.php');
+
+function admin_menu() {
+    add_submenu_page( 'options-general.php', __('WP-Vitrines Settings', 'wp-vitrines-master'), __('WP-Vitrines', 'wp-vitrines-master'), 'manage_options', 'wp-vitrines', 'wp_vitrines_page_admin');
+    // call register settings function
+    add_action( 'admin_init', 'register_settings' );
+}
+add_action( 'admin_menu', 'admin_menu' );
+
+function register_settings() {
+    register_setting('wp-vitrines-settings-group', 'wp_vitrines_config');
+}
+
+function settings_link($links) {
+    $settings_link = '<a href="options-general.php?page=wp-vitrines.php">Settings</a>';
+    array_unshift($links, $settings_link);
+    return $links;
+}
+add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), 'settings_link' );
+
 ?>
