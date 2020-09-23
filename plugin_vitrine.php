@@ -1174,7 +1174,7 @@ function display_order_meta_box( $post_vitrine ) {
 	$order6 = esc_html (get_post_meta( $post_vitrine->ID, "order6", true ) );
 	$order7 = esc_html (get_post_meta( $post_vitrine->ID, "order7", true ) );
 	$order8 = esc_html (get_post_meta( $post_vitrine->ID, "order8", true ) );
-	for ($metaboxID=1; $metaboxID<=8; $metaboxID ++) { //abre o loop dos componEentes
+	for ($metaboxID=1; $metaboxID<=8; $metaboxID++) { //abre o loop dos componEentes
 		${"vitrine_title_0$metaboxID"} = esc_html (get_post_meta( $post_vitrine->ID, "title_vitrine_0" . $metaboxID . "", true ) );
 	}
 ?>
@@ -1230,14 +1230,14 @@ function display_order_meta_box( $post_vitrine ) {
 			<?php
 				$boxes = 0;
 				for ($metaboxID=1; $metaboxID<=8; $metaboxID ++) { //abre o loop dos componEentes
-				$onOff = ( get_post_meta( get_the_ID(), 'onOff_vitrine_0'. $metaboxID, true ) );
-				if ( $onOff == 'on' ) { 
+					$onOff = ( get_post_meta( get_the_ID(), 'onOff_vitrine_0'. $metaboxID, true ) );
+					if ( $onOff == 'on' ) { 
 						$boxes ++;
-					}	
+					}
 				}
 				if ( $boxes >= 1 ) { 
 					$btn_on = "display: block;";
-					for ($metaboxID=1; $metaboxID<=8; $metaboxID ++) { //abre o loop dos componEentes
+					for ($metaboxID=1; $metaboxID<=8; $metaboxID++) { //abre o loop dos componEentes
 							//${"vitrine_title_0$metaboxID"} = esc_html (get_post_meta( $post_vitrine->ID, "title_vitrine_0" . $metaboxID . "", true ) );
 							?>
 							<?php
@@ -1245,7 +1245,7 @@ function display_order_meta_box( $post_vitrine ) {
 							${"item_$metaboxID"} = substr(${"order$metaboxID"}, -1);
 							$value = ${"item_$metaboxID"};
 							$title = esc_html (get_post_meta( $post_vitrine->ID, "title_vitrine_0" . $value . "", true ) );
-							?><li alt="ALT" title="´<?php echo $title; ?>" class="ui-state-default" id="item-<?php echo ${"item_$metaboxID"};?>"><?php
+							?><li alt="ALT" title="<?php echo $title; ?>" class="ui-state-default" id="item-<?php echo ${"item_$metaboxID"};?>"><?php
 							echo "<i class='fas fa-sort item_icon'></i>";
 							echo $metaboxID;
 							echo ". ";
@@ -1268,7 +1268,7 @@ function display_order_meta_box( $post_vitrine ) {
 					$btn_on = "display: none;";
 					?>
 					<b><?php _e( 'The order of the components can only be changed after saving the post', 'wp-vitrines-master' ) ?></b>
-				<?php 
+					<?php 
 				};
 			?>
 		</ul>
@@ -1277,27 +1277,24 @@ function display_order_meta_box( $post_vitrine ) {
 			$varTextUpdated = __( 'Updated', 'wp-vitrines-master' );;
 		?>
 		<script>
-		   jQuery(document).ready(function() {
-		   var $=jQuery.noConflict();
-		   $('#sortableContainer').sortable();
-		   //$('<div id=buttonDiv><a id="link">Atualizar Ordem dos Boxes</a></div>').appendTo('#btnArea');
-		   //$('<a class="button" id="link">Update order of the components</a>').appendTo('#btnArea');
-		   $('<a class="button" id="link"><?php echo $varTextOrder; ?></a>').appendTo('#btnArea');
-		   //$('#link').click(function() {
-		   $('#link').click(function() {
-				$('#resultado').empty();
-				$('#msg').empty();
-				$('<span class="alert"><?php echo $varTextUpdated; ?>!</span>').appendTo('#msg');
-				var itemOrder = $('#sortableContainer').sortable("toArray");
-				var item = 1;
-				for (var i = 0; i <= 7; i++) {
-				//$("<label>Posição do Box"+ item +":</label><input type='text' class='position' name='order"+ item +"' value='" + itemOrder[i] + "' /><br>").appendTo('#resultado');
-				$("<label>Posição do Box"+ item +":</label><input type='text' class='position' name='order"+ item +"' value='" + itemOrder[i] + "' /><br>").appendTo('#resultado');
-
-				item++;
-						}
-				})
-
+		    jQuery(document).ready(function() {
+			    var $ = jQuery.noConflict();
+			    $('#sortableContainer').sortable();
+				$('#sortableContainer').on( "sortbeforestop", function( event, ui ) {
+			    	// $('#resultado').empty();
+					// $('#msg').empty();
+					// $('<span class="alert"><?php echo $varTextUpdated; ?>!</span>').appendTo('#msg');
+					var itemOrder = $('#sortableContainer').sortable("toArray");
+					var item = 1;
+					for (var i = 0; i <= 7; i++) {
+						//$("<label>Posição do Box"+ item +":</label><input type='text' class='position' name='order"+ item +"' value='" + itemOrder[i] + "' /><br>").appendTo('#resultado');
+						$("#position"+item).val(itemOrder[i]);
+						item++;
+					}
+				});
+			    //$('<div id=buttonDiv><a id="link">Atualizar Ordem dos Boxes</a></div>').appendTo('#btnArea');
+			    //$('<a class="button" id="link">Update order of the components</a>').appendTo('#btnArea');
+			    //$('<a class="button" id="link"><?php echo $varTextOrder; ?></a>').appendTo('#btnArea');
 			});
 		</script>
 
@@ -1314,9 +1311,9 @@ function display_order_meta_box( $post_vitrine ) {
 			?>
 				<label>Posição do Box<?php echo $metaboxID;?> :</label>
 				<?php if (empty(${"order$metaboxID"})) { ?>
-					<input type='text' class='position' name='order<?php echo $metaboxID;?>' value='item-<?php echo $metaboxID;?>' />
+					<input type='text' id="position<?php echo $metaboxID; ?>" class='position' name='order<?php echo $metaboxID; ?>' value='item-<?php echo $metaboxID; ?>' />
 				<?php } else { ?>
-					<input type='text' class='position' name='order<?php echo $metaboxID;?>' value='<?php echo ${"order$metaboxID"};?>' />
+					<input type='text' id="position<?php echo $metaboxID; ?>" class='position' name='order<?php echo $metaboxID; ?>' value='<?php echo ${"order$metaboxID"}; ?>' />
 				<?php }; ?>
 				<br>
 		<?php }//fecho loop
