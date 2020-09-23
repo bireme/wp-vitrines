@@ -1229,7 +1229,7 @@ function display_order_meta_box( $post_vitrine ) {
 		<ul id="sortableContainer">
 			<?php
 				$boxes = 0;
-				for ($metaboxID=1; $metaboxID<=8; $metaboxID ++) { //abre o loop dos componEentes
+				for ($metaboxID=1; $metaboxID<=8; $metaboxID++) { //abre o loop dos componEentes
 					$onOff = ( get_post_meta( get_the_ID(), 'onOff_vitrine_0'. $metaboxID, true ) );
 					if ( $onOff == 'on' ) { 
 						$boxes ++;
@@ -1302,14 +1302,14 @@ function display_order_meta_box( $post_vitrine ) {
 		<div id="msg"></div>
 		<div id="resultado" style="display: none;">
 <?php
-		for ($metaboxID=1; $metaboxID<=8; $metaboxID ++) { //abre o loop dos componEentes
+		for ($metaboxID=1; $metaboxID<=8; $metaboxID++) { //abre o loop dos componEentes
 			//${"vitrine_title_0$metaboxID"} = esc_html (get_post_meta( $post_vitrine->ID, "title_vitrine_0" . $metaboxID . "", true ) );
 			$item = ${"order$metaboxID"};
 			${"item_$metaboxID"} = substr(${"order$metaboxID"}, -1);
 			$value = ${"item_$metaboxID"};
 			$title = esc_html (get_post_meta( $post_vitrine->ID, "title_vitrine_0" . $value . "", true ) );
 			?>
-				<label>Posição do Box<?php echo $metaboxID;?> :</label>
+				<label>Posição do Box<?php echo $metaboxID; ?> :</label>
 				<?php if (empty(${"order$metaboxID"})) { ?>
 					<input type='text' id="position<?php echo $metaboxID; ?>" class='position' name='order<?php echo $metaboxID; ?>' value='item-<?php echo $metaboxID; ?>' />
 				<?php } else { ?>
