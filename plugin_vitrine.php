@@ -1455,6 +1455,21 @@ if (function_exists('add_theme_support')) {
 }
 load_plugin_textdomain( 'vitrine_conhecimento_bvs', false, basename( dirname( __FILE__ ) ) . '/languages' );
 
+function wp_vitrines_custom_css() {
+    global $post;
+    $my_css = esc_html( get_post_meta( $post->ID, "my_css", true ) );
+    if ( $my_css ) {
+?>
+
+<style type="text/css">
+	<?php echo $my_css; ?>
+</style>
+
+<?php
+    }
+}
+add_action( 'wp_head', 'wp_vitrines_custom_css' );
+
 function admin_menu() {
     add_submenu_page( 'options-general.php', __('WP-Vitrines Settings', 'wp-vitrines-master'), __('WP-Vitrines', 'wp-vitrines-master'), 'manage_options', 'wp-vitrines', 'wp_vitrines_page_admin');
     // call register settings function
