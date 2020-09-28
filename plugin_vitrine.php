@@ -173,10 +173,10 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
 	<?php 
 		$plugin_dir = plugin_dir_url( __FILE__ );
 	?>
-	<!--link href="<?php echo $plugin_dir; ?>/fontawesome-free-5.11.2-web/css/all.css" rel="stylesheet"--> <!--load all styles -->
-	<script defer src="<?php echo $plugin_dir; ?>/fontawesome-free-5.11.2-web/js/all.js"></script> <!--load all styles -->
-	<link href="<?php echo $plugin_dir; ?>simple-iconpicker.min.css" rel='stylesheet' type='text/css' />
-    <script type='text/javascript' src="<?php echo $plugin_dir; ?>simple-iconpicker.min.js"></script>
+	<!--link href="<?php echo $plugin_dir; ?>/fontawesome/css/all.css" rel="stylesheet"--> <!--load all styles -->
+	<script defer src="<?php echo $plugin_dir; ?>/fontawesome/js/all.js"></script> <!--load all styles -->
+	<link href="<?php echo $plugin_dir; ?>simple-iconpicker/simple-iconpicker.min.css" rel='stylesheet' type='text/css' />
+    <script type='text/javascript' src="<?php echo $plugin_dir; ?>simple-iconpicker/simple-iconpicker.min.js"></script>
 	<script>
     var whichInput = 0;
 	
