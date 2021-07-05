@@ -1455,7 +1455,7 @@ load_plugin_textdomain( 'vitrine_conhecimento_bvs', false, basename( dirname( __
 
 function wp_vitrines_custom_css() {
     global $post;
-    $my_css = sanitize_text_field( get_post_meta( $post->ID, "my_css", true ) );
+    $my_css = get_post_meta( $post->ID, "my_css", true );
     if ( $my_css ) {
 ?>
 
