@@ -26,7 +26,7 @@
             $onOff = ( get_post_meta( get_the_ID(), 'onOff_vitrine_0'. $comp, true ) );
             if ( $onOff == 'on' ) { $visibility = "inherit"; } else { $visibility = "hidden"; }
         ?>
-        <div class="cl cl_desk_1 mobile_none" style="visibility: <?php echo  $visibility; ?>; ">
+        <div class="cl cl_desk_1 mobile_none" style="visibility: <?php echo $visibility; ?>; ">
             <svg class="lines g90dD" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="20mm" height="20mm" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" viewBox="0 0 509.32 509.32" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <g id="Camada_x0020_2">
                     <metadata id="90grausDir"/>
@@ -117,7 +117,7 @@
             $onOff = ( get_post_meta( get_the_ID(), 'onOff_vitrine_0'. $comp, true ) );
             if ( $onOff == 'on' ) { $visibility = "inherit"; } else { $visibility = "hidden"; }
         ?>
-        <div class="cl cl_desk_1 mobile_none" style="visibility: <?php echo  $visibility; ?>; ">
+        <div class="cl cl_desk_1 mobile_none" style="visibility: <?php echo  $visibility; ?>;">
             <svg class="lines horizontal lineright" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="20mm" height="1mm" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" viewBox="0 0 1333.33 66.67" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <g id="Camada_x0020_3">
                     <metadata id="h06"/>

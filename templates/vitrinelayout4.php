@@ -48,7 +48,7 @@
                 $onOff = ( get_post_meta( get_the_ID(), 'onOff_vitrine_0'. $comp, true ) );
                 if ( $onOff == 'on' ) { $visibility = "inherit"; } else { $visibility = "hidden"; }
             ?>
-            <div class="component comp_left" style="visibility: <?php echo $visibility; ?>; "> 
+            <div class="component comp_left" style="visibility: <?php echo $visibility; ?>;"> 
                 <?php include ("component_content.php"); ?>        
             </div>
         </div>

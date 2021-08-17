@@ -1,7 +1,4 @@
 <div class="vitrine_layout boxes_8">
-    <?php 
-        $dir = plugin_dir_url( __FILE__ );
-    ?>
     <div class="image_background" style="background: #ffffff url(<?php the_post_thumbnail_url( 'vitrine_image' ); ?>) no-repeat center center;"></div>
     <div class="row">
         <div class="cl cl_desk_5 comp01">

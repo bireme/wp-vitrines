@@ -61,10 +61,10 @@
             </svg>        
         </div>
         <?php 
-                $order = esc_html (get_post_meta( get_the_ID(), "order4", true ) );
-                $comp = substr($order, -1);
-                $onOff = ( get_post_meta( get_the_ID(), 'onOff_vitrine_0'. $comp, true ) );
-                if ( $onOff == 'on' ) { $visibility = "inherit"; } else { $visibility = "hidden"; }
+            $order = esc_html (get_post_meta( get_the_ID(), "order4", true ) );
+            $comp = substr($order, -1);
+            $onOff = ( get_post_meta( get_the_ID(), 'onOff_vitrine_0'. $comp, true ) );
+            if ( $onOff == 'on' ) { $visibility = "inherit"; } else { $visibility = "hidden"; }
         ?>
         <div class="cl cl_desk_2 mobile_none">
             <svg class="lines g90dDB" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="20mm" height="20mm" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" viewBox="0 0 1333.33 1333.33" xmlns:xlink="http://www.w3.org/1999/xlink">

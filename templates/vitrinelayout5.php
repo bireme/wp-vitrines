@@ -74,7 +74,7 @@
                 </g>
             </svg>        
         </div>
-        <div class="cl cl_desk_1 mobile_none" style="visibility: <?php echo $visibility; ?>; ">
+        <div class="cl cl_desk_1 mobile_none" style="visibility: <?php echo $visibility; ?>;">
             <svg class="lines g90dDB" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="20mm" height="20mm" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" viewBox="0 0 1333.33 1333.33" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <g id="Camada_x0020_8">
                     <metadata id="90grausDirBase"/>
