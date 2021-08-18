@@ -42,6 +42,23 @@ if ($site_lang == 'en') {
             $presentation_font_size = esc_html (get_post_meta( get_the_ID(), "presentation_font_size", true ) );
             $font_size = esc_html (get_post_meta( get_the_ID(), "font_size", true ) );
         ?>
+        <style>
+            .component, .image_background {
+                border-color: <?php echo $boxBorder_color; ?> !important;
+            }
+            .lines {
+                fill: <?php echo $boxBorder_color; ?> !important; 
+            }
+            .vitrine .entry, 
+            .vitrine .vitrinebyform {
+                font-size: <?php echo $font_size; ?> !important;
+                line-height: 120% !important;
+            }
+            .vitrinebyform .presentation {
+                font-size: <?php echo $presentation_font_size; ?> !important;
+                line-height: 120% !important;            
+            }
+        </style>
         <div class="vitrineTitle" style="background: <?php echo $titleBg_color; ?>">
             <h2 style="color: <?php echo $titleFont_color; ?>"><?php the_title(); ?></h2>
         </div>
