@@ -4,7 +4,8 @@ Template Name: Vitrine do Conhecimento BVSalud
 */
  
 get_header();
-wp_enqueue_style ('theme-style', plugin_dir_url( __FILE__ ) .'css/page_vitrine.css');
+wp_enqueue_style('theme-styles', plugin_dir_url( __FILE__ ) .'css/page_vitrine.css');
+wp_enqueue_script('font-awesome', 'https://kit.fontawesome.com/be0bade886.js', array(), null, true);
 
 $config = get_option('wp_vitrines_config');
 $home_url = ( $config['home_url'] ) ? $config['home_url'] : get_bloginfo('url');
@@ -29,10 +30,9 @@ if ($site_lang == 'en') {
 
 <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
     <?php $plugin_dir = plugin_dir_url( __FILE__ ); ?>
-    <script src="https://kit.fontawesome.com/be0bade886.js" crossorigin="anonymous"></script>
     <div class="vitrine">
         <div class="breadcrumb">
-            <a href="<?php echo rtrim($home_url, '/'); ?>/<?php echo ($site_lang);?>" title="<?php bloginfo('name'); ?>">Home</a> / <a href="../"><?php echo $vitrines_breadcrumb; ?></a>
+            <a href="<?php echo rtrim($home_url, '/'); ?>/<?php echo ($site_lang); ?>" title="<?php bloginfo('name'); ?>">Home</a> / <a href="../"><?php echo $vitrines_breadcrumb; ?></a>
         </div>
         <?php 
             //Carrega Variaveis da Customização da Vitrine
@@ -42,23 +42,6 @@ if ($site_lang == 'en') {
             $presentation_font_size = esc_html (get_post_meta( get_the_ID(), "presentation_font_size", true ) );
             $font_size = esc_html (get_post_meta( get_the_ID(), "font_size", true ) );
         ?>
-        <style>
-            .component, .image_background {
-                border-color: <?php echo $boxBorder_color; ?> !important;
-            }
-            .lines {
-                  fill: <?php echo $boxBorder_color; ?> !important; 
-            }
-            .vitrine .entry, 
-            .vitrine .vitrinebyform {
-                font-size: <?php echo $font_size; ?> !important;
-                line-height: 120% !important;
-            }
-            .vitrinebyform .presentation {
-                font-size: <?php echo $presentation_font_size; ?> !important;
-                line-height: 120% !important;            
-            }
-        </style>
         <div class="vitrineTitle" style="background: <?php echo $titleBg_color; ?>">
             <h2 style="color: <?php echo $titleFont_color; ?>"><?php the_title(); ?></h2>
         </div>
@@ -78,7 +61,6 @@ if ($site_lang == 'en') {
                     $countBoxes ++;
                 }
             }
-            //echo $countBoxes;
             include ("vitrinelayout".$countBoxes.".php");
         ?>
 

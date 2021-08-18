@@ -10,6 +10,7 @@ Text Domain: wp-vitrines-master
 Domain Path: /languages
 */
 
+define( 'WP_VITRINES_PLUGIN_URL',  plugin_dir_url(__FILE__) );
 define( 'WP_VITRINES_PLUGIN_PATH',  plugin_dir_path(__FILE__) );
 
 require_once(WP_VITRINES_PLUGIN_PATH . '/settings.php');
@@ -44,7 +45,6 @@ function create_post_vitrine() {
             'supports' => array( 'title', 'editor', 'thumbnail', 'revisions', 'custom-fields' ),
             'taxonomies' => array( '' ),
             'menu_icon' => 'dashicons-lightbulb',
-            /*'menu_icon' => plugins_url( 'images/image.png', __FILE__ ),*/
             'has_archive' => true
         )
     );
@@ -89,7 +89,6 @@ function my_admin() {
 add_action( 'admin_init', 'my_admin' );
 
 function display_basic_vitrine_meta_box( $post_vitrine ) {
-    //wp_enqueue_script('jquery');
     wp_enqueue_media();
 
     //Carregando Custom Fields Gravados
@@ -101,17 +100,13 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
 
     //Custom Fields Infografico
     $infographic_collumns = esc_html (get_post_meta( $post_vitrine->ID, "infographic_collumns", true ) );
-
-    //Start Looop Infográficos 01 até 6
-    for ($number_of_infographics=1; $number_of_infographics<=6; $number_of_infographics ++) {
+    for ($number_of_infographics=1; $number_of_infographics<=6; $number_of_infographics++) {
         ${'title_infografico_0'.$number_of_infographics} = esc_html (get_post_meta( $post_vitrine->ID, "title_infografico_0".$number_of_infographics, true ) );
-        //${'code_infografico_0'.$number_of_infographics} = esc_html (get_post_meta( $post_vitrine->ID, "code_infografico_0".$number_of_infographics, true ) );
-        //${'text_infografico_0'.$number_of_infographics} = esc_html (get_post_meta( $post_vitrine->ID, "text_infografico_0".$number_of_infographics, true ) );
-        ${'text_infografico_0'.$number_of_infographics} = get_post_meta( $post_vitrine->ID, "text_infografico_0".$number_of_infographics, true );
+        ${'text_infografico_0'.$number_of_infographics} = esc_html (get_post_meta( $post_vitrine->ID, "text_infografico_0".$number_of_infographics, true ) );
         ${'basic_vitrine_infografico_color_0'.$number_of_infographics} = esc_html (get_post_meta( $post_vitrine->ID, "basic_vitrine_infografico_color_0".$number_of_infographics, true ) );
         ${'basic_vitrine_infografico_id_0'.$number_of_infographics} = esc_html (get_post_meta( $post_vitrine->ID, "basic_vitrine_infografico_id_0".$number_of_infographics, true ) );
         ${'basic_vitrine_infografico_bg_0'.$number_of_infographics} = esc_html (get_post_meta( $post_vitrine->ID, "basic_vitrine_infografico_bg_0".$number_of_infographics, true ) );
-    } //End Loop
+    }
         
     //Custom fields videos
     $video_01 = esc_html (get_post_meta( $post_vitrine->ID, "video_01", true ) );
@@ -126,9 +121,7 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
     //Custom Fields relacionados ao modal de Textos
     $highlights_collumns = esc_html (get_post_meta( $post_vitrine->ID, "highlights_collumns", true ) );
     $texts_collumns = esc_html (get_post_meta( $post_vitrine->ID, "texts_collumns", true ) );
-
-    //Looop Texts 01 até 20
-    for ($number_of_texts=1; $number_of_texts<=20; $number_of_texts ++) {
+    for ($number_of_texts=1; $number_of_texts<=20; $number_of_texts++) {
         ${'texts_content_0'.$number_of_texts.'_title'} = esc_html (get_post_meta( $post_vitrine->ID, "texts_content_0".$number_of_texts."_title", true ) );
         ${'texts_vitrine_content_0'.$number_of_texts} = esc_html (get_post_meta( $post_vitrine->ID, "texts_vitrine_content_0".$number_of_texts, true ) );
         ${'texts_vitrine_content_color_0'.$number_of_texts} = esc_html (get_post_meta( $post_vitrine->ID, "texts_vitrine_content_color_0".$number_of_texts, true ) );
@@ -136,22 +129,16 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
         ${'texts_vitrine_content_bg_0'.$number_of_texts} = esc_html (get_post_meta( $post_vitrine->ID, "texts_vitrine_content_bg_0".$number_of_texts, true ) );
     }
 
-    $title_text_1 = esc_html (get_post_meta( $post_vitrine->ID, "title_text_01", true ) );
-    $text_1 = esc_html (get_post_meta( $post_vitrine->ID, "text_01", true ) );
-    $texts_color_1 = esc_html (get_post_meta( $post_vitrine->ID, "texts_color", true ) );
-    $texts_bg_1 = esc_html (get_post_meta( $post_vitrine->ID, "texts_bg", true ) );
-
     //responsibility
     $responsibility = esc_html (get_post_meta( $post_vitrine->ID, "responsibility", true ) );
     $responsibility_color = esc_html (get_post_meta( $post_vitrine->ID, "responsibility_color", true ) );
     $responsibility_bg = esc_html (get_post_meta( $post_vitrine->ID, "responsibility_bg", true ) );
 
-    //css
+    //custom css
     $my_css = esc_html (get_post_meta( $post_vitrine->ID, "my_css", true ) );
 
     //Loop Custom fields Texts and Images
-    for ($number_of_fields=1; $number_of_fields<=20; $number_of_fields ++) {
-        //${ 'basic_content_0' . $number_of_fields . '_title'} = esc_html (get_post_meta( $post_vitrine->ID, "basic_content_01_title", true ) );
+    for ($number_of_fields=1; $number_of_fields<=20; $number_of_fields++) {
         ${'basic_content_0'.$number_of_fields.'_title'} = esc_html (get_post_meta( $post_vitrine->ID, "basic_content_0".$number_of_fields."_title", true ) );
         ${'image_url_0'.$number_of_fields} = esc_html (get_post_meta( $post_vitrine->ID, "image_url_0".$number_of_fields, true ) );
         ${'basic_vitrine_content_0'.$number_of_fields} = esc_html (get_post_meta( $post_vitrine->ID, "basic_vitrine_content_0".$number_of_fields, true ) );
@@ -160,43 +147,13 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
         ${'basic_vitrine_content_bg_0'.$number_of_fields} = esc_html (get_post_meta( $post_vitrine->ID, "basic_vitrine_content_bg_0".$number_of_fields, true ) );
     }
 ?>
-    <!--script src="https://kit.fontawesome.com/be0bade886.js" crossorigin="anonymous"></script-->    
-    <script>
-        function Mudarestado(el) {
-            var display = document.getElementById(el).style.display;
-            if(display == "none")
-                document.getElementById(el).style.display = 'block';
-            else
-                document.getElementById(el).style.display = 'none';
-        }
-    </script>
-    <?php $plugin_dir = plugin_dir_url( __FILE__ ); ?>
-    <!--link href="<?php echo $plugin_dir; ?>fontawesome/css/all.css" rel="stylesheet"--> <!--load all styles -->
-    <script defer src="<?php echo $plugin_dir; ?>fontawesome/js/all.js"></script> <!--load all styles -->
-    <link href="<?php echo $plugin_dir; ?>simple-iconpicker/simple-iconpicker.min.css" rel='stylesheet' type='text/css' />
-    <script type='text/javascript' src="<?php echo $plugin_dir; ?>simple-iconpicker/simple-iconpicker.min.js"></script>
-    <script>
-        var whichInput = 0;
-        jQuery(document).ready(function( $ ) {
-            $('.input1').iconpicker(".input1");
-            $('.input2').iconpicker(".input2");
-            $('.input3').iconpicker(".input3");
-            $('.input4').iconpicker(".input4");
-            $('.input5').iconpicker(".input5");
-            $('.input6').iconpicker(".input6");
-            $('.input7').iconpicker(".input7");
-            $('.input8').iconpicker(".input8");
-            //$('#inputid2').iconpicker("#inputid2");
-            //$('.input3').iconpicker(".input3");
-        });
-    </script>
     <div class="basic_vitrine_description">
         <p><i class="fas fa-info-circle"></i> <?php echo esc_html( __( "In the menu below you can create your Window with text, images, videos and other content without Page Builder.", 'wp-vitrines-master' ) ); ?></p>
     </div>
     <div class="spacer"></div>    
     <div class="box_modal" id="modal-window-vitrinePresentation">
         <div class="summary">
-            <a onclick="Mudarestado('presentation_box')" title="<?php _e( 'Presentation of the theme', 'wp-vitrines-master' ) ?>"><i class="fas fa-align-justify"></i><?php _e( 'Presentation', 'wp-vitrines-master' ) ?></a>
+            <a onclick="mudarEstado('presentation_box')" title="<?php _e( 'Presentation of the theme', 'wp-vitrines-master' ) ?>"><i class="fas fa-align-justify"></i><?php _e( 'Presentation', 'wp-vitrines-master' ) ?></a>
         </div>
         <div class="vitrine_box" id="presentation_box" style="display: none;">
             <div class="row">
@@ -253,7 +210,7 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
     <div class="spacer"></div>
     <div class="box_modal" id="modal-window-imagesAndTexts">
         <div class="summary">
-            <a onclick="Mudarestado('highlights_box')" title="<?php _e( 'Main Content', 'wp-vitrines-master' ) ?>"><i class="far fa-image"></i><?php _e( 'Main Content', 'wp-vitrines-master' ) ?></a>
+            <a onclick="mudarEstado('highlights_box')" title="<?php _e( 'Main Content', 'wp-vitrines-master' ) ?>"><i class="far fa-image"></i><?php _e( 'Main Content', 'wp-vitrines-master' ) ?></a>
         </div>
         <div class="vitrine_box" id="highlights_box" style="display: none;">
             <div class="row">
@@ -325,11 +282,11 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
                 <hr />
                 </div>
                 <?php if ($number_of_fields==5) { ?>
-                    <button style="display: <?php echo $show; ?>" id="button_6" type="button" onclick="Mudarestado('boxHighlight_6'), Mudarestado('boxHighlight_7'), Mudarestado('boxHighlight_8'), Mudarestado('boxHighlight_9'), Mudarestado('boxHighlight_10'), Mudarestado('button_6'), Mudarestado('button_11')"><?php _e( 'Show More', 'wp-vitrines-master' ) ?></button>
+                    <button style="display: <?php echo $show; ?>" id="button_6" type="button" onclick="mudarEstado('boxHighlight_6'), mudarEstado('boxHighlight_7'), mudarEstado('boxHighlight_8'), mudarEstado('boxHighlight_9'), mudarEstado('boxHighlight_10'), mudarEstado('button_6'), mudarEstado('button_11')"><?php _e( 'Show More', 'wp-vitrines-master' ) ?></button>
                 <?php } elseif ($number_of_fields==10) { ?>
-                    <button style="display: <?php echo $show; ?>" id="button_11" type="button" onclick="Mudarestado('boxHighlight_11'), Mudarestado('boxHighlight_12'), Mudarestado('boxHighlight_13'), Mudarestado('boxHighlight_14'), Mudarestado('boxHighlight_15'), Mudarestado('button_11'), Mudarestado('button_16')"><?php _e( 'Show More', 'wp-vitrines-master' ) ?></button>
+                    <button style="display: <?php echo $show; ?>" id="button_11" type="button" onclick="mudarEstado('boxHighlight_11'), mudarEstado('boxHighlight_12'), mudarEstado('boxHighlight_13'), mudarEstado('boxHighlight_14'), mudarEstado('boxHighlight_15'), mudarEstado('button_11'), mudarEstado('button_16')"><?php _e( 'Show More', 'wp-vitrines-master' ) ?></button>
                 <?php } elseif ($number_of_fields==15) { ?>
-                    <button style="display: <?php echo $show; ?>" id="button_16" type="button" onclick="Mudarestado('boxHighlight_16'), Mudarestado('boxHighlight_17'), Mudarestado('boxHighlight_18'), Mudarestado('boxHighlight_19'), Mudarestado('boxHighlight_20'), Mudarestado('button_16')"><?php _e( 'Show More', 'wp-vitrines-master' ) ?></button>
+                    <button style="display: <?php echo $show; ?>" id="button_16" type="button" onclick="mudarEstado('boxHighlight_16'), mudarEstado('boxHighlight_17'), mudarEstado('boxHighlight_18'), mudarEstado('boxHighlight_19'), mudarEstado('boxHighlight_20'), mudarEstado('button_16')"><?php _e( 'Show More', 'wp-vitrines-master' ) ?></button>
                 <?php } ?>
             <?php } ?>
             <div class="spacer"></div>
@@ -340,7 +297,7 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
     <div class="spacer"></div>
     <div class="box_modal" id="modal-window-infografico">
         <div class="summary">
-            <a onclick="Mudarestado('infographic_box')" title="<?php _e( 'Infographics, images, graphs, tables, etc.', 'wp-vitrines-master' ) ?>"><i class="fas fa-chart-line"></i><?php _e( 'Infographics, images, graphs, tables, etc.', 'wp-vitrines-master' ) ?></a>
+            <a onclick="mudarEstado('infographic_box')" title="<?php _e( 'Infographics, images, graphs, tables, etc.', 'wp-vitrines-master' ) ?>"><i class="fas fa-chart-line"></i><?php _e( 'Infographics, images, graphs, tables, etc.', 'wp-vitrines-master' ) ?></a>
         </div>
         <div class="vitrine_box" id="infographic_box" style="display: none;">
             <div class="row center">
@@ -362,7 +319,7 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
                     </div>
                 </div>
             </div>
-            <?php for ($number_of_infographics=1; $number_of_infographics<=6; $number_of_infographics ++) { ?>
+            <?php for ($number_of_infographics=1; $number_of_infographics<=6; $number_of_infographics++) { ?>
                 <?php 
                     if ($number_of_infographics >= 2) {
                         $show = 'none';
@@ -377,12 +334,9 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
                     </div>
                     <div class="col-75">
                         <label><?php _e( 'Title', 'wp-vitrines-master' ) ?>: <i><?php _e( 'optional content', 'wp-vitrines-master' ) ?></i></label><br>
-                        <input type="text" class="title_infografico input100" name="title_infografico_0<?php echo $number_of_infographics; ?>" value="<?php echo ${'title_infografico_0'.$number_of_infographics}; ?>" />    <br>
+                        <input type="text" class="title_infografico input100" name="title_infografico_0<?php echo $number_of_infographics; ?>" value="<?php echo ${'title_infografico_0'.$number_of_infographics}; ?>" /><br>
                         <?php 
                             $content   = html_entity_decode(${'text_infografico_0'.$number_of_infographics}); 
-                            //$content_html   = htmlspecialchars(${'text_infografico_0'.$number_of_infographics}); 
-                            //$content = html_entity_decode($content_html);
-                            //$content   = ${'text_infografico_0'.$number_of_infographics}; 
                             $editor_id = 'text_infografico_0' . $number_of_infographics;
                             $settings  = array( 
                                 'media_buttons' => true,
@@ -410,11 +364,11 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
                     <hr />
                 </div>
             <?php } ?>
-            <button style="display: block" id="button_info2" type="button" onclick="Mudarestado('boxInfographics_02'), Mudarestado('button_info2'), Mudarestado('button_info3')"> <?php _e( 'Show more', 'wp-vitrines-master' ) ?> </button>
-            <button style="display: none" id="button_info3" type="button" onclick="Mudarestado('boxInfographics_03'), Mudarestado('button_info3'), Mudarestado('button_info4')"> <?php _e( 'Show more', 'wp-vitrines-master' ) ?> </button>
-            <button style="display: none" id="button_info4" type="button" onclick="Mudarestado('boxInfographics_04'), Mudarestado('button_info4'), Mudarestado('button_info5')"> <?php _e( 'Show more', 'wp-vitrines-master' ) ?> </button>
-            <button style="display: none" id="button_info5" type="button" onclick="Mudarestado('boxInfographics_05'), Mudarestado('button_info5'), Mudarestado('button_info6')"> <?php _e( 'Show more', 'wp-vitrines-master' ) ?> </button>
-            <button style="display: none" id="button_info6" type="button" onclick="Mudarestado('boxInfographics_06'), Mudarestado('button_info6')"> <?php _e( 'Show more', 'wp-vitrines-master' ) ?> </button>
+            <button style="display: block" id="button_info2" type="button" onclick="mudarEstado('boxInfographics_02'), mudarEstado('button_info2'), mudarEstado('button_info3')"> <?php _e( 'Show more', 'wp-vitrines-master' ) ?> </button>
+            <button style="display: none" id="button_info3" type="button" onclick="mudarEstado('boxInfographics_03'), mudarEstado('button_info3'), mudarEstado('button_info4')"> <?php _e( 'Show more', 'wp-vitrines-master' ) ?> </button>
+            <button style="display: none" id="button_info4" type="button" onclick="mudarEstado('boxInfographics_04'), mudarEstado('button_info4'), mudarEstado('button_info5')"> <?php _e( 'Show more', 'wp-vitrines-master' ) ?> </button>
+            <button style="display: none" id="button_info5" type="button" onclick="mudarEstado('boxInfographics_05'), mudarEstado('button_info5'), mudarEstado('button_info6')"> <?php _e( 'Show more', 'wp-vitrines-master' ) ?> </button>
+            <button style="display: none" id="button_info6" type="button" onclick="mudarEstado('boxInfographics_06'), mudarEstado('button_info6')"> <?php _e( 'Show more', 'wp-vitrines-master' ) ?> </button>
         </div>
     </div>
     <?php // End of Modal Infográfico ?>
@@ -423,7 +377,7 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
     <div class="spacer"></div>
     <div class="box_modal" id="modal-window-videos">
         <div class="summary">
-            <a onclick="Mudarestado('videos_box')" title="Vídeos"><i class="fab fa-youtube"></i><?php _e( 'Videos', 'wp-vitrines-master' ) ?></a>
+            <a onclick="mudarEstado('videos_box')" title="Vídeos"><i class="fab fa-youtube"></i><?php _e( 'Videos', 'wp-vitrines-master' ) ?></a>
         </div>
         <div class="vitrine_box" id="videos_box" style="display: none;">
             <div class="row">
@@ -439,18 +393,30 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
                     <div class="row">
                         <div class="col-30">
                             <label><?php _e( 'Video Code', 'wp-vitrines-master' ) ?> 01:</label><br>
-                            <input type="url" class="video_01 input100" name="video_01" value="<?php echo $video_01; ?>" />    <br>
-                            <img src="https://img.youtube.com/vi/<?php echo get_video_code($video_01); ?>/default.jpg"><br>
+                            <input type="url" class="video_01 input100" name="video_01" value="<?php echo $video_01; ?>" /><br>
+                            <?php if ( $video_01 ) : ?>
+                                <img src="https://img.youtube.com/vi/<?php echo get_video_code($video_01); ?>/default.jpg"><br>
+                            <?php else : ?>
+                                <img src="https://fakeimg.pl/120x90/?text=<?php _e( 'Video', 'wp-vitrines-master' ) ?> 01"><br>
+                            <?php endif; ?>
                         </div>
                         <div class="col-30">
                             <label><?php _e( 'Video Code', 'wp-vitrines-master' ) ?> 02:</label><br>
-                            <input type="url" class="video_02 input100" name="video_02" value="<?php echo $video_02; ?>" />    <br>
-                            <img src="https://img.youtube.com/vi/<?php echo get_video_code($video_02); ?>/default.jpg"><br>
+                            <input type="url" class="video_02 input100" name="video_02" value="<?php echo $video_02; ?>" /><br>
+                            <?php if ( $video_02 ) : ?>
+                                <img src="https://img.youtube.com/vi/<?php echo get_video_code($video_02); ?>/default.jpg"><br>
+                            <?php else : ?>
+                                <img src="https://fakeimg.pl/120x90/?text=<?php _e( 'Video', 'wp-vitrines-master' ) ?> 02"><br>
+                            <?php endif; ?>
                         </div>
                         <div class="col-30">
                             <label><?php _e( 'Video Code', 'wp-vitrines-master' ) ?> 03:</label><br>
-                            <input type="url" class="video_03 input100" name="video_03" value="<?php echo $video_03; ?>" />    <br>
+                            <input type="url" class="video_03 input100" name="video_03" value="<?php echo $video_03; ?>" /><br>
+                            <?php if ( $video_03 ) : ?>
                                 <img src="https://img.youtube.com/vi/<?php echo get_video_code($video_03); ?>/default.jpg"><br>
+                            <?php else : ?>
+                                <img src="https://fakeimg.pl/120x90/?text=<?php _e( 'Video', 'wp-vitrines-master' ) ?> 03"><br>
+                            <?php endif; ?>
                         </div>
                     </div>
                     <div class="spacer"></div>
@@ -486,7 +452,7 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
     <div class="spacer"></div>
     <div class="box_modal" id="modal-window-texts">
         <div class="summary">
-            <a  onclick="Mudarestado('texts_box')" title="<?php _e( 'Links to publications, documents and related or recommended sites ', 'wp-vitrines-master' ) ?>:"><i class="fas fa-font"></i><?php _e( 'Links to publications, documents and related or recommended sites ', 'wp-vitrines-master' ) ?>:</a>
+            <a  onclick="mudarEstado('texts_box')" title="<?php _e( 'Links to publications, documents and related or recommended sites ', 'wp-vitrines-master' ) ?>:"><i class="fas fa-font"></i><?php _e( 'Links to publications, documents and related or recommended sites ', 'wp-vitrines-master' ) ?>:</a>
         </div>
         <div class="vitrine_box" id="texts_box" style="display: none;">
             <div class="row center">
@@ -498,7 +464,7 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
                     <option value="3" <?php selected($selected_option, '3') ?>>3 <?php _e( 'columns', 'wp-vitrines-master' ) ?></option>
                 </select>
             </div>
-            <?php for ($number_of_texts=1; $number_of_texts<=20; $number_of_texts ++) { ?>
+            <?php for ($number_of_texts=1; $number_of_texts<=20; $number_of_texts++) { ?>
                 <?php 
                     if ($number_of_texts >= 6) {
                         $show = 'none';
@@ -546,11 +512,11 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
                     <hr />
                 </div>
                 <?php if ($number_of_texts==5) { ?>
-                    <button style="display: <?php echo $show; ?>" id="button_t6" type="button" onclick="Mudarestado('boxTexts_6'), Mudarestado('boxTexts_7'), Mudarestado('boxTexts_8'), Mudarestado('boxTexts_9'), Mudarestado('boxTexts_10'), Mudarestado('button_t6'), Mudarestado('button_t11')"><?php _e( 'Show more', 'wp-vitrines-master' ) ?> </button>
+                    <button style="display: <?php echo $show; ?>" id="button_t6" type="button" onclick="mudarEstado('boxTexts_6'), mudarEstado('boxTexts_7'), mudarEstado('boxTexts_8'), mudarEstado('boxTexts_9'), mudarEstado('boxTexts_10'), mudarEstado('button_t6'), mudarEstado('button_t11')"><?php _e( 'Show more', 'wp-vitrines-master' ) ?> </button>
                 <?php } elseif ($number_of_texts==10) { ?>
-                    <button style="display: <?php echo $show; ?>" id="button_t11" type="button" onclick="Mudarestado('boxTexts_11'), Mudarestado('boxTexts_12'), Mudarestado('boxTexts_13'), Mudarestado('boxTexts_14'), Mudarestado('boxTexts_15'), Mudarestado('button_t11'), Mudarestado('button_t16')"><?php _e( 'Show more', 'wp-vitrines-master' ) ?> </button>
+                    <button style="display: <?php echo $show; ?>" id="button_t11" type="button" onclick="mudarEstado('boxTexts_11'), mudarEstado('boxTexts_12'), mudarEstado('boxTexts_13'), mudarEstado('boxTexts_14'), mudarEstado('boxTexts_15'), mudarEstado('button_t11'), mudarEstado('button_t16')"><?php _e( 'Show more', 'wp-vitrines-master' ) ?> </button>
                 <?php } elseif ($number_of_texts==15) { ?>
-                    <button style="display: <?php echo $show; ?>" id="button_t16" type="button" onclick="Mudarestado('boxTexts_16'), Mudarestado('boxTexts_17'), Mudarestado('boxTexts_18'), Mudarestado('boxTexts_19'), Mudarestado('boxTexts_20'), Mudarestado('button_t16')"><?php _e( 'Show more', 'wp-vitrines-master' ) ?> </button>
+                    <button style="display: <?php echo $show; ?>" id="button_t16" type="button" onclick="mudarEstado('boxTexts_16'), mudarEstado('boxTexts_17'), mudarEstado('boxTexts_18'), mudarEstado('boxTexts_19'), mudarEstado('boxTexts_20'), mudarEstado('button_t16')"><?php _e( 'Show more', 'wp-vitrines-master' ) ?> </button>
                 <?php } ?>
             <?php } ?> 
             <div class="spacer"></div>
@@ -561,7 +527,7 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
     <div class="spacer"></div>
     <div class="box_modal" id="modal-window-responsibility">
         <div class="summary">
-            <a  onclick="Mudarestado('responsabilit_box')" title="<?php _e( 'Authorship and collaborators', 'wp-vitrines-master' ) ?>"><i class="fas fa-user-check"></i><?php _e( 'Authorship and collaborators', 'wp-vitrines-master' ) ?></a>
+            <a  onclick="mudarEstado('responsabilit_box')" title="<?php _e( 'Authorship and collaborators', 'wp-vitrines-master' ) ?>"><i class="fas fa-user-check"></i><?php _e( 'Authorship and collaborators', 'wp-vitrines-master' ) ?></a>
         </div>
         <div class="vitrine_box" id="responsabilit_box" style="display: none;">
             <div class="row">
@@ -594,7 +560,7 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
     <div class="spacer"></div>
     <div class="box_modal" id="modal-window-css" style="display: none_S;">
         <div class="summary">
-            <a  onclick="Mudarestado('csseditor_box')" title="Editor de CSS"><i class="fas fa-code"></i><?php _e( 'CSS Editor', 'wp-vitrines-master' ) ?></a>
+            <a  onclick="mudarEstado('csseditor_box')" title="Editor de CSS"><i class="fas fa-code"></i><?php _e( 'CSS Editor', 'wp-vitrines-master' ) ?></a>
         </div>
         <div class="vitrine_box" id="csseditor_box" style="display: none;">
             <div class="row">
@@ -619,19 +585,11 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
 <?php
 function display_post_vitrine_meta_box( $post_vitrine ) {
 ?>
-    <script>
-        jQuery(function($){
-            $(".componente_title").on("click",function(){
-              $(this).next().slideToggle();
-            });
-         });
-    </script>
     <div class="vitrine_description">
         <p><?php echo esc_html( __( "In the fields below we can create the highlighted components of the Window, at least 4 and at most 8 components, the system will organize the best display of the highlighted components and  images.", 'wp-vitrines-master' ) ); ?></p>
     </div>
-
     <?php
-        for ($metaboxID=1; $metaboxID<=8; $metaboxID ++) { //abre o loop dos componentes 
+        for ($metaboxID=1; $metaboxID<=8; $metaboxID++) { //abre o loop dos componentes 
             //On Off Metabox
             ${"vitrine_onOff_0$metaboxID"} = esc_html (get_post_meta( $post_vitrine->ID, "onOff_vitrine_0" . $metaboxID . "", true ) );
             // Titulo do Metabox
@@ -724,7 +682,6 @@ function display_post_vitrine_meta_box( $post_vitrine ) {
                         <div class="col-50 icon_select">
                             <label><?php _e( 'Icon', 'wp-vitrines-master' ) ?>: </label><br>
                             <span class="comp_info"><?php _e( 'Select the source of the icon that represents the component', 'wp-vitrines-master' ) ?>:</span><br>
-                            <!--input type="text" class="input100" name="imageType_0<?php echo $metaboxID; ?>_vitrine" value="<?php echo ${"vitrine_imageType_0$metaboxID"}; ?>" /-->
                             <?php
                                 $selected_option = ${"vitrine_imageType_0$metaboxID"};
                             ?>
@@ -759,225 +716,15 @@ function display_post_vitrine_meta_box( $post_vitrine ) {
                             <textarea id="vitrine_notes_0<?php echo $metaboxID; ?>" name="notes_0<?php echo $metaboxID; ?>_vitrine"
                               rows="10"><?php echo ${"vitrine_notes_0$metaboxID"}; ?></textarea>
                             <span class="comp_info">
-                            <?php _e( 'The Notes field is internal and only used for the website´s information team, you can attach information that you think is necessary.', 'wp-vitrines-master' ) ?>
+                            <?php _e( 'The Notes field is internal and only used for the website´s information team, you can attach information that you think is necessary.', 'wp-vitrines-master' ); ?>
                             </span><br>
                         </div>
                     </div>
                 </div>
             </div>
             <!-- Fim dos Componente no Loop -->
-    <?php
-        } // Fecha Loop dos componentes
-    ?>
-
-    <style>
-        .spacer {
-            width: 100%;
-            height: 1px;
-            clear: both;
-        }
-        .summary {
-            font-size: 22px;
-            margin-left: 20px;
-            margin-top: 5px;
-        }
-        .summary svg {
-            float: left;
-            margin-right: 10px;
-        }
-        .summary li a i {
-            margin-right: 5px;
-        }
-        .box_modal {
-            float: left;
-            width: 100%;
-            
-        }
-        .componente_box {
-            padding: 10px;
-        }
-        .componente_title:hover {
-            cursor: pointer;
-            background: #d4eded;
-        }
-        .componente_box {
-            padding: 10px;
-        }
-        .componente_box textarea {
-            width: 100% !important;
-        }
-        .csstextarea {}
-        .vitrine_title {
-            font-size: 120%;
-            width: 100%;
-        }
-        .vitrine_description {
-            font-style: italic;
-        }
-        .componente_box h1.componente_title {
-            border-bottom: 2px solid #cecece;
-            padding: 5px 10px;
-        }
-        .vitrine_box {
-            border-left: 3px solid #0073aa;
-            background:#f1f1f1;
-            width: 100%;
-            float: left;
-            margin-bottom: 20px;
-        }
-        .col-100 {
-            width: 98%;
-            clear: both;
-            display: inline-block;
-        }
-        .col-5 {
-            width: 3%;
-            float: left;
-            padding: 1%;
-        }
-        .col-10 {
-            width: 8%;
-            float: left;
-            padding: 1%;
-        }
-        .col-20 {
-            width: 18%;
-            float: left;
-            padding: 1%;
-        }
-        .col-30 {
-            width: 28%;
-            float: left;
-            padding: 1%;
-        }
-        .col-50 {
-            width: 48%;
-            float: left;
-            padding: 1%;
-        }
-        .col-60 {
-            width: 58%;
-            float: left;
-            padding: 1%;
-        }
-        .col-70 {
-            width: 68%;
-            float: left;
-            padding: 1%;
-        }
-        .col-75 {
-            width: 73%;
-            float: left;
-            padding: 1%;
-        }
-        .col-80 {
-            width: 78%;
-            float: left;
-            padding: 1%;
-        }
-        .componente_box input {
-        }
-        .col-100, .col-50 {
-            padding: 1%;
-        }
-        .componente_content {
-            background: #f1f1f1;
-        }
-        .input100 {
-            width: 100%;
-        }
-        .select_icon {
-            width: 100px;
-            float: left;
-            text-align: center;
-            height: 100px; 
-            margin: 5px;
-        }
-        .input_id {
-            width: 90%;
-        }
-        input[type=radio]:checked + label>img {
-            background: #FFF;
-        }
-        /* Stuff after this is only to make things more pretty */
-        input[type=radio] + label>img {
-          width: 70px;
-          height: 70px;
-        }
-        
-        /*ON OFF*/
-        .onoffswitch {
-            position: relative; width: 90px;
-            -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
-        }
-        .onoffswitch-checkbox {
-            display: none !important;
-        }
-        .onoffswitch-label {
-            display: block; overflow: hidden; cursor: pointer;
-            border: 2px solid #999999; border-radius: 20px;
-        }
-        .onoffswitch-inner {
-            display: block; width: 200%; margin-left: -100%;
-            transition: margin 0.3s ease-in 0s;
-        }
-        .onoffswitch-inner:before, .onoffswitch-inner:after {
-            display: block; float: left; width: 50%; height: 30px; padding: 0; line-height: 30px;
-            font-size: 14px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
-            box-sizing: border-box;
-        }
-        .onoffswitch-inner:before {
-            content: "ON";
-            padding-left: 10px;
-            background-color: #34A7C1; color: #FFFFFF;
-        }
-        .onoffswitch-inner:after {
-            content: "OFF";
-            padding-right: 10px;
-            background-color: #EEEEEE; color: #999999;
-            text-align: right;
-        }
-        .onoffswitch-switch {
-            display: block; width: 18px; margin: 6px;
-            background: #FFFFFF;
-            position: absolute; top: 0; bottom: 0;
-            right: 56px;
-            border: 2px solid #999999; border-radius: 20px;
-            transition: all 0.3s ease-in 0s; 
-        }
-        .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
-            margin-left: 0;
-        }
-        .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
-            right: 0px; 
-        }
-
-        .vitrine_text {
-            border: 1px solid red;
-        }
-        .center {
-            text-align: center;
-        }
-        .howl-iconpicker {
-            width: 700px !important;
-        }
-        .howl-iconpicker-close {
-            width: 682px !important;
-        }
-        .howl-iconpicker .geticonval {
-            width: 60px !important;
-            height: 60px !important;
-            font-size: 43px;
-            text-align: center;
-        }
-        input.font_size {
-            width: 100% !important;
-            float: right;
-        }
-    </style>
-<?php
-} //fecha function display_post_vitrine_meta_box
-?>
+    <?php } // Fecha Loop dos componentes ?>
+<?php } //fecha function display_post_vitrine_meta_box ?>
 
 <?php 
 // inserir aqui novo metabox 
@@ -988,6 +735,7 @@ function display_adjustVitrine_meta_box( $post_vitrine ) {
     $boxBorder_color = esc_html (get_post_meta( $post_vitrine->ID, "boxBorder_color", true ) );
     $boxLines_color = esc_html (get_post_meta( $post_vitrine->ID, "boxLines_color", true ) );
     $data = esc_html (get_post_meta( $post_vitrine->ID, "data", true ) );
+    $presentation_font_size = esc_html (get_post_meta( $post_vitrine->ID, "presentation_font_size", true ) );
     $font_size = esc_html (get_post_meta( $post_vitrine->ID, "font_size", true ) );
     $showWPEditor = esc_html (get_post_meta( $post_vitrine->ID, "showWPEditor", true ) );
 ?>
@@ -1005,11 +753,15 @@ function display_adjustVitrine_meta_box( $post_vitrine ) {
                 <?php if($showWPEditor == "on") $fieldShowWPEditor = 'checked="checked"'; ?>
                 <input type="checkbox" name="showWPEditor" id="showWPEditor" <?php echo $fieldShowWPEditor; ?> />                    
             </div>
-            <?php if ($showWPEditor != "on") { ?>
+            <?php if ($showWPEditor == "on") : ?>
+                <style>
+                    #basic_vitrine_meta_box { display: none; }
+                </style>
+            <?php else : ?>
                 <style>
                     #postdivrich { display: none; }
                 </style>
-            <?php } ?>
+            <?php endif; ?>
             <div class="spacer"></div>
         <hr />            
         </div>
@@ -1110,57 +862,12 @@ function display_order_meta_box( $post_vitrine ) {
     $order7 = esc_html (get_post_meta( $post_vitrine->ID, "order7", true ) );
     $order8 = esc_html (get_post_meta( $post_vitrine->ID, "order8", true ) );
 
+    $metabox = get_post_meta( $post_vitrine->ID, "metabox", true );
     for ($metaboxID=1; $metaboxID<=8; $metaboxID++) { //abre o loop dos componEentes
         ${"vitrine_title_0$metaboxID"} = esc_html (get_post_meta( $post_vitrine->ID, "title_vitrine_0" . $metaboxID . "", true ) );
     }
 ?>
     <p><i class="fas fa-info-circle"></i> <?php echo esc_html( __( "Drag to change the order of the highlighted components  in the Window", 'wp-vitrines-master' ) ); ?></p>
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <!--link rel="stylesheet" href="/resources/demos/style.css"-->
-    <style>
-        div.sortIt { width: 120px; background-color: #44c756; font-family: Verdana;
-            float: left; margin: 4px; text-align: center; border: medium solid #999;
-            padding: 4px; color:#eee; box-shadow:5px 5px 5px #444;}
-        .msg {
-            display: block;
-        }
-        .alert {
-            #006a25;
-            background:
-            #abd46e;
-            text-align: center;
-            display: block;
-            padding: 3px;
-            margin: 15px 30px;
-        }
-        .ui-state-default { cursor: move; padding: 3px;}
-        .item_icon {margin-right: 3px;}
-        .number_component {
-            width: 15px;
-            height: 15px;
-            background: #555;
-            border-radius: 50%;
-            display: inline-block;
-            font-weight: bold;
-            color:
-            #FFF;
-            text-align: center;
-            font-size: 10px;
-            margin-right: 4px;
-        }
-        .component_off {
-            height: 15px;
-            background: #530505;
-            display: inline-block;
-            font-weight: bold;
-            color:
-            #FFF;
-            text-align: center;
-            font-size: 10px;
-            margin-right: 4px;
-        }            
-    </style>
-        
     <ul id="sortableContainer">
         <?php
             $boxes = 0;
@@ -1174,7 +881,6 @@ function display_order_meta_box( $post_vitrine ) {
             if ( $boxes >= 1 ) { 
                 $btn_on = "display: block;";
                 for ($metaboxID=1; $metaboxID<=8; $metaboxID++) { //abre o loop dos componEentes
-                    //${"vitrine_title_0$metaboxID"} = esc_html (get_post_meta( $post_vitrine->ID, "title_vitrine_0" . $metaboxID . "", true ) );
                     $item = ${"order$metaboxID"};
                     ${"item_$metaboxID"} = substr(${"order$metaboxID"}, -1);
                     $value = ${"item_$metaboxID"};
@@ -1191,7 +897,6 @@ function display_order_meta_box( $post_vitrine ) {
                     $onOff = ( get_post_meta( get_the_ID(), 'onOff_vitrine_0'. ${"item_$metaboxID"}, true ) );
                     if ( $onOff != 'on' ) { 
                         echo "<span class='component_off'>";
-                        //echo " DESABILITADO";
                         echo esc_html( __( "DISABLED", 'wp-vitrines-master' ) );
                         echo "</span>";                            
                     }    
@@ -1212,34 +917,13 @@ function display_order_meta_box( $post_vitrine ) {
         $varTextOrder = __( 'Update order of the components', 'wp-vitrines-master' );
         $varTextUpdated = __( 'Updated', 'wp-vitrines-master' );
     ?>
-    <script>
-        jQuery(document).ready(function() {
-            var $ = jQuery.noConflict();
-            $('#sortableContainer').sortable();
-            $('#sortableContainer').on( "sortbeforestop", function( event, ui ) {
-                // $('#resultado').empty();
-                // $('#msg').empty();
-                // $('<span class="alert"><?php echo $varTextUpdated; ?>!</span>').appendTo('#msg');
-                var itemOrder = $('#sortableContainer').sortable("toArray");
-                var item = 1;
-                for (var i = 0; i <= 7; i++) {
-                    //$("<label>Posição do Box"+ item +":</label><input type='text' class='position' name='order"+ item +"' value='" + itemOrder[i] + "' /><br>").appendTo('#resultado');
-                    $("#position"+item).val(itemOrder[i]);
-                    item++;
-                }
-            });
-            //$('<div id=buttonDiv><a id="link">Atualizar Ordem dos Boxes</a></div>').appendTo('#btnArea');
-            //$('<a class="button" id="link">Update order of the components</a>').appendTo('#btnArea');
-            //$('<a class="button" id="link"><?php echo $varTextOrder; ?></a>').appendTo('#btnArea');
-        });
-    </script>
 
     <div id="btnArea" style="<?php echo $btn_on; ?>"></div>
     <div id="msg"></div>
     <div id="resultado" style="display: none;">
+
     <?php
         for ($metaboxID=1; $metaboxID<=8; $metaboxID++) { //abre o loop dos componEentes
-            //${"vitrine_title_0$metaboxID"} = esc_html (get_post_meta( $post_vitrine->ID, "title_vitrine_0" . $metaboxID . "", true ) );
             $item = ${"order$metaboxID"};
             ${"item_$metaboxID"} = substr(${"order$metaboxID"}, -1);
             $value = ${"item_$metaboxID"};
@@ -1264,7 +948,7 @@ function display_order_meta_box( $post_vitrine ) {
 function add_post_vitrine_fields( $post_vitrine_id, $post_vitrine ) {
     // Check post type for post_vitrines
     if ( $post_vitrine->post_type == 'post_vitrines' ) {
-        // Store data in post meta table if present in post data
+        //Store data in post meta table if present in post data
         //Custom Fields da Versão Basica da Vitrine - Apresentação
         update_post_meta( $post_vitrine_id, 'basic_vitrine_title', $_POST['basic_vitrine_title'] );
         update_post_meta( $post_vitrine_id, 'basic_vitrine_presentation', $_POST['basic_vitrine_presentation'] );
@@ -1282,11 +966,10 @@ function add_post_vitrine_fields( $post_vitrine_id, $post_vitrine ) {
         update_post_meta( $post_vitrine_id, 'order7', $_POST['order7'] );
         update_post_meta( $post_vitrine_id, 'order8', $_POST['order8'] );
 
-        // Infografico Tableu custom fields    
+        // Infografico Tableu custom fields
         update_post_meta( $post_vitrine_id, 'infographic_collumns', $_POST['infographic_collumns'] );
-        for ($number_of_infographics=1; $number_of_infographics<=6; $number_of_infographics ++) { //abre o loop de update dos componentes
+        for ($number_of_infographics=1; $number_of_infographics<=6; $number_of_infographics++) {
             update_post_meta( $post_vitrine_id, 'title_infografico_0' . $number_of_infographics, $_POST['title_infografico_0' . $number_of_infographics] );
-            //update_post_meta( $post_vitrine_id, 'code_infografico_0' . $number_of_infographics, $_POST['code_infografico_0' . $number_of_infographics] );
             update_post_meta( $post_vitrine_id, 'text_infografico_0' . $number_of_infographics, $_POST['text_infografico_0' . $number_of_infographics] );
             update_post_meta( $post_vitrine_id, 'basic_vitrine_infografico_color_0' . $number_of_infographics, $_POST['basic_vitrine_infografico_color_0' . $number_of_infographics] );
             update_post_meta( $post_vitrine_id, 'basic_vitrine_infografico_bg_0' . $number_of_infographics, $_POST['basic_vitrine_infografico_bg_0' . $number_of_infographics] );
@@ -1306,7 +989,7 @@ function add_post_vitrine_fields( $post_vitrine_id, $post_vitrine ) {
         //Custom fields relacionados ao modal Textos
         update_post_meta( $post_vitrine_id, 'highlights_collumns', $_POST['highlights_collumns'] );
         update_post_meta( $post_vitrine_id, 'texts_collumns', $_POST['texts_collumns'] );
-        for ($number_of_texts=1; $number_of_texts<=20; $number_of_texts ++) { //abre o loop de update dos componentes
+        for ($number_of_texts=1; $number_of_texts<=20; $number_of_texts++) {
             update_post_meta( $post_vitrine_id, 'texts_content_0' . $number_of_texts . '_title', $_POST['texts_content_0' . $number_of_texts . '_title'] );
             update_post_meta( $post_vitrine_id, 'texts_vitrine_content_0' . $number_of_texts, $_POST['texts_vitrine_content_0' . $number_of_texts] );
             update_post_meta( $post_vitrine_id, 'texts_vitrine_content_id_0' . $number_of_texts, $_POST['texts_vitrine_content_id_0' . $number_of_texts] );
@@ -1319,7 +1002,7 @@ function add_post_vitrine_fields( $post_vitrine_id, $post_vitrine ) {
         update_post_meta( $post_vitrine_id, 'responsibility_color', $_POST['responsibility_color'] );
         update_post_meta( $post_vitrine_id, 'responsibility_bg', $_POST['responsibility_bg'] );
 
-        //my_css    
+        //custom css
         update_post_meta( $post_vitrine_id, 'my_css', $_POST['my_css'] );
 
         //Custom Fields Caixa de Configurações da Vitrine
@@ -1333,7 +1016,7 @@ function add_post_vitrine_fields( $post_vitrine_id, $post_vitrine ) {
         update_post_meta( $post_vitrine_id, 'showWPEditor', $_POST['showWPEditor'] );
 
         //Custom Fields da Versão Basica imagens e textos até 20 de cada.
-        for ($number_of_fields=1; $number_of_fields<=20; $number_of_fields ++) { //abre o loop de update dos componentes
+        for ($number_of_fields=1; $number_of_fields<=20; $number_of_fields++) {
             update_post_meta( $post_vitrine_id, 'basic_content_0' . $number_of_fields . '_title', $_POST['basic_content_0' . $number_of_fields . '_title'] );
             update_post_meta( $post_vitrine_id, 'image_url_0' . $number_of_fields, $_POST['image_url_0' . $number_of_fields] );
             update_post_meta( $post_vitrine_id, 'basic_vitrine_content_0' . $number_of_fields, $_POST['basic_vitrine_content_0' . $number_of_fields] );
@@ -1342,7 +1025,7 @@ function add_post_vitrine_fields( $post_vitrine_id, $post_vitrine ) {
             update_post_meta( $post_vitrine_id, 'basic_vitrine_content_id_0' . $number_of_fields, $_POST['basic_vitrine_content_id_0' . $number_of_fields] );
         }
 
-        for ($metaboxUpdate=1; $metaboxUpdate<=8; $metaboxUpdate ++) { //abre o loop de update dos componentes
+        for ($metaboxUpdate=1; $metaboxUpdate<=8; $metaboxUpdate++) {
             update_post_meta( $post_vitrine_id, 'onOff_vitrine_0' . $metaboxUpdate, $_POST['onOff_0' . $metaboxUpdate . '_vitrine'] );
             update_post_meta( $post_vitrine_id, 'title_vitrine_0' . $metaboxUpdate, $_POST['title_0' . $metaboxUpdate . '_vitrine'] );
             update_post_meta( $post_vitrine_id, 'titleLink_vitrine_0' . $metaboxUpdate, $_POST['titleLink_0' . $metaboxUpdate . '_vitrine'] );
@@ -1358,7 +1041,7 @@ function add_post_vitrine_fields( $post_vitrine_id, $post_vitrine ) {
             update_post_meta( $post_vitrine_id, 'iconColor_vitrine_0' . $metaboxUpdate, $_POST['iconColor_0' . $metaboxUpdate . '_vitrine'] );
             update_post_meta( $post_vitrine_id, 'imageURL_vitrine_0' . $metaboxUpdate, $_POST['imageURL_0' . $metaboxUpdate . '_vitrine'] );
             update_post_meta( $post_vitrine_id, 'notes_vitrine_0' . $metaboxUpdate, $_POST['notes_0' . $metaboxUpdate . '_vitrine'] );
-        } //fecha loop de update dos campos do metabox
+        }
     } // fecha if $post_vitrine
 } // fecha function add_post_vitrine_fields
 add_action( 'save_post', 'add_post_vitrine_fields', 10, 2 );
@@ -1366,23 +1049,9 @@ add_action( 'save_post', 'add_post_vitrine_fields', 10, 2 );
 function include_template_function( $template_path ) {
     if ( get_post_type() == 'post_vitrines' ) {
         if ( is_single() ) {
-            // checks if the file exists in the theme first,
-            // otherwise serve the file from the plugin
-            // if ( $theme_file = locate_template( array ( 'single_vitrines.php' ) ) ) {
-            //     $template_path = $theme_file;
-            // } else {
-            //     $template_path = plugin_dir_path( __FILE__ ) . '/templates/single_vitrines.php';
-            // }
             $template_path = plugin_dir_path( __FILE__ ) . '/templates/single_vitrines.php';
         }
         if ( is_archive() ) {
-            // checks if the file exists in the theme first,
-            // otherwise serve the file from the plugin
-            // if ( $theme_file = locate_template( array ( 'archive_vitrines.php' ) ) ) {
-            //     $template_path = $theme_file;
-            // } else {
-            //     $template_path = plugin_dir_path( __FILE__ ) . '/templates/archive_vitrines.php';
-            // }
             $template_path = plugin_dir_path( __FILE__ ) . '/templates/archive_vitrines.php';
         }
     }
@@ -1395,11 +1064,11 @@ if (function_exists('add_theme_support')) {
     add_image_size('vitrine_image', 320, 320, true);
     add_image_size('vitrine_highlight', 225, 140, true);
 }
-load_plugin_textdomain( 'vitrine_conhecimento_bvs', false, basename( dirname( __FILE__ ) ) . '/languages' );
 
 function wp_vitrines_custom_css() {
     global $post;
     $my_css = stripslashes(get_post_meta( $post->ID, "my_css", true ));
+
     if ( $my_css ) {
 ?>
 
@@ -1429,4 +1098,27 @@ function settings_link($links) {
     return $links;
 }
 add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), 'settings_link' );
+
+// Update CSS within in Admin
+function admin_enqueue() {
+    global $pagenow;
+    $post_type = get_post_type();
+
+    if ( 'post_vitrines' == $post_type && 'post.php' == $pagenow ) {
+        wp_enqueue_style('jquery-ui', '//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css');
+        wp_enqueue_style('font-awesome', WP_VITRINES_PLUGIN_URL.'fontawesome/css/all.min.css');
+        wp_enqueue_style('simple-iconpicker', WP_VITRINES_PLUGIN_URL.'simple-iconpicker/simple-iconpicker.min.css');
+        wp_enqueue_style('admin-styles', WP_VITRINES_PLUGIN_URL.'templates/css/admin.css');
+
+        // wp_enqueue_script('font-awesome', WP_VITRINES_PLUGIN_URL.'fontawesome/js/all.min.js', array(), null, true);
+        wp_enqueue_script('simple-iconpicker', WP_VITRINES_PLUGIN_URL.'simple-iconpicker/simple-iconpicker.min.js', array(), null, true);
+        wp_enqueue_script('admin-scripts', WP_VITRINES_PLUGIN_URL.'templates/js/admin.js', array(), null, true);
+    }
+}
+add_action('admin_enqueue_scripts', 'admin_enqueue');
+
+function remove_custom_meta_form() {
+    remove_meta_box( 'postcustom', 'post_vitrines', 'normal' );
+}
+add_action( 'admin_menu' , 'remove_custom_meta_form' );
 ?>
