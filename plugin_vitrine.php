@@ -153,7 +153,7 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
     <div class="spacer"></div>    
     <div class="box_modal" id="modal-window-vitrinePresentation">
         <div class="summary">
-            <a onclick="mudarEstado('presentation_box')" title="<?php _e( 'Presentation of the theme', 'wp-vitrines-master' ) ?>"><i class="fas fa-align-justify"></i><?php _e( 'Presentation', 'wp-vitrines-master' ) ?></a>
+            <a onclick="mudarEstado('presentation_box')" title="<?php _e( 'Presentation of the theme', 'wp-vitrines-master' ); ?>"><i class="fas fa-align-justify bv-icon"></i><?php _e( 'Presentation', 'wp-vitrines-master' ); ?></a>
         </div>
         <div class="vitrine_box" id="presentation_box" style="display: none;">
             <div class="row">
@@ -210,7 +210,7 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
     <div class="spacer"></div>
     <div class="box_modal" id="modal-window-imagesAndTexts">
         <div class="summary">
-            <a onclick="mudarEstado('highlights_box')" title="<?php _e( 'Main Content', 'wp-vitrines-master' ) ?>"><i class="far fa-image"></i><?php _e( 'Main Content', 'wp-vitrines-master' ) ?></a>
+            <a onclick="mudarEstado('highlights_box')" title="<?php _e( 'Main Content', 'wp-vitrines-master' ); ?>"><i class="far fa-image bv-icon"></i><?php _e( 'Main Content', 'wp-vitrines-master' ); ?></a>
         </div>
         <div class="vitrine_box" id="highlights_box" style="display: none;">
             <div class="row">
@@ -297,7 +297,7 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
     <div class="spacer"></div>
     <div class="box_modal" id="modal-window-infografico">
         <div class="summary">
-            <a onclick="mudarEstado('infographic_box')" title="<?php _e( 'Infographics, images, graphs, tables, etc.', 'wp-vitrines-master' ) ?>"><i class="fas fa-chart-line"></i><?php _e( 'Infographics, images, graphs, tables, etc.', 'wp-vitrines-master' ) ?></a>
+            <a onclick="mudarEstado('infographic_box')" title="<?php _e( 'Infographics, images, graphs, tables, etc.', 'wp-vitrines-master' ); ?>"><i class="fas fa-chart-line bv-icon"></i><?php _e( 'Infographics, images, graphs, tables, etc.', 'wp-vitrines-master' ); ?></a>
         </div>
         <div class="vitrine_box" id="infographic_box" style="display: none;">
             <div class="row center">
@@ -377,7 +377,7 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
     <div class="spacer"></div>
     <div class="box_modal" id="modal-window-videos">
         <div class="summary">
-            <a onclick="mudarEstado('videos_box')" title="Vídeos"><i class="fab fa-youtube"></i><?php _e( 'Videos', 'wp-vitrines-master' ) ?></a>
+            <a onclick="mudarEstado('videos_box')" title="<?php _e( 'Videos', 'wp-vitrines-master' ); ?>"><i class="fab fa-youtube bv-icon"></i><?php _e( 'Videos', 'wp-vitrines-master' ); ?></a>
         </div>
         <div class="vitrine_box" id="videos_box" style="display: none;">
             <div class="row">
@@ -452,7 +452,7 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
     <div class="spacer"></div>
     <div class="box_modal" id="modal-window-texts">
         <div class="summary">
-            <a  onclick="mudarEstado('texts_box')" title="<?php _e( 'Links to publications, documents and related or recommended sites ', 'wp-vitrines-master' ) ?>:"><i class="fas fa-font"></i><?php _e( 'Links to publications, documents and related or recommended sites ', 'wp-vitrines-master' ) ?>:</a>
+            <a  onclick="mudarEstado('texts_box')" title="<?php _e( 'Links to publications, documents and related or recommended sites ', 'wp-vitrines-master' ); ?>:"><i class="fas fa-font bv-icon"></i><?php _e( 'Links to publications, documents and related or recommended sites ', 'wp-vitrines-master' ); ?>:</a>
         </div>
         <div class="vitrine_box" id="texts_box" style="display: none;">
             <div class="row center">
@@ -527,7 +527,7 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
     <div class="spacer"></div>
     <div class="box_modal" id="modal-window-responsibility">
         <div class="summary">
-            <a  onclick="mudarEstado('responsabilit_box')" title="<?php _e( 'Authorship and collaborators', 'wp-vitrines-master' ) ?>"><i class="fas fa-user-check"></i><?php _e( 'Authorship and collaborators', 'wp-vitrines-master' ) ?></a>
+            <a  onclick="mudarEstado('responsabilit_box')" title="<?php _e( 'Authorship and collaborators', 'wp-vitrines-master' ); ?>"><i class="fas fa-user-check bv-icon"></i><?php _e( 'Authorship and collaborators', 'wp-vitrines-master' ); ?></a>
         </div>
         <div class="vitrine_box" id="responsabilit_box" style="display: none;">
             <div class="row">
@@ -560,7 +560,7 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
     <div class="spacer"></div>
     <div class="box_modal" id="modal-window-css" style="display: none_S;">
         <div class="summary">
-            <a  onclick="mudarEstado('csseditor_box')" title="Editor de CSS"><i class="fas fa-code"></i><?php _e( 'CSS Editor', 'wp-vitrines-master' ) ?></a>
+            <a  onclick="mudarEstado('csseditor_box')" title="<?php _e( 'CSS Editor', 'wp-vitrines-master' ); ?>"><i class="fas fa-code bv-icon"></i><?php _e( 'CSS Editor', 'wp-vitrines-master' ); ?></a>
         </div>
         <div class="vitrine_box" id="csseditor_box" style="display: none;">
             <div class="row">
