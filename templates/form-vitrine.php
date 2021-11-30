@@ -20,9 +20,7 @@
         ?>
         <div class="presentation_content">
             <?php $content = get_post_meta( get_the_ID(), "basic_vitrine_presentation", true ); ?>
-            <?php if ( is_shortcode($content) ) : ?>
-                <?php $content = do_shortcode( $content ); ?>
-            <?php endif; ?>
+            <?php $content = do_shortcode( $content ); ?>
             <?php echo $content; ?>
         </div>
     </div>
@@ -49,9 +47,7 @@
     <div class="vitrine_1_column">
         <div class="responsability_content">
             <?php $content = get_post_meta( get_the_ID(), "responsibility", true ); ?>
-            <?php if ( is_shortcode($content) ) : ?>
-                <?php $content = do_shortcode( $content ); ?>
-            <?php endif; ?>
+            <?php $content = do_shortcode( $content ); ?>
             <?php echo $content; ?>
         </div>
     </div>

@@ -21,9 +21,7 @@
             <div id="<?php if (empty($id)) { echo 'highlight_'.$count; } else { echo $id; }; ?>" class="highlightBox" style="<?php if (isset($bgcolor)) { echo "background-color: $bgcolor !important;"; } ?> <?php if (isset($fontcolor)) { echo "color: $fontcolor !important;"; } ?>">
                 <h2><?php echo $title; ?></h2>
                 <div class="contentHighlight">
-                    <?php if ( is_shortcode($content) ) : ?>
-                        <?php $content = do_shortcode( $content ); ?>
-                    <?php endif; ?>
+                    <?php $content = do_shortcode( $content ); ?>
                     <?php echo $content; ?>
                 </div>
             </div>
