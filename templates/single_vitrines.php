@@ -2,7 +2,7 @@
 /*
 Template Name: Vitrine do Conhecimento BVSalud
 */
- 
+
 get_header();
 wp_enqueue_style('theme-styles', plugin_dir_url( __FILE__ ) .'css/page_vitrine.css');
 wp_enqueue_script('font-awesome', 'https://kit.fontawesome.com/be0bade886.js', array(), null, true);

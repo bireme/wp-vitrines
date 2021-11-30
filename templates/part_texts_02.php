@@ -7,16 +7,17 @@
     <?php 
         $texts = 0;
         for ($count=1; $count<=20; $count ++) {
-            $value = (get_post_meta( get_the_ID(), 'texts_vitrine_content_0'. $count, true ) );
+            $value = get_post_meta( get_the_ID(), 'texts_vitrine_content_0'. $count, true );
             if (!empty($value)) { $texts ++; }
         }
         $count = 1;
         for ($count=1; $count<= $texts; $count ++) {
-            $title = (get_post_meta( get_the_ID(), "texts_content_0".$count."_title", true ) );
-            $content = (get_post_meta( get_the_ID(), 'texts_vitrine_content_0'. $count, true ) );
-            $fontcolor = (get_post_meta( get_the_ID(), 'texts_vitrine_content_color_0'. $count, true ) );
-            $bgcolor = (get_post_meta( get_the_ID(), 'texts_vitrine_content_bg_0'. $count, true ) );
-            $id = (get_post_meta( get_the_ID(), 'texts_vitrine_content_id_0'. $count, true ) );
+            $title = get_post_meta( get_the_ID(), "texts_content_0".$count."_title", true );
+            $content = get_post_meta( get_the_ID(), 'texts_vitrine_content_0'. $count, true );
+            $fontcolor = get_post_meta( get_the_ID(), 'texts_vitrine_content_color_0'. $count, true );
+            $bgcolor = get_post_meta( get_the_ID(), 'texts_vitrine_content_bg_0'. $count, true );
+            $id = get_post_meta( get_the_ID(), 'texts_vitrine_content_id_0'. $count, true );
+            
             if ($count % 2 == 0) { 
                 $checkDIV = 1;  
             } else { 
@@ -32,6 +33,9 @@
             <div id="<?php if (empty($id)) { echo 'texts_'.$count; } else { echo $id; }; ?>" class="textsBox <?php echo 'texts_'.$count;?>" style="<?php if (isset($bgcolor)) { echo "background-color: $bgcolor !important;"; } ?> <?php if (isset($fontcolor)) { echo " color: $fontcolor !important;"; } ?>">
                 <h2><?php echo $title; ?></h2>
                 <div class="contenttexts">
+                    <?php if ( is_shortcode($content) ) : ?>
+                        <?php $content = do_shortcode( $content ); ?>
+                    <?php endif; ?>
                     <?php echo $content; ?>
                 </div>
             </div>
