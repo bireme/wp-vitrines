@@ -100,7 +100,7 @@ if ($site_lang == 'en') {
                             <div class="vitrine_excerpt">
                                 <?php the_excerpt(); ?>
                             </div>
-                        <?php } ?>
+                        <?php endif; ?>
                     </div>
                 </div>
             </a>
