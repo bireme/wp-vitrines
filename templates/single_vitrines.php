@@ -63,11 +63,17 @@ if ($site_lang == 'en') {
             <h2 style="color: <?php echo $titleFont_color; ?>"><?php the_title(); ?></h2>
         </div>
         <div class="dateBox">
-            <?php 
-                $data = esc_html (get_post_meta( get_the_ID(), "data", true ) );
-                $data = new DateTime($data);
+            <?php
+                $data = esc_html( get_post_meta( get_the_ID(), "data", true ) );
+
+                if ( $data ) {
+                    $datetime = new DateTime($data);
+                    $modified_date = $datetime->format('d/m/Y');
+                } else {
+                    $modified_date = get_modified_date(get_the_ID());
+                }
             ?>
-            <span>Conteúdo atualizado em: <?php echo $data->format('d/m/Y'); ?></span>
+            <span>Conteúdo atualizado em: <?php echo $modified_date; ?></span>
         </div>
 
         <?php 
