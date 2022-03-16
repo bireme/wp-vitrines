@@ -291,7 +291,7 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
             <?php } ?>
             <div class="spacer"></div>
         </div>
-    </div>        
+    </div>
 
     <?php // Modal Infográfico ?>
     <div class="spacer"></div>
@@ -581,7 +581,6 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
 <?php
 } //End of display_basic_vitrine_meta_box
 ?>
-
 <?php
 function display_post_vitrine_meta_box( $post_vitrine ) {
 ?>
@@ -725,7 +724,6 @@ function display_post_vitrine_meta_box( $post_vitrine ) {
             <!-- Fim dos Componente no Loop -->
     <?php } // Fecha Loop dos componentes ?>
 <?php } //fecha function display_post_vitrine_meta_box ?>
-
 <?php 
 // inserir aqui novo metabox 
 function display_adjustVitrine_meta_box( $post_vitrine ) {
@@ -850,7 +848,6 @@ function display_adjustVitrine_meta_box( $post_vitrine ) {
 <?php
 }
 ?>
-
 <?php
 function display_order_meta_box( $post_vitrine ) {
     $order1 = esc_html (get_post_meta( $post_vitrine->ID, "order1", true ) );
@@ -943,7 +940,6 @@ function display_order_meta_box( $post_vitrine ) {
 <?php 
 } // fecha function display_order_meta_box
 ?>
-
 <?php
 function add_post_vitrine_fields( $post_vitrine_id, $post_vitrine ) {
     // Check post type for post_vitrines
