@@ -753,11 +753,13 @@ function display_adjustVitrine_meta_box( $post_vitrine ) {
             </div>
             <?php if ($showWPEditor == "on") : ?>
                 <style>
+                    #postdivrich { display: block; }
                     #basic_vitrine_meta_box { display: none; }
                 </style>
             <?php else : ?>
                 <style>
                     #postdivrich { display: none; }
+                    #basic_vitrine_meta_box { display: block; }
                 </style>
             <?php endif; ?>
             <div class="spacer"></div>
