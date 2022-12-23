@@ -558,7 +558,7 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
 
     <?php //Modal CSS ?>
     <div class="spacer"></div>
-    <div class="box_modal" id="modal-window-css" style="display: none_S;">
+    <div class="box_modal" id="modal-window-css">
         <div class="summary">
             <a  onclick="mudarEstado('csseditor_box')" title="<?php _e( 'CSS Editor', 'wp-vitrines-master' ); ?>"><i class="fas fa-code bv-icon"></i><?php _e( 'CSS Editor', 'wp-vitrines-master' ); ?></a>
         </div>
@@ -570,8 +570,7 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
                         <?php _e( 'Use this editor if you need to configure something specific to this Window. The CSS included in this field will only affect this Window.', 'wp-vitrines-master' ) ?>
                     </div>
                 </div>
-                <div class="row">
-                    <label><?php _e( 'Your CSS', 'wp-vitrines-master' ) ?></label><br>
+                <div class="row my-css">
                     <textarea name="my_css" rows="8" class="input100 csstextarea"><?php echo $my_css; ?></textarea>
                 </div>
             </div>
