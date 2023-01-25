@@ -18,21 +18,13 @@ if ( defined( 'POLYLANG_VERSION' ) ) {
 } else {
     $site_lang = '';
 }
-
-if ($site_lang == 'en') {
-    $vitrines_breadcrumb = "Windows of Knowledge";
-} elseif ($site_lang == 'es') {
-    $vitrines_breadcrumb = "Vitrinas del Conocimiento";    
-} else {
-    $vitrines_breadcrumb = "Vitrines do Conhecimento";        
-}
 ?>
 
 <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
     <?php $plugin_dir = plugin_dir_url( __FILE__ ); ?>
     <div class="vitrine">
         <div class="breadcrumb">
-            <a href="<?php echo rtrim($home_url, '/'); ?>/<?php echo ($site_lang); ?>" title="<?php bloginfo('name'); ?>">Home</a> / <a href="../"><?php echo $vitrines_breadcrumb; ?></a>
+            <a href="<?php echo rtrim($home_url, '/'); ?>/<?php echo $site_lang; ?>" title="<?php bloginfo('name'); ?>">Home</a> / <a href="../"><?php _e( 'Windows of Knowledge', 'wp-vitrines-master' ); ?></a>
         </div>
         <?php 
             //Carrega Variaveis da Customização da Vitrine

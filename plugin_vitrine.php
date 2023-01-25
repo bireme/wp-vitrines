@@ -452,11 +452,11 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
     <div class="spacer"></div>
     <div class="box_modal" id="modal-window-texts">
         <div class="summary">
-            <a  onclick="mudarEstado('texts_box')" title="<?php _e( 'Links to publications, documents and related or recommended sites ', 'wp-vitrines-master' ); ?>:"><i class="fas fa-font bv-icon"></i><?php _e( 'Links to publications, documents and related or recommended sites ', 'wp-vitrines-master' ); ?>:</a>
+            <a  onclick="mudarEstado('texts_box')" title="<?php _e( 'Links to publications, documents and related or recommended sites', 'wp-vitrines-master' ); ?>:"><i class="fas fa-font bv-icon"></i><?php _e( 'Links to publications, documents and related or recommended sites', 'wp-vitrines-master' ); ?>:</a>
         </div>
         <div class="vitrine_box" id="texts_box" style="display: none;">
             <div class="row center">
-                <span class="comp_info"><?php _e( 'Select the number of columns to display the main content ', 'wp-vitrines-master' ) ?>::</span><br>
+                <span class="comp_info"><?php _e( 'Select the number of columns to display the main content', 'wp-vitrines-master' ) ?>:</span><br>
                 <?php $selected_option = $texts_collumns; ?>
                 <select name="texts_collumns" id="texts_collumns">
                     <option value="1" <?php selected($selected_option, '1') ?>>1 <?php _e( 'column', 'wp-vitrines-master' ) ?></option>

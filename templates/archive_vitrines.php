@@ -82,7 +82,7 @@ if ($site_lang == 'en') {
 </style>
 
 <div class="middle">
-    <div class="breadcrumb"><a href="<?php echo rtrim($home_url, '/'); ?>/<?php echo ($site_lang);?>" title="<?php bloginfo('name'); ?>">Home</a> /  </div>
+    <div class="breadcrumb"><a href="<?php echo rtrim($home_url, '/'); ?>/<?php echo ($site_lang);?>" title="<?php bloginfo('name'); ?>">Home</a> / </div>
 
     <h2 class="storytitle"><?php echo($vitrines_title);?></h2>
 
@@ -110,7 +110,7 @@ if ($site_lang == 'en') {
     </div>
 
     <div class="vitrine_links">
-        <a href="<?php echo ($vitrine_link_url);?>" target="_blank"><?php echo ($vitrine_link);?></a>
+        <a href="<?php echo $vitrine_link_url; ?>" target="_blank"><?php echo $vitrine_link; ?></a>
     </div>
 </div>
 <?php get_footer(); ?>

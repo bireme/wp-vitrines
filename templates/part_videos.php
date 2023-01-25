@@ -36,7 +36,7 @@
         </div>
         <?php if (!empty($more_videos)) { ?>
             <div class="row morevideos">
-                <span class=""><a style="<?php if (isset($fontcolor)) { echo " color: $fontcolor !important;"; } ?>" href="<?php echo $more_videos ?>" <?php if ( $more_videos_target ) echo 'target="_blank"'; ?>>Mais vídeos</a></span>
+                <span class=""><a style="<?php if (isset($fontcolor)) { echo " color: $fontcolor !important;"; } ?>" href="<?php echo $more_videos ?>" <?php if ( $more_videos_target ) echo 'target="_blank"'; ?>><?php _e( 'More videos', 'wp-vitrines-master' ); ?></a></span>
             </div>
         <?php } ?>
     </div>
