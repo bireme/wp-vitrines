@@ -95,10 +95,16 @@ if ($site_lang == 'en') {
                     </div>
                     <div class="info">
                         <h2 class="vitrine_title"><?php the_title(); ?></h2>
-                        <?php $showWPEditor = esc_html (get_post_meta( get_the_ID(), "showWPEditor", true ) ); ?>
+                        <?php $showWPEditor = esc_html( get_post_meta( get_the_ID(), "showWPEditor", true ) ); ?>
                         <?php if ($showWPEditor == "on") : ?>
                             <div class="vitrine_excerpt">
                                 <?php the_excerpt(); ?>
+                            </div>
+                        <?php else : ?>
+                            <?php $content = get_post_meta( get_the_ID(), "basic_vitrine_presentation", true ); ?>
+                            <?php $content = do_shortcode( $content ); ?>
+                            <div class="vitrine_excerpt">
+                                <?php echo wp_trim_words( $content, 55, '[...]' ); ?>
                             </div>
                         <?php endif; ?>
                     </div>

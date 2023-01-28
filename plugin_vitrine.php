@@ -165,7 +165,7 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
             </div>
             <div class="row">
                 <div class="col-100">
-                    <label><?php _e( 'Title', 'wp-vitrines-master' ) ?>:<i><?php _e( 'optional content', 'wp-vitrines-master' ) ?></i></label><br>
+                    <label><?php _e( 'Title', 'wp-vitrines-master' ) ?> (<?php _e( 'optional content', 'wp-vitrines-master' ) ?>):</label><br>
                     <input type="text" class="vitrine_title" name="basic_vitrine_title" value="<?php echo $basic_vitrine_title; ?>" />                
                 </div>
             </div>
@@ -218,7 +218,7 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
                     <div class="helper">
                         <p>
                             <i class="fas fa-info-circle"></i>
-                            <?php _e( 'Main Content ...', 'wp-vitrines-master' ) ?>
+                            <?php _e( 'Main Content', 'wp-vitrines-master' ); ?>
                         </p>
                     </div>
                 </div>
