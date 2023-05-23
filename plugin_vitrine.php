@@ -109,6 +109,7 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
     }
         
     //Custom fields videos
+    $videos_title = esc_html (get_post_meta( $post_vitrine->ID, "videos_title", true ) );
     $video_01 = esc_html (get_post_meta( $post_vitrine->ID, "video_01", true ) );
     $video_02 = esc_html (get_post_meta( $post_vitrine->ID, "video_02", true ) );
     $video_03 = esc_html (get_post_meta( $post_vitrine->ID, "video_03", true ) );
@@ -250,9 +251,10 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
                     </div>
                     <div class="col-75">
                         <div class="row">
-                            <label><?php _e( 'Title', 'wp-vitrines-master' ) ?>: <i><?php _e( 'optional content', 'wp-vitrines-master' ) ?></i></label><br>
+                            <label><?php _e( 'Title', 'wp-vitrines-master' ) ?> (<?php _e( 'optional content', 'wp-vitrines-master' ) ?>):</label><br>
                             <input type="text" class="basic_content_title input100" name="basic_content_0<?php echo $number_of_fields; ?>_title" value="<?php echo ${'basic_content_0'. $number_of_fields .'_title'}; ?>">
                         </div>
+                        <br>
                         <?php 
                             $content   = html_entity_decode(${'basic_vitrine_content_0'.$number_of_fields}); 
                             $editor_id = 'basic_vitrine_content_0' . $number_of_fields;
@@ -333,8 +335,8 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
                     <?php echo $number_of_infographics; ?>
                     </div>
                     <div class="col-75">
-                        <label><?php _e( 'Title', 'wp-vitrines-master' ) ?>: <i><?php _e( 'optional content', 'wp-vitrines-master' ) ?></i></label><br>
-                        <input type="text" class="title_infografico input100" name="title_infografico_0<?php echo $number_of_infographics; ?>" value="<?php echo ${'title_infografico_0'.$number_of_infographics}; ?>" /><br>
+                        <label><?php _e( 'Title', 'wp-vitrines-master' ) ?> (<?php _e( 'optional content', 'wp-vitrines-master' ) ?>):</label><br>
+                        <input type="text" class="title_infografico input100" name="title_infografico_0<?php echo $number_of_infographics; ?>" value="<?php echo ${'title_infografico_0'.$number_of_infographics}; ?>" /><br><br>
                         <?php 
                             $content   = html_entity_decode(${'text_infografico_0'.$number_of_infographics}); 
                             $editor_id = 'text_infografico_0' . $number_of_infographics;
@@ -380,6 +382,12 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
             <a onclick="mudarEstado('videos_box')" title="<?php _e( 'Videos', 'wp-vitrines-master' ); ?>"><i class="fab fa-youtube bv-icon"></i><?php _e( 'Videos', 'wp-vitrines-master' ); ?></a>
         </div>
         <div class="vitrine_box" id="videos_box" style="display: none;">
+            <div class="row">
+                <div class="col-100">
+                    <label><?php _e( 'Title', 'wp-vitrines-master' ) ?> (<?php _e( 'optional content', 'wp-vitrines-master' ) ?>):</label><br>
+                    <input type="text" class="videos_title input100" name="videos_title" value="<?php echo $videos_title; ?>" />
+                </div>
+            </div>
             <div class="row">
                 <div class="col-100">
                     <div class="helper">
@@ -479,9 +487,9 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
                     </div>
                     <div class="col-75">
                         <div class="row">
-                            <label><?php _e( 'Title', 'wp-vitrines-master' ) ?>: <i><?php _e( 'optional content', 'wp-vitrines-master' ) ?></i></label><br>
+                            <label><?php _e( 'Title', 'wp-vitrines-master' ) ?> (<?php _e( 'optional content', 'wp-vitrines-master' ) ?>):</label><br>
                             <input type="text" class="texts_content_title input100" name="texts_content_0<?php echo $number_of_texts; ?>_title" value="<?php echo ${'texts_content_0'. $number_of_texts .'_title'}; ?>">
-                        </div>
+                        </div><br>
                         <?php 
                             $content   = html_entity_decode(${'texts_vitrine_content_0'.$number_of_texts}); 
                             $editor_id = 'texts_vitrine_content_0' . $number_of_texts;
@@ -974,6 +982,7 @@ function add_post_vitrine_fields( $post_vitrine_id, $post_vitrine ) {
         }
 
         //Custom Fields Videos
+        update_post_meta( $post_vitrine_id, 'videos_title', $_POST['videos_title'] );
         update_post_meta( $post_vitrine_id, 'video_01', $_POST['video_01'] );
         update_post_meta( $post_vitrine_id, 'video_02', $_POST['video_02'] );
         update_post_meta( $post_vitrine_id, 'video_03', $_POST['video_03'] );
@@ -1101,7 +1110,7 @@ function admin_enqueue() {
     global $pagenow;
     $post_type = get_post_type();
 
-    if ( 'post_vitrines' == $post_type && 'post.php' == $pagenow ) {
+    if ( 'post_vitrines' == $post_type && in_array($pagenow, array('post.php', 'post-new.php')) ) {
         wp_enqueue_style('jquery-ui', '//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css');
         wp_enqueue_style('font-awesome', WP_VITRINES_PLUGIN_URL.'fontawesome/css/all.min.css');
         wp_enqueue_style('simple-iconpicker', WP_VITRINES_PLUGIN_URL.'simple-iconpicker/simple-iconpicker.min.css');
