@@ -9,6 +9,7 @@
         $value = (get_post_meta( get_the_ID(), 'video_0'. $count, true ) );
         if (!empty($value)) { $videos ++; }
     }
+    $title = (get_post_meta( get_the_ID(), 'videos_title', true ) );
     $fontcolor = (get_post_meta( get_the_ID(), 'videos_color', true ) );
     $bgcolor = (get_post_meta( get_the_ID(), 'videos_bg', true ) );
     $id = (get_post_meta( get_the_ID(), 'videos_id', true ) );
@@ -16,17 +17,17 @@
     $more_videos_target = (get_post_meta( get_the_ID(), 'more_videos_target', true ) );
 ?>
 <div class="videos row <?php echo $videos ?>_videos" id="<?php if (empty($id)) { echo 'videos'; } else { echo $id; }; ?>" style="<?php if (isset($bgcolor)) { echo "background-color: $bgcolor !important;"; } ?> <?php if (isset($fontcolor)) { echo " color: $fontcolor !important;"; } ?>">
-    <div class="videos_<?php echo $videos ?>">
+    <?php if ( $title ) : ?>
+        <h2 style="padding-top: 20px;"><?php echo esc_html($title); ?></h2>
+    <?php endif; ?>
+    <div class="videos_<?php echo $videos; ?>">
         <?php
             for ($count=1; $count<= $videos; $count ++) {
                 $video = (get_post_meta( get_the_ID(), 'video_0'. $count, true ) );
             ?>
                 <div class="contentvideos">
                     <div class="video-player" style="text-align: center;">
-                       <iframe width="560" height="315" 
-                          src="https://www.youtube.com/embed/<?php echo get_video_code($video); ?>" frameborder="0" 
-                          allow="accelerometer; autoplay; encrypted-media;
-                          gyroscope; picture-in-picture" allowfullscreen>[
+                       <iframe width="560" height="315" src="https://www.youtube.com/embed/<?php echo get_video_code($video); ?>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen>[
                        </iframe>
                     </div>
                 </div>
