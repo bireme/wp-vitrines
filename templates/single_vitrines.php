@@ -65,7 +65,7 @@ if ( defined( 'POLYLANG_VERSION' ) ) {
                     $modified_date = get_modified_date(get_the_ID());
                 }
             ?>
-            <span>Conteúdo atualizado em: <?php echo $modified_date; ?></span>
+            <span><?php _e( 'Updated content in:', 'wp-vitrines-master' ); ?> <?php echo $modified_date; ?></span>
         </div>
 
         <?php 

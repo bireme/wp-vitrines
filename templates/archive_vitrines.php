@@ -4,7 +4,8 @@ Template Name: Archive Vitrines do Conhecimento
 */ 
  
 get_header();
-wp_enqueue_style ('theme-style', plugin_dir_url( __FILE__ ) .'css/page_vitrine.css');
+
+wp_enqueue_style ('theme-styles', plugin_dir_url( __FILE__ ) .'css/page_vitrine.css');
 
 $config = get_option('wp_vitrines_config');
 $home_url = ( $config['home_url'] ) ? $config['home_url'] : get_bloginfo('url');
@@ -12,29 +13,9 @@ $current_language = strtolower(get_bloginfo('language'));
 $site_lang = substr($current_language, 0,2);
 
 if ( defined( 'POLYLANG_VERSION' ) ) {
-    $default_language = pll_default_language();
-    if ( $default_language == $site_lang ) $site_lang = '';
+    $vitrine_link_url = pll_home_url();
 } else {
-    $site_lang = '';
-}
-
-if ($site_lang == 'en') {
-    $vitrines_title = "Windows of Knowledge";
-    $vitrine_link = "Windows of Knowledge Collection of the VHL Network";
-    $vitrine_link_url = "https://bvsalud.org/en/vitrinas";
-} elseif ($site_lang == 'es' || $default_language =='_e') {
-    $vitrines_title = "Vitrinas del Conocimiento";    
-    $vitrine_link = " Colección de Vitrinas del Conocimiento de la Red BVS";
-    $vitrine_link_url = "https://bvsalud.org/es/vitrinas";
-} elseif ($site_lang == 'pt' || $default_language =='_p') {
-    $vitrines_title = "Vitrines do Conhecimento";
-    $vitrine_link = "Coleção de Vitrines do Conhecimento da Rede BVS";
-    $vitrine_link_url = "https://bvsalud.org/vitrinas";
-} else {
-    $vitrines_title = "Vitrines do Conhecimento";
-    $vitrine_link = "Coleção de Vitrines do Conhecimento da Rede BVS";
-    $vitrine_link_url = "https://bvsalud.org/vitrinas";
-    $site_lang = '';
+    $vitrine_link_url = home_url('/');
 }
 ?>
 
@@ -84,7 +65,7 @@ if ($site_lang == 'en') {
 <div class="middle">
     <div class="breadcrumb"><a href="<?php echo rtrim($home_url, '/'); ?>/<?php echo ($site_lang);?>" title="<?php bloginfo('name'); ?>">Home</a> / </div>
 
-    <h2 class="storytitle"><?php echo($vitrines_title);?></h2>
+    <h2 class="storytitle"><?php _e( 'Windows of Knowledge', 'wp-vitrines-master' ); ?></h2>
 
     <div class="vitrine_list">
         <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
@@ -116,7 +97,7 @@ if ($site_lang == 'en') {
     </div>
 
     <div class="vitrine_links">
-        <a href="<?php echo $vitrine_link_url; ?>" target="_blank"><?php echo $vitrine_link; ?></a>
+        <a href="<?php echo $vitrine_link_url; ?>" target="_blank"><?php _e( 'Windows of Knowledge Collection of the VHL Network', 'wp-vitrines-master' ); ?></a>
     </div>
 </div>
 <?php get_footer(); ?>
