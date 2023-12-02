@@ -236,7 +236,7 @@ function display_basic_vitrine_meta_box( $post_vitrine ) {
             </div>
             <div class="spacer"></div>
             <hr />
-            <?php for ($number_of_fields=1; $number_of_fields<=20; $number_of_fields ++) { ?>
+            <?php for ($number_of_fields=1; $number_of_fields<=20; $number_of_fields++) { ?>
                 <?php 
                     if ($number_of_fields >= 6) {
                         $show = 'none';
