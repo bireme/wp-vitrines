@@ -1,0 +1,796 @@
+/* =============================================
+   Vitrine Builder – Editor CSS (Admin)
+   ============================================= */
+
+/* ── Forçar largura total no admin ── */
+.post-type-vitrine #post-body.columns-1 #post-body-content {
+    width: 100%;
+}
+.post-type-vitrine #side-sortables,
+.post-type-vitrine #postbox-container-1 {
+    display: none !important;
+}
+.post-type-vitrine #postbox-container-2 {
+    width: 100% !important;
+}
+
+/* ── Topbar ── */
+#vitrine-topbar {
+    margin: 12px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+#vitrine-page-settings {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 13px;
+}
+.vitrine-topbar-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    user-select: none;
+    font-weight: 500;
+}
+.vitrine-topbar-toggle input[type="checkbox"] {
+    margin: 0;
+}
+.vitrine-topbar-color {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+}
+.vitrine-topbar-color input[type="color"] {
+    width: 32px;
+    height: 28px;
+    padding: 1px;
+    border: 1px solid #8c8f94;
+    border-radius: 3px;
+    cursor: pointer;
+}
+#vitrine-opt-bg-clear {
+    font-size: 11px !important;
+    line-height: 1 !important;
+    padding: 2px 6px !important;
+    color: #d63638;
+    margin-left: -8px;
+}
+
+/* ── Layout principal do editor ── */
+#vitrine-editor {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    background: #f0f0f1;
+    min-height: 600px;
+    overflow: hidden;
+}
+
+/* ── Área superior: sidebar + canvas ── */
+#vitrine-editor-top {
+    display: flex;
+    flex: 1;
+    min-height: 400px;
+    overflow: hidden;
+}
+
+/* ── Sidebars ── */
+.vitrine-sidebar {
+    width: 240px;
+    min-width: 240px;
+    background: #fff;
+    border-right: 1px solid #dcdcde;
+    padding: 16px;
+    overflow-y: auto;
+    flex-shrink: 0;
+}
+.vitrine-sidebar h3 {
+    margin: 0 0 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1d2327;
+}
+
+/* ── Painel inferior de configurações ── */
+#vitrine-settings-bottom {
+    background: #fff;
+    border-top: 2px solid #0073aa;
+    max-height: 420px;
+    overflow-y: auto;
+    transition: max-height 0.3s ease;
+}
+#vitrine-settings-bottom.is-collapsed {
+    max-height: 40px;
+    overflow: hidden;
+}
+.vitrine-settings-bottom-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background: #f0f0f1;
+    border-bottom: 1px solid #dcdcde;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+.vitrine-settings-bottom-header h3 {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1d2327;
+}
+#vitrine-settings-toggle {
+    padding: 0 4px !important;
+    line-height: 1 !important;
+}
+#vitrine-settings-toggle .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    transition: transform 0.3s;
+}
+#vitrine-settings-bottom.is-collapsed #vitrine-settings-toggle .dashicons {
+    transform: rotate(180deg);
+}
+#vitrine-settings-panel {
+    padding: 12px 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 20px;
+    align-items: flex-start;
+}
+#vitrine-settings-panel > .vitrine-field-group {
+    min-width: 180px;
+    max-width: 280px;
+    flex: 1 1 200px;
+}
+#vitrine-settings-panel > .vitrine-field-group--full {
+    flex: 1 1 100%;
+    max-width: 100%;
+}
+#vitrine-settings-panel > hr {
+    flex: 1 1 100%;
+    margin: 4px 0;
+}
+#vitrine-settings-panel > .vitrine-settings-empty {
+    flex: 1 1 100%;
+}
+#vitrine-settings-panel > .vitrine-aranha-section,
+#vitrine-settings-panel > .vitrine-toggle-section {
+    flex: 1 1 100%;
+}
+
+/* ── Elementos na sidebar esquerda ── */
+.vitrine-element-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    margin-bottom: 6px;
+    background: #f6f7f7;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    cursor: grab;
+    user-select: none;
+    font-size: 13px;
+    transition: background 0.15s, box-shadow 0.15s;
+}
+.vitrine-element-item:hover {
+    background: #e9ecef;
+    box-shadow: 0 1px 3px rgba(0,0,0,.1);
+}
+.vitrine-element-item .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: #0073aa;
+}
+
+/* ── Canvas central ── */
+#vitrine-canvas-wrapper {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: #e2e4e7;
+}
+#vitrine-canvas {
+    min-height: 500px;
+    background: #fff;
+    border: 2px dashed #c3c4c7;
+    border-radius: 4px;
+    padding: 16px;
+    position: relative;
+}
+.vitrine-canvas-placeholder {
+    text-align: center;
+    color: #a7aaad;
+    font-size: 15px;
+    padding: 80px 0;
+}
+
+/* ── Bloco no canvas ── */
+.vitrine-canvas-block {
+    position: relative;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    margin-bottom: 12px;
+    background: #fff;
+    transition: box-shadow 0.15s;
+    box-sizing: border-box;
+}
+.vitrine-canvas-block:hover {
+    box-shadow: 0 0 0 1px #0073aa;
+}
+.vitrine-canvas-block.is-selected {
+    box-shadow: 0 0 0 2px #0073aa;
+}
+
+/* ── Bloco dentro de row container ── */
+.vitrine-canvas-block--in-row {
+    margin-bottom: 0;
+    overflow: visible;
+}
+
+/* ── Toolbar do bloco ── */
+.vitrine-block-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    background: #f0f0f1;
+    border-bottom: 1px solid #dcdcde;
+    border-radius: 4px 4px 0 0;
+    font-size: 12px;
+    color: #50575e;
+}
+.vitrine-drag-handle {
+    cursor: grab;
+    color: #787c82;
+}
+.vitrine-block-label {
+    flex: 1;
+    font-weight: 600;
+}
+.vitrine-block-toolbar button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px;
+    color: #787c82;
+    line-height: 1;
+}
+.vitrine-block-toolbar button:hover {
+    color: #d63638;
+}
+.vitrine-block-toolbar button .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+/* ── Badge de largura (%) na toolbar ── */
+.vitrine-width-badge {
+    background: #8e44ad;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 10px;
+    line-height: 1.4;
+    white-space: nowrap;
+    letter-spacing: 0.3px;
+}
+
+/* ── Preview do bloco ── */
+.vitrine-block-preview {
+    padding: 12px 16px;
+    min-height: 30px;
+}
+.vitrine-block-preview img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+/* ── Handle de redimensionamento (altura – inferior) ── */
+.vitrine-resize-handle {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -4px;
+    height: 8px;
+    cursor: ns-resize;
+    z-index: 5;
+    background: transparent;
+}
+.vitrine-resize-handle:hover,
+body.vitrine-resizing .vitrine-resize-handle {
+    background: rgba(0, 115, 170, 0.25);
+}
+body.vitrine-resizing {
+    cursor: ns-resize !important;
+    user-select: none !important;
+}
+
+/* ── Divisor de largura entre elementos (row container) ── */
+.vitrine-col-divider {
+    flex: 0 0 12px;
+    margin: 0 -6px;
+    position: relative;
+    cursor: ew-resize;
+    z-index: 15;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: stretch;
+}
+.vitrine-col-divider::before {
+    content: '';
+    width: 4px;
+    height: 32px;
+    max-height: 50%;
+    border-radius: 4px;
+    background: #c3c4c7;
+    transition: background 0.15s, height 0.15s, box-shadow 0.15s;
+}
+.vitrine-col-divider:hover::before {
+    background: #0073aa;
+    height: 48px;
+    max-height: 70%;
+    box-shadow: 0 0 0 3px rgba(0,115,170,0.15);
+}
+body.vitrine-resizing-width .vitrine-col-divider::before {
+    background: #0073aa;
+    height: 100%;
+    max-height: 100%;
+    border-radius: 0;
+    width: 2px;
+    box-shadow: 0 0 0 4px rgba(0,115,170,0.12);
+}
+body.vitrine-resizing-width {
+    cursor: ew-resize !important;
+    user-select: none !important;
+}
+
+/* ── Ghost SortableJS ── */
+.vitrine-ghost {
+    opacity: 0.4;
+    border: 2px dashed #0073aa;
+    background: #e8f4fc;
+}
+
+/* ── Painel de configurações ── */
+.vitrine-settings-empty {
+    color: #a7aaad;
+    font-style: italic;
+    font-size: 13px;
+}
+.vitrine-field-group {
+    margin-bottom: 14px;
+}
+.vitrine-field-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #1d2327;
+}
+.vitrine-field-group input[type="text"],
+.vitrine-field-group input[type="number"],
+.vitrine-field-group textarea {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #8c8f94;
+    border-radius: 3px;
+    font-size: 13px;
+}
+.vitrine-field-group input[type="color"] {
+    width: 50px;
+    height: 32px;
+    padding: 2px;
+    border: 1px solid #8c8f94;
+    border-radius: 3px;
+    cursor: pointer;
+}
+.vitrine-field-group textarea {
+    resize: vertical;
+}
+
+/* ── Campo de largura ── */
+.vitrine-field-group--width input {
+    border-color: #8e44ad !important;
+}
+.vitrine-width-input-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+.vitrine-width-input-row input {
+    flex: 1;
+}
+.vitrine-btn-distribute {
+    flex-shrink: 0;
+    font-size: 15px !important;
+    line-height: 1 !important;
+    padding: 4px 8px !important;
+}
+.vitrine-field-hint {
+    font-size: 11px;
+    color: #8c8f94;
+    margin: 4px 0 0;
+    font-style: italic;
+}
+
+/* ── Select nos campos da sidebar ── */
+.vitrine-field-group select {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #8c8f94;
+    border-radius: 3px;
+    font-size: 13px;
+    background: #fff;
+}
+
+/* ── Media image preview na sidebar ── */
+.vitrine-image-preview {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    border-radius: 3px;
+    margin-bottom: 8px;
+    border: 1px solid #dcdcde;
+}
+.vitrine-image-field .button {
+    font-size: 12px;
+}
+.vitrine-image-url-input {
+    display: block;
+    width: 100%;
+    margin-top: 6px;
+    font-size: 12px;
+    padding: 4px 8px;
+    border: 1px solid #c3c4c7;
+    border-radius: 3px;
+    box-sizing: border-box;
+}
+
+/* ── Template Picker ── */
+.vitrine-template-picker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    min-height: 300px;
+}
+.vitrine-template-picker__title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1d2327;
+    margin: 0 0 20px;
+}
+.vitrine-template-picker__grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    max-width: 700px;
+}
+.vitrine-template-picker__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 20px 24px;
+    border: 2px solid #c3c4c7;
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    min-width: 180px;
+}
+.vitrine-template-picker__item:hover {
+    border-color: #0073aa;
+    box-shadow: 0 0 0 1px #0073aa;
+}
+.vitrine-template-picker__item strong {
+    font-size: 14px;
+    color: #1d2327;
+}
+.vitrine-template-picker__item span {
+    font-size: 12px;
+    color: #8c8f94;
+}
+.vitrine-template-picker__hint {
+    margin-top: 20px;
+    font-size: 12px;
+    color: #8c8f94;
+    font-style: italic;
+}
+
+/* ── Container: zona de drop para filhos ── */
+.vitrine-canvas-block--container {
+    border: 2px solid #8e44ad;
+}
+.vitrine-canvas-block--container > .vitrine-block-toolbar {
+    background: #f3e8fa;
+}
+.vitrine-container-drop {
+    min-height: 50px;
+    margin: 0 12px 12px;
+    padding: 10px;
+    border: 2px dashed #c9a5e0;
+    border-radius: 4px;
+    background: #faf5ff;
+    position: relative;
+}
+.vitrine-container-drop:empty::after {
+    content: 'Arraste elementos aqui dentro';
+    display: block;
+    text-align: center;
+    color: #b39ddb;
+    font-size: 12px;
+    padding: 16px 0;
+}
+.vitrine-container-drop .vitrine-canvas-block {
+    margin-bottom: 8px;
+}
+.vitrine-container-label {
+    display: inline-block;
+    font-weight: 600;
+}
+
+/* ── Container em modo linha (row) ── */
+.vitrine-container-drop--row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 0;
+    align-items: stretch;
+    padding: 8px;
+    overflow: hidden;
+}
+.vitrine-container-drop--row > .vitrine-canvas-block {
+    min-width: 40px;
+    margin-bottom: 0;
+    box-sizing: border-box;
+}
+.vitrine-container-drop--row:empty::after {
+    width: 100%;
+}
+
+/* ── Aranha: painel de itens repetíveis ── */
+.vitrine-aranha-section-title {
+    margin: 0 0 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1d2327;
+}
+.vitrine-aranha-item {
+    background: #f6f7f7;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 8px;
+}
+.vitrine-aranha-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.vitrine-aranha-item-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #0073aa;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+}
+.vitrine-aranha-item .vitrine-field-group {
+    margin-bottom: 8px;
+}
+.vitrine-aranha-item .vitrine-field-group:last-child {
+    margin-bottom: 0;
+}
+.vitrine-aranha-item .vitrine-field-group label {
+    font-size: 11px;
+    margin-bottom: 2px;
+}
+.vitrine-aranha-item input[type="text"] {
+    width: 100%;
+    padding: 4px 6px;
+    font-size: 12px;
+    border: 1px solid #8c8f94;
+    border-radius: 3px;
+    box-sizing: border-box;
+}
+.vitrine-aranha-add-item {
+    width: 100%;
+    margin-top: 4px;
+    text-align: center;
+}
+
+/* ── Repeater genérico (Toggle, etc.) ── */
+.vitrine-repeater-section-title {
+    margin: 0 0 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1d2327;
+}
+.vitrine-repeater-item {
+    background: #f6f7f7;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 8px;
+}
+.vitrine-repeater-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.vitrine-repeater-item-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #0073aa;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+}
+.vitrine-repeater-item .vitrine-field-group {
+    margin-bottom: 8px;
+}
+.vitrine-repeater-item .vitrine-field-group:last-child {
+    margin-bottom: 0;
+}
+.vitrine-repeater-item .vitrine-field-group label {
+    font-size: 11px;
+    margin-bottom: 2px;
+}
+.vitrine-repeater-item input[type="text"],
+.vitrine-repeater-item textarea {
+    width: 100%;
+    padding: 4px 6px;
+    font-size: 12px;
+    border: 1px solid #8c8f94;
+    border-radius: 3px;
+    box-sizing: border-box;
+}
+.vitrine-repeater-item textarea {
+    resize: vertical;
+    font-family: monospace;
+    min-height: 80px;
+}
+.vitrine-toggle-add-item {
+    width: 100%;
+    margin-top: 4px;
+    text-align: center;
+}
+
+/* ── Campo de CSS personalizado ── */
+.vitrine-field-group--custom-css {
+    flex: 1 1 100% !important;
+    max-width: 100% !important;
+}
+.vitrine-field-group--custom-css textarea {
+    width: 100%;
+    min-height: 60px;
+    font-family: monospace;
+    font-size: 12px;
+    resize: vertical;
+    padding: 6px 8px;
+    border: 1px solid #8c8f94;
+    border-radius: 3px;
+    background: #f9f9f9;
+    tab-size: 2;
+}
+.vitrine-field-group--custom-css .vitrine-field-hint {
+    font-size: 11px;
+    color: #8c8f94;
+    margin: 4px 0 0;
+    font-style: italic;
+}
+
+/* ── WYSIWYG Toolbar (aranha items) ── */
+.vitrine-wysiwyg-toolbar {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 4px;
+}
+.vitrine-wysiwyg-btn {
+    background: #f0f0f1;
+    border: 1px solid #c3c4c7;
+    border-radius: 3px;
+    padding: 2px 6px;
+    font-size: 12px;
+    line-height: 1.4;
+    cursor: pointer;
+    color: #50575e;
+    min-width: 24px;
+    text-align: center;
+}
+.vitrine-wysiwyg-btn:hover {
+    background: #e0e0e0;
+    border-color: #8c8f94;
+}
+.vitrine-aranha-wysiwyg[contenteditable] {
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    padding: 6px 8px;
+    min-height: 48px;
+    font-size: 13px;
+    line-height: 1.5;
+    background: #fff;
+    outline: none;
+    overflow-y: auto;
+    max-height: 120px;
+}
+.vitrine-aranha-wysiwyg[contenteditable]:focus {
+    border-color: #2271b1;
+    box-shadow: 0 0 0 1px #2271b1;
+}
+
+/* ── Hero Settings (editor admin) ── */
+#vitrine-hero-settings {
+    background: #f6f7f7;
+    border: 1px solid #c3c4c7;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+}
+#vitrine-hero-settings h4 {
+    margin: 0 0 10px;
+    font-size: 13px;
+    font-weight: 600;
+}
+.vitrine-hero-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    align-items: flex-start;
+}
+.vitrine-hero-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 140px;
+}
+.vitrine-hero-field label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #50575e;
+}
+.vitrine-hero-field input[type="text"],
+.vitrine-hero-field input[type="number"] {
+    width: 100%;
+    max-width: 220px;
+}
+.vitrine-hero-field input[type="range"] {
+    width: 140px;
+}
+.vitrine-hero-image-field .vitrine-image-preview {
+    max-width: 120px;
+    max-height: 60px;
+    border-radius: 4px;
+    object-fit: cover;
+}
+#vitrine-hero-preview {
+    display: none;
+}
