@@ -115,7 +115,7 @@ class Vitrine_Element_Aranha extends Vitrine_Element {
 
     private function render_item( $item, $side, $icon_size, $index = 0, $total = 1 ) {
         $text = wp_kses_post( isset( $item['text'] ) ? $item['text'] : '' );
-        $icon = isset( $item['icon'] ) ? esc_url( $item['icon'] ) : '';
+        $icon = isset( $item['icon'] ) ? $item['icon'] : '';
         $link = isset( $item['link'] ) ? esc_url( $item['link'] ) : '';
 
         $mid = ( $total - 1 ) / 2;
@@ -149,7 +149,7 @@ class Vitrine_Element_Aranha extends Vitrine_Element {
 
     private function render_top_item( $item, $icon_size, $index = 0, $total = 1 ) {
         $text = wp_kses_post( isset( $item['text'] ) ? $item['text'] : '' );
-        $icon = isset( $item['icon'] ) ? esc_url( $item['icon'] ) : '';
+        $icon = isset( $item['icon'] ) ? $item['icon'] : '';
         $link = isset( $item['link'] ) ? esc_url( $item['link'] ) : '';
 
         // Bend: left / right / straight (vertical) based on position
@@ -173,55 +173,33 @@ class Vitrine_Element_Aranha extends Vitrine_Element {
     }
 
     private function render_top_arm( $bend ) {
-        $output = '<div class="vitrine-aranha__top-arm">';
-
-        if ( $bend === 'straight' ) {
-            // Vertical line straight down
-            $output .= '<div style="position:absolute;left:50%;top:0;bottom:0;width:2px;background:var(--aranha-line);transform:translateX(-50%);"></div>';
+        if ( 'straight' === $bend ) {
+            $d = 'M 50,0 L 50,100';
+        } elseif ( 'left' === $bend ) {
+            $d = 'M 50,0 C 50,50 100,50 100,100';
         } else {
-            // Segment 1: vertical down from card to midpoint
-            $output .= '<div style="position:absolute;left:50%;top:0;height:50%;width:2px;background:var(--aranha-line);transform:translateX(-50%);"></div>';
-
-            // Segment 2: horizontal from midpoint toward center
-            $hx = ( 'left' === $bend ) ? 'left:50%;right:0;' : 'left:0;right:50%;';
-            $output .= '<div style="position:absolute;top:50%;' . $hx . 'height:2px;background:var(--aranha-line);"></div>';
-
-            // Segment 3: vertical from bend down to circle top
-            $vx = ( 'left' === $bend ) ? 'right:0;' : 'left:0;';
-            $output .= '<div style="position:absolute;top:50%;bottom:0;' . $vx . 'width:2px;background:var(--aranha-line);transform:translateX(-50%);"></div>';
+            $d = 'M 50,0 C 50,50 0,50 0,100';
         }
-
-        $output .= '</div>';
-        return $output;
+        return '<div class="vitrine-aranha__top-arm">' .
+            '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">' .
+            '<path d="' . esc_attr( $d ) . '" fill="none" stroke="var(--aranha-line)" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linecap="round" />' .
+            '</svg></div>';
     }
 
     private function render_arm( $bend, $side ) {
-        $output = '<div class="vitrine-aranha__arm">';
-
-        if ( $bend === 'straight' ) {
-            $output .= '<div style="position:absolute;top:50%;left:0;right:0;height:2px;background:var(--aranha-line);transform:translateY(-50%);"></div>';
+        if ( 'left' === $side ) {
+            if ( 'straight' === $bend )   { $d = 'M 0,50 L 100,50'; }
+            elseif ( 'down' === $bend )   { $d = 'M 0,50 C 50,50 50,100 100,100'; }
+            else                          { $d = 'M 0,50 C 50,50 50,0 100,0'; }
         } else {
-            // Segment 1: horizontal from card to midpoint
-            $h1 = ( 'left' === $side )
-                ? 'left:0;width:50%;'
-                : 'right:0;width:50%;';
-            $output .= '<div style="position:absolute;top:50%;' . $h1 . 'height:2px;background:var(--aranha-line);"></div>';
-
-            // Segment 2: vertical from midpoint toward center
-            $vx = ( 'left' === $side ) ? 'left:50%;' : 'right:50%;';
-            $vy = ( 'down' === $bend )
-                ? 'top:50%;bottom:0;'
-                : 'top:0;bottom:50%;';
-            $output .= '<div style="position:absolute;' . $vx . $vy . 'width:2px;background:var(--aranha-line);transform:translateX(-50%);"></div>';
-
-            // Segment 3: horizontal from bend to circle side
-            $h2x = ( 'left' === $side ) ? 'left:50%;right:0;' : 'left:0;right:50%;';
-            $h2y = ( 'down' === $bend ) ? 'bottom:0;' : 'top:0;';
-            $output .= '<div style="position:absolute;' . $h2y . $h2x . 'height:2px;background:var(--aranha-line);"></div>';
+            if ( 'straight' === $bend )   { $d = 'M 100,50 L 0,50'; }
+            elseif ( 'down' === $bend )   { $d = 'M 100,50 C 50,50 50,100 0,100'; }
+            else                          { $d = 'M 100,50 C 50,50 50,0 0,0'; }
         }
-
-        $output .= '</div>';
-        return $output;
+        return '<div class="vitrine-aranha__arm">' .
+            '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">' .
+            '<path d="' . esc_attr( $d ) . '" fill="none" stroke="var(--aranha-line)" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linecap="round" />' .
+            '</svg></div>';
     }
 
     private function render_text( $text, $link ) {
@@ -232,10 +210,22 @@ class Vitrine_Element_Aranha extends Vitrine_Element {
     }
 
     private function render_icon( $icon, $icon_size ) {
-        if ( $icon ) {
-            return '<img class="vitrine-aranha__icon" src="' . $icon . '" alt="" style="width:' . $icon_size . 'px;height:' . $icon_size . 'px;" />';
+        if ( ! $icon ) {
+            return '';
         }
-        return '';
+
+        // Dashicons (WordPress built-in)
+        if ( strpos( $icon, 'dashicons-' ) === 0 ) {
+            return '<span class="dashicons ' . esc_attr( $icon ) . ' vitrine-aranha__icon" style="font-size:' . $icon_size . 'px;width:' . $icon_size . 'px;height:' . $icon_size . 'px;"></span>';
+        }
+
+        // Font Awesome (fas, far, fab, fal, fad…)
+        if ( preg_match( '/^fa[srlbd]?\s/', $icon ) ) {
+            return '<i class="' . esc_attr( $icon ) . ' vitrine-aranha__icon" style="font-size:' . $icon_size . 'px;"></i>';
+        }
+
+        // Imagem (URL)
+        return '<img class="vitrine-aranha__icon" src="' . esc_url( $icon ) . '" alt="" style="width:' . $icon_size . 'px;height:' . $icon_size . 'px;" />';
     }
 }
 

@@ -62,6 +62,14 @@ class Vitrine_Editor {
             return;
         }
 
+        // Font Awesome 6 Free
+        wp_enqueue_style(
+            'font-awesome',
+            'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css',
+            array(),
+            '6.7.2'
+        );
+
         // SortableJS via CDN
         wp_enqueue_script(
             'sortablejs',
@@ -75,14 +83,14 @@ class Vitrine_Editor {
             'vitrine-editor-css',
             VITRINE_URL . 'assets/css/editor.css',
             array(),
-            VITRINE_VERSION
+            filemtime( VITRINE_PATH . 'assets/css/editor.css' )
         );
 
         wp_enqueue_script(
             'vitrine-editor-js',
             VITRINE_URL . 'assets/js/editor.js',
             array( 'jquery', 'sortablejs', 'wp-util' ),
-            VITRINE_VERSION,
+            filemtime( VITRINE_PATH . 'assets/js/editor.js' ),
             true
         );
 
@@ -129,6 +137,14 @@ class Vitrine_Editor {
                 'hero_text_color'      => '#ffffff',
                 'hero_overlay_opacity' => '50',
                 'hero_height'          => '400',
+                'hero_font_size'       => '36',
+                'hero_text_align'      => 'center',
+                'hero_description'     => '',
+                'hero_desc_size'       => '18',
+                'hero_text_bold'       => '1',
+                'hero_text_italic'     => '0',
+                'hero_desc_bold'       => '0',
+                'hero_desc_italic'     => '0',
             ),
         ) );
     }
@@ -222,6 +238,14 @@ class Vitrine_Editor {
                 'hero_text_color'       => isset( $page_settings['hero_text_color'] ) ? sanitize_hex_color( $page_settings['hero_text_color'] ) : '#ffffff',
                 'hero_overlay_opacity'  => isset( $page_settings['hero_overlay_opacity'] ) ? absint( $page_settings['hero_overlay_opacity'] ) : 50,
                 'hero_height'           => isset( $page_settings['hero_height'] ) ? absint( $page_settings['hero_height'] ) : 400,
+                'hero_font_size'        => isset( $page_settings['hero_font_size'] ) ? absint( $page_settings['hero_font_size'] ) : 36,
+                'hero_text_align'       => isset( $page_settings['hero_text_align'] ) && in_array( $page_settings['hero_text_align'], array( 'left', 'center', 'right' ), true ) ? $page_settings['hero_text_align'] : 'center',
+                'hero_description'      => isset( $page_settings['hero_description'] ) ? wp_kses_post( $page_settings['hero_description'] ) : '',
+                'hero_desc_size'        => isset( $page_settings['hero_desc_size'] ) ? absint( $page_settings['hero_desc_size'] ) : 18,
+                'hero_text_bold'        => isset( $page_settings['hero_text_bold'] ) && $page_settings['hero_text_bold'] === '0' ? '0' : '1',
+                'hero_text_italic'      => ! empty( $page_settings['hero_text_italic'] ) ? '1' : '0',
+                'hero_desc_bold'        => ! empty( $page_settings['hero_desc_bold'] ) ? '1' : '0',
+                'hero_desc_italic'      => ! empty( $page_settings['hero_desc_italic'] ) ? '1' : '0',
             );
             update_post_meta( $post_id, '_vitrine_page_settings', $clean_page );
         }

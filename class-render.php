@@ -88,9 +88,16 @@ class Vitrine_Render {
             return;
         }
         wp_enqueue_style(
+            'font-awesome',
+            'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css',
+            array(),
+            '6.7.2'
+        );
+
+        wp_enqueue_style(
             'vitrine-front-css',
             VITRINE_URL . 'assets/css/frontend.css',
-            array(),
+            array( 'font-awesome' ),
             VITRINE_VERSION
         );
 

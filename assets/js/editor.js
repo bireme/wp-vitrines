@@ -24,8 +24,114 @@
         hero_text: '',
         hero_text_color: '#ffffff',
         hero_overlay_opacity: '50',
-        hero_height: '400'
+        hero_height: '400',
+        hero_font_size: '36',
+        hero_text_align: 'center',
+        hero_description: '',
+        hero_desc_size: '18',
+        hero_text_bold: '1',
+        hero_text_italic: '0'
     };
+
+    /* ──────────── Listas de ícones para o picker ──────────── */
+
+    var DASHICONS_LIST = [
+        'dashicons-admin-appearance','dashicons-admin-comments','dashicons-admin-home',
+        'dashicons-admin-media','dashicons-admin-network','dashicons-admin-page',
+        'dashicons-admin-plugins','dashicons-admin-settings','dashicons-admin-site',
+        'dashicons-admin-users','dashicons-awards','dashicons-building',
+        'dashicons-businessman','dashicons-calendar','dashicons-camera',
+        'dashicons-cart','dashicons-chart-area','dashicons-chart-bar',
+        'dashicons-chart-line','dashicons-chart-pie','dashicons-clipboard',
+        'dashicons-clock','dashicons-controls-play','dashicons-desktop',
+        'dashicons-download','dashicons-edit','dashicons-email',
+        'dashicons-email-alt2','dashicons-feedback','dashicons-filter',
+        'dashicons-flag','dashicons-format-image','dashicons-format-video',
+        'dashicons-groups','dashicons-hammer','dashicons-heart',
+        'dashicons-id','dashicons-images-alt','dashicons-info',
+        'dashicons-instagram','dashicons-laptop','dashicons-layout',
+        'dashicons-lightbulb','dashicons-list-view','dashicons-location',
+        'dashicons-location-alt','dashicons-lock','dashicons-marker',
+        'dashicons-menu','dashicons-microphone','dashicons-money',
+        'dashicons-networking','dashicons-palmtree','dashicons-performance',
+        'dashicons-phone','dashicons-plus','dashicons-portfolio',
+        'dashicons-products','dashicons-rss','dashicons-saved',
+        'dashicons-schedule','dashicons-search','dashicons-share',
+        'dashicons-shield','dashicons-smartphone','dashicons-smiley',
+        'dashicons-star-empty','dashicons-star-filled','dashicons-sticky',
+        'dashicons-store','dashicons-tag','dashicons-tablet',
+        'dashicons-thumbs-up','dashicons-tickets-alt','dashicons-twitter',
+        'dashicons-upload','dashicons-vault','dashicons-video-alt3',
+        'dashicons-visibility','dashicons-warning','dashicons-yes',
+        'dashicons-youtube'
+    ];
+
+    var FA_ICONS_LIST = [
+        'fas fa-address-book','fas fa-anchor','fas fa-award',
+        'fas fa-ban','fas fa-bars','fas fa-bell',
+        'fas fa-bolt','fas fa-book','fas fa-bookmark',
+        'fas fa-briefcase','fas fa-building','fas fa-bullhorn',
+        'fas fa-bullseye','fas fa-calendar','fas fa-camera',
+        'fas fa-certificate','fas fa-chart-bar','fas fa-chart-line',
+        'fas fa-chart-pie','fas fa-check','fas fa-check-circle',
+        'fas fa-clock','fas fa-cloud','fas fa-code',
+        'fas fa-cog','fas fa-comment','fas fa-comments',
+        'fas fa-compass','fas fa-crown','fas fa-cube',
+        'fas fa-database','fas fa-desktop','fas fa-download',
+        'fas fa-envelope','fas fa-exclamation-circle','fas fa-eye',
+        'fas fa-fire','fas fa-flag','fas fa-flask',
+        'fas fa-folder','fas fa-gem','fas fa-gift',
+        'fas fa-globe','fas fa-graduation-cap','fas fa-handshake',
+        'fas fa-hashtag','fas fa-headphones','fas fa-heart',
+        'fas fa-home','fas fa-image','fas fa-info-circle',
+        'fas fa-key','fas fa-laptop','fas fa-layer-group',
+        'fas fa-leaf','fas fa-lightbulb','fas fa-link',
+        'fas fa-list','fas fa-location-dot','fas fa-lock',
+        'fas fa-medal','fas fa-mobile','fas fa-money-bill',
+        'fas fa-music','fas fa-network-wired','fas fa-palette',
+        'fas fa-paper-plane','fas fa-pen','fas fa-percent',
+        'fas fa-phone','fas fa-plane','fas fa-play',
+        'fas fa-plug','fas fa-plus','fas fa-puzzle-piece',
+        'fas fa-circle-question','fas fa-recycle','fas fa-rocket',
+        'fas fa-rss','fas fa-magnifying-glass','fas fa-share',
+        'fas fa-shield','fas fa-signal','fas fa-sliders',
+        'fas fa-smile','fas fa-star','fas fa-store',
+        'fas fa-tag','fas fa-tags','fas fa-thumbs-up',
+        'fas fa-ticket','fas fa-toolbox','fas fa-trophy',
+        'fas fa-truck','fas fa-tv','fas fa-umbrella',
+        'fas fa-upload','fas fa-user','fas fa-users',
+        'fas fa-video','fas fa-wallet','fas fa-wifi',
+        'fas fa-wrench',
+        'fab fa-facebook','fab fa-instagram','fab fa-linkedin',
+        'fab fa-x-twitter','fab fa-whatsapp','fab fa-youtube',
+        'fab fa-tiktok','fab fa-pinterest','fab fa-github'
+    ];
+
+    function isIconClass(icon) {
+        return icon && (icon.indexOf('dashicons-') === 0 || /^fa[srlbd]?\s/.test(icon));
+    }
+
+    function renderIconPreviewHtml(icon) {
+        if (!icon) return '';
+        if (icon.indexOf('dashicons-') === 0) {
+            return '<span class="dashicons ' + escapeAttr(icon) + '" style="font-size:30px;width:30px;height:30px;color:#0073aa;display:inline-block;"></span>';
+        }
+        if (/^fa[srlbd]?\s/.test(icon)) {
+            return '<i class="' + escapeAttr(icon) + '" style="font-size:26px;color:#0073aa;"></i>';
+        }
+        return '<img src="' + escapeAttr(icon) + '" style="max-width:48px;max-height:48px;border-radius:3px;object-fit:contain;display:block;" />';
+    }
+
+    function buildCanvasIconHtml(icon, size) {
+        if (!icon) return '';
+        if (icon.indexOf('dashicons-') === 0) {
+            return '<span class="dashicons ' + escapeAttr(icon) + '" style="font-size:' + size + 'px;width:' + size + 'px;height:' + size + 'px;color:inherit;flex-shrink:0;"></span>';
+        }
+        if (/^fa[srlbd]?\s/.test(icon)) {
+            return '<i class="' + escapeAttr(icon) + '" style="font-size:' + size + 'px;flex-shrink:0;"></i>';
+        }
+        return '<img src="' + escapeAttr(icon) + '" style="width:' + size + 'px;height:' + size + 'px;border-radius:3px;object-fit:contain;flex-shrink:0;" alt="" />';
+    }
 
     /* ──────────────────── Helpers ──────────────────── */
 
@@ -226,17 +332,31 @@
         var color = pageSettings.hero_text_color || '#ffffff';
         var opa   = parseInt(pageSettings.hero_overlay_opacity || '50', 10) / 100;
         var h     = parseInt(pageSettings.hero_height || '400', 10);
+        var fs    = parseInt(pageSettings.hero_font_size || '36', 10);
+        var align = pageSettings.hero_text_align || 'center';
+        var desc      = pageSettings.hero_description || '';
+        var dfs       = parseInt(pageSettings.hero_desc_size || '18', 10);
+        var textBold  = pageSettings.hero_text_bold !== '0' ? '700' : '400';
+        var textItal  = pageSettings.hero_text_italic === '1' ? 'italic' : 'normal';
+        var descBold  = '400'; // formatação inline no HTML
+        var descItal  = 'normal';
 
-        if (!img && !text) {
+        if (!img && !text && !desc) {
             $prev.empty().hide();
             return;
         }
 
+        var justifyMap = { left: 'flex-start', center: 'center', right: 'flex-end' };
+        var justifyContent = justifyMap[align] || 'center';
+
         var bgStyle = img ? 'background:url(' + escapeAttr(img) + ') center/cover no-repeat;' : 'background:#333;';
-        var html = '<div style="position:relative;' + bgStyle + 'height:' + h + 'px;border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center;margin-top:10px;">';
+        var html = '<div style="position:relative;' + bgStyle + 'height:' + h + 'px;border-radius:6px;overflow:hidden;display:flex;flex-direction:column;align-items:' + justifyContent + ';justify-content:center;gap:10px;margin-top:10px;padding:0 20px;">';
         html += '<div style="position:absolute;inset:0;background:rgba(0,0,0,' + opa + ');"></div>';
         if (text) {
-            html += '<span style="position:relative;z-index:1;font-size:24px;font-weight:700;color:' + escapeAttr(color) + ';text-align:center;padding:0 20px;text-shadow:0 2px 8px rgba(0,0,0,.5);">' + escapeHtml(text) + '</span>';
+            html += '<span style="position:relative;z-index:1;font-size:' + fs + 'px;font-weight:' + textBold + ';font-style:' + textItal + ';color:' + escapeAttr(color) + ';text-align:' + escapeAttr(align) + ';text-shadow:0 2px 8px rgba(0,0,0,.5);">' + escapeHtml(text) + '</span>';
+        }
+        if (desc) {
+            html += '<span style="position:relative;z-index:1;font-size:' + dfs + 'px;color:' + escapeAttr(color) + ';text-align:' + escapeAttr(align) + ';opacity:0.9;text-shadow:0 1px 4px rgba(0,0,0,.5);">' + desc + '</span>';
         }
         html += '</div>';
 
@@ -308,6 +428,15 @@
                         '<span class="vitrine-drag-handle dashicons dashicons-move"></span>' +
                         '<span class="vitrine-block-label">' + escapeHtml(elDef.label) + '</span>' +
                         widthBadgeHtml +
+                        (isContainer ? (function() {
+                            var dir = settings.direction || 'column';
+                            var isRow = dir === 'row';
+                            return '<button type="button" class="vitrine-dir-toggle" title="Alternar layout do container" data-id="' + escapeAttr(item.id) + '">' +
+                                '<span class="dashicons ' + (isRow ? 'dashicons-grid-view' : 'dashicons-menu') + '"></span>' +
+                                '<span class="vitrine-dir-label">' + (isRow ? 'Linhas' : 'Colunas') + '</span>' +
+                            '</button>';
+                        })() : '') +
+                        (isContainer ? '<button type="button" class="vitrine-block-collapse" title="Colapsar/Expandir"><span class="dashicons dashicons-arrow-down-alt2"></span></button>' : '') +
                         '<button type="button" class="vitrine-block-duplicate" title="Duplicar">' +
                             '<span class="dashicons dashicons-admin-page"></span>' +
                         '</button>' +
@@ -388,33 +517,21 @@
 
                 function buildAranhaArm(bend, side, color) {
                     var overlap = side === 'left' ? 'margin-right:-20px;' : 'margin-left:-20px;';
-                    var base = 'flex:1;min-width:10px;position:relative;align-self:stretch;' + overlap + 'z-index:1;';
-                    if (bend === 'straight') {
-                        return '<div style="' + base + '">' +
-                            '<div style="position:absolute;top:50%;left:0;right:0;height:2px;background:' + color + ';transform:translateY(-50%);"></div>' +
-                        '</div>';
-                    }
-                    var segs = '';
+                    var base = 'flex:1;min-width:10px;position:relative;align-self:stretch;overflow:visible;' + overlap + 'z-index:1;';
+                    var d;
                     if (side === 'left') {
-                        segs += '<div style="position:absolute;top:50%;left:0;width:50%;height:2px;background:' + color + ';"></div>';
-                        if (bend === 'down') {
-                            segs += '<div style="position:absolute;top:50%;left:50%;width:2px;bottom:0;background:' + color + ';transform:translateX(-50%);"></div>';
-                            segs += '<div style="position:absolute;bottom:0;left:50%;right:0;height:2px;background:' + color + ';"></div>';
-                        } else {
-                            segs += '<div style="position:absolute;top:0;left:50%;width:2px;bottom:50%;background:' + color + ';transform:translateX(-50%);"></div>';
-                            segs += '<div style="position:absolute;top:0;left:50%;right:0;height:2px;background:' + color + ';"></div>';
-                        }
+                        if (bend === 'straight')    d = 'M 0,50 L 100,50';
+                        else if (bend === 'down')   d = 'M 0,50 C 50,50 50,100 100,100';
+                        else                        d = 'M 0,50 C 50,50 50,0 100,0';
                     } else {
-                        segs += '<div style="position:absolute;top:50%;right:0;width:50%;height:2px;background:' + color + ';"></div>';
-                        if (bend === 'down') {
-                            segs += '<div style="position:absolute;top:50%;right:50%;width:2px;bottom:0;background:' + color + ';transform:translateX(50%);"></div>';
-                            segs += '<div style="position:absolute;bottom:0;left:0;right:50%;height:2px;background:' + color + ';"></div>';
-                        } else {
-                            segs += '<div style="position:absolute;top:0;right:50%;width:2px;bottom:50%;background:' + color + ';transform:translateX(50%);"></div>';
-                            segs += '<div style="position:absolute;top:0;left:0;right:50%;height:2px;background:' + color + ';"></div>';
-                        }
+                        if (bend === 'straight')    d = 'M 100,50 L 0,50';
+                        else if (bend === 'down')   d = 'M 100,50 C 50,50 50,100 0,100';
+                        else                        d = 'M 100,50 C 50,50 50,0 0,0';
                     }
-                    return '<div style="' + base + '">' + segs + '</div>';
+                    return '<div style="' + base + '">' +
+                        '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" style="overflow:visible;">' +
+                        '<path d="' + d + '" fill="none" stroke="' + color + '" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linecap="round" /></svg>' +
+                    '</div>';
                 }
 
                 function buildAranhaCards(items, side) {
@@ -434,13 +551,13 @@
                         if (side === 'left') {
                             h += '<div style="display:flex;align-items:center;gap:6px;border:2px solid ' + aLineColor + ';border-radius:8px;padding:6px 10px;background:#fff;flex-shrink:0;max-width:180px;position:relative;z-index:2;">';
                             h += '<span style="font-size:11px;color:' + aTextColor + ';text-align:right;line-height:1.3;">' + (t || '') + '</span>';
-                            if (ic) h += '<img src="' + escapeAttr(ic) + '" style="width:' + aIconSize + 'px;height:' + aIconSize + 'px;border-radius:3px;object-fit:contain;flex-shrink:0;" alt="" />';
+                            if (ic) h += buildCanvasIconHtml(ic, aIconSize);
                             h += '</div>';
                             h += buildAranhaArm(bend, side, aLineColor);
                         } else {
                             h += buildAranhaArm(bend, side, aLineColor);
                             h += '<div style="display:flex;align-items:center;gap:6px;border:2px solid ' + aLineColor + ';border-radius:8px;padding:6px 10px;background:#fff;flex-shrink:0;max-width:180px;position:relative;z-index:2;">';
-                            if (ic) h += '<img src="' + escapeAttr(ic) + '" style="width:' + aIconSize + 'px;height:' + aIconSize + 'px;border-radius:3px;object-fit:contain;flex-shrink:0;" alt="" />';
+                            if (ic) h += buildCanvasIconHtml(ic, aIconSize);
                             h += '<span style="font-size:11px;color:' + aTextColor + ';line-height:1.3;">' + (t || '') + '</span>';
                             h += '</div>';
                         }
@@ -465,24 +582,18 @@
 
                         h += '<div style="flex:1;display:flex;flex-direction:column;align-items:center;">';
                         h += '<div style="display:flex;align-items:center;gap:6px;border:2px solid ' + aLineColor + ';border-radius:8px;padding:6px 10px;background:#fff;flex-shrink:0;max-width:180px;position:relative;z-index:2;">';
-                        if (ic) h += '<img src="' + escapeAttr(ic) + '" style="width:' + aIconSize + 'px;height:' + aIconSize + 'px;border-radius:3px;object-fit:contain;flex-shrink:0;" alt="" />';
+                        if (ic) h += buildCanvasIconHtml(ic, aIconSize);
                         h += '<span style="font-size:11px;color:' + aTextColor + ';line-height:1.3;text-align:center;">' + (t || '') + '</span>';
                         h += '</div>';
-                        // Vertical arm
-                        h += '<div style="flex:1;min-height:20px;width:100%;position:relative;margin-bottom:-20px;z-index:1;">';
-                        if (bend === 'straight') {
-                            h += '<div style="position:absolute;left:50%;top:0;bottom:0;width:2px;background:' + aLineColor + ';transform:translateX(-50%);"></div>';
-                        } else {
-                            h += '<div style="position:absolute;left:50%;top:0;height:50%;width:2px;background:' + aLineColor + ';transform:translateX(-50%);"></div>';
-                            if (bend === 'left') {
-                                h += '<div style="position:absolute;top:50%;left:50%;right:0;height:2px;background:' + aLineColor + ';"></div>';
-                                h += '<div style="position:absolute;top:50%;right:0;bottom:0;width:2px;background:' + aLineColor + ';"></div>';
-                            } else {
-                                h += '<div style="position:absolute;top:50%;left:0;right:50%;height:2px;background:' + aLineColor + ';"></div>';
-                                h += '<div style="position:absolute;top:50%;left:0;bottom:0;width:2px;background:' + aLineColor + ';"></div>';
-                            }
-                        }
-                        h += '</div>';
+                        // Vertical arm — SVG Bézier
+                        var ad;
+                        if (bend === 'straight')    ad = 'M 50,0 L 50,100';
+                        else if (bend === 'left')   ad = 'M 50,0 C 50,50 100,50 100,100';
+                        else                        ad = 'M 50,0 C 50,50 0,50 0,100';
+                        h += '<div style="flex:1;min-height:20px;width:100%;position:relative;margin-bottom:-20px;z-index:1;overflow:visible;">' +
+                            '<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none" style="overflow:visible;">' +
+                            '<path d="' + ad + '" fill="none" stroke="' + aLineColor + '" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linecap="round" /></svg>' +
+                        '</div>';
                         h += '</div>';
                     });
                     h += '</div>';
@@ -704,6 +815,30 @@
         if (selectedId === id) selectedId = null;
         renderCanvas();
         renderSettings();
+    });
+
+    $(document).on('click', '.vitrine-dir-toggle', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var id   = $(this).data('id');
+        var item = findItemById(id);
+        if (!item) return;
+        var newDir = (item.settings.direction === 'row') ? 'column' : 'row';
+        item.settings.direction = newDir;
+        if (newDir === 'row') {
+            distributeWidths(id);
+        } else {
+            clearWidths(id);
+        }
+        renderCanvas();
+        if (selectedId === id) renderSettings();
+    });
+
+    $(document).on('click', '.vitrine-block-collapse', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        $(this).closest('.vitrine-canvas-block--container').toggleClass('is-collapsed');
     });
 
     $(document).on('click', '.vitrine-block-duplicate', function (e) {
@@ -934,8 +1069,9 @@
                     inputHtml = '<input type="text" class="vitrine-field" data-field="' + escapeAttr(field.name) + '" value="' + escapeAttr(val) + '" />';
             }
 
+            var extraClass = field.type === 'textarea' ? ' vitrine-field-group--full' : '';
             $panel.append(
-                '<div class="vitrine-field-group">' +
+                '<div class="vitrine-field-group' + extraClass + '">' +
                     '<label>' + escapeHtml(field.label) + '</label>' +
                     inputHtml +
                 '</div>'
@@ -968,6 +1104,7 @@
         // Inicializa TinyMCE nos campos de texto da aranha
         if (item.type === 'aranha') {
             setTimeout(initAranhaMCE, 50);
+            setTimeout(initAranhaSort, 80);
         }
 
         // Inicializa TinyMCE nos campos textarea genéricos
@@ -1025,6 +1162,42 @@
             }
         });
         _skipMCESync = false;
+    }
+
+    function initAranhaSort() {
+        $('.vitrine-aranha-items-list').each(function () {
+            var $list = $(this);
+            if ($list.data('sortable-init')) return; // evita dupla init
+            $list.data('sortable-init', true);
+
+            Sortable.create(this, {
+                handle: '.vitrine-aranha-drag',
+                draggable: '.vitrine-aranha-item',
+                animation: 150,
+                ghostClass: 'vitrine-aranha-ghost',
+                onEnd: function (evt) {
+                    if (evt.oldIndex === evt.newIndex) return;
+                    if (!selectedId) return;
+                    var item = findItemById(selectedId);
+                    if (!item) return;
+
+                    var key = $list.data('aranha-key');
+                    if (!key || !item.settings[key]) return;
+
+                    // Lê a nova ordem pelos índices originais ainda no DOM
+                    var arr = item.settings[key];
+                    var newOrder = [];
+                    $list.children('.vitrine-aranha-item').each(function () {
+                        var idx = parseInt($(this).data('aranha-idx'), 10);
+                        if (!isNaN(idx) && arr[idx]) newOrder.push(arr[idx]);
+                    });
+                    item.settings[key] = newOrder;
+
+                    renderSettings();
+                    renderCanvas();
+                }
+            });
+        });
     }
 
     function initAranhaMCE() {
@@ -1203,17 +1376,46 @@
             html += '</div>';
             html += '<div class="vitrine-field-group"><label>Link</label>';
             html += '<input type="text" class="vitrine-aranha-field" data-aranha-prop="link" value="' + escapeAttr(ai.link || '') + '" placeholder="https://" /></div>';
-            html += '<div class="vitrine-field-group"><label>Ícone</label>';
-            html += '<div class="vitrine-image-field vitrine-aranha-icon-field">';
-            if (ai.icon) {
-                html += '<img src="' + escapeAttr(ai.icon) + '" class="vitrine-image-preview" />';
-            }
+            html += '<div class="vitrine-field-group vitrine-field-group--full"><label>Ícone</label>';
+            html += '<div class="vitrine-aranha-icon-field">';
+            // Preview do ícone atual
+            html += '<div class="vitrine-icon-current">' + renderIconPreviewHtml(ai.icon || '') + '</div>';
             html += '<input type="hidden" class="vitrine-aranha-field" data-aranha-prop="icon" value="' + escapeAttr(ai.icon || '') + '" />';
-            html += '<button type="button" class="button vitrine-aranha-select-icon">Ícone</button>';
+            html += '<div class="vitrine-icon-actions">';
+            html += '<button type="button" class="button vitrine-aranha-open-picker">Escolher Ícone ▾</button>';
             if (ai.icon) {
                 html += ' <button type="button" class="button vitrine-aranha-remove-icon">Remover</button>';
             }
+            html += '</div>';
+            // Painel picker (fechado por padrão)
+            html += '<div class="vitrine-icon-picker" style="display:none;">';
+            html += '<div class="vitrine-icon-picker-tabs">';
+            html += '<button type="button" class="vitrine-icon-tab is-active" data-tab="upload">Imagem</button>';
+            html += '<button type="button" class="vitrine-icon-tab" data-tab="dashicons">Dashicons</button>';
+            html += '<button type="button" class="vitrine-icon-tab" data-tab="fa">Font Awesome</button>';
+            html += '</div>';
+            // Aba: Imagem
+            html += '<div class="vitrine-icon-tab-panel" data-panel="upload">';
+            html += '<button type="button" class="button vitrine-aranha-select-icon">Selecionar da Biblioteca</button>';
+            html += '</div>';
+            // Aba: Dashicons
+            html += '<div class="vitrine-icon-tab-panel" data-panel="dashicons" style="display:none;">';
+            html += '<input type="text" class="vitrine-icon-search" placeholder="Filtrar dashicons..." />';
+            html += '<div class="vitrine-icons-grid">';
+            DASHICONS_LIST.forEach(function (d) {
+                html += '<button type="button" class="vitrine-icon-pick" data-icon="' + escapeAttr(d) + '" title="' + escapeAttr(d) + '"><span class="dashicons ' + escapeAttr(d) + '"></span></button>';
+            });
             html += '</div></div>';
+            // Aba: Font Awesome
+            html += '<div class="vitrine-icon-tab-panel" data-panel="fa" style="display:none;">';
+            html += '<input type="text" class="vitrine-icon-search" placeholder="Filtrar ícones FA..." />';
+            html += '<div class="vitrine-icons-grid">';
+            FA_ICONS_LIST.forEach(function (f) {
+                html += '<button type="button" class="vitrine-icon-pick" data-icon="' + escapeAttr(f) + '" title="' + escapeAttr(f) + '"><i class="' + escapeAttr(f) + '"></i></button>';
+            });
+            html += '</div></div>';
+            html += '</div>'; // picker
+            html += '</div></div>'; // icon-field + field-group
             html += '</div>';
         });
 
@@ -1404,7 +1606,47 @@
         renderCanvas();
     });
 
-    // Selecionar ícone do item aranha
+    // Abrir/fechar picker de ícone
+    $(document).on('click', '.vitrine-aranha-open-picker', function (e) {
+        e.stopPropagation();
+        var $picker = $(this).closest('.vitrine-aranha-icon-field').find('.vitrine-icon-picker');
+        $('.vitrine-icon-picker').not($picker).hide(); // fecha outros
+        $picker.toggle();
+    });
+
+    // Trocar aba do picker
+    $(document).on('click', '.vitrine-icon-tab', function () {
+        var tab = $(this).data('tab');
+        var $picker = $(this).closest('.vitrine-icon-picker');
+        $picker.find('.vitrine-icon-tab').removeClass('is-active');
+        $(this).addClass('is-active');
+        $picker.find('.vitrine-icon-tab-panel').hide();
+        $picker.find('[data-panel="' + tab + '"]').show();
+    });
+
+    // Filtrar ícones no grid
+    $(document).on('input', '.vitrine-icon-search', function () {
+        var q = $(this).val().toLowerCase().replace(/^fa[srlbd]?\s+/, '');
+        $(this).next('.vitrine-icons-grid').find('.vitrine-icon-pick').each(function () {
+            var name = ($(this).data('icon') || '').toLowerCase().replace(/^fa[srlbd]?\s+/, '');
+            $(this).toggle(q === '' || name.indexOf(q) !== -1);
+        });
+    });
+
+    // Selecionar ícone (dashicons ou FA)
+    $(document).on('click', '.vitrine-icon-pick', function (e) {
+        e.preventDefault();
+        var icon = $(this).data('icon');
+        var $field = $(this).closest('.vitrine-aranha-icon-field');
+        $field.find('.vitrine-aranha-field[data-aranha-prop="icon"]').val(icon).trigger('change');
+        $field.find('.vitrine-icon-current').html(renderIconPreviewHtml(icon));
+        $field.find('.vitrine-icon-picker').hide();
+        if (!$field.find('.vitrine-aranha-remove-icon').length) {
+            $field.find('.vitrine-icon-actions').append(' <button type="button" class="button vitrine-aranha-remove-icon">Remover</button>');
+        }
+    });
+
+    // Selecionar imagem da biblioteca WP
     $(document).on('click', '.vitrine-aranha-select-icon', function (e) {
         e.preventDefault();
         var $container = $(this).closest('.vitrine-aranha-icon-field');
@@ -1419,22 +1661,30 @@
         frame.on('select', function () {
             var attachment = frame.state().get('selection').first().toJSON();
             $input.val(attachment.url).trigger('change');
-            $container.find('.vitrine-image-preview').remove();
-            $container.find('.vitrine-aranha-remove-icon').remove();
-            $container.prepend('<img src="' + escapeAttr(attachment.url) + '" class="vitrine-image-preview" />');
-            $container.find('.vitrine-aranha-select-icon').after(' <button type="button" class="button vitrine-aranha-remove-icon">Remover</button>');
+            $container.find('.vitrine-icon-current').html(renderIconPreviewHtml(attachment.url));
+            $container.find('.vitrine-icon-picker').hide();
+            if (!$container.find('.vitrine-aranha-remove-icon').length) {
+                $container.find('.vitrine-icon-actions').append(' <button type="button" class="button vitrine-aranha-remove-icon">Remover</button>');
+            }
         });
 
         frame.open();
     });
 
-    // Remover ícone do item aranha
+    // Remover ícone
     $(document).on('click', '.vitrine-aranha-remove-icon', function (e) {
         e.preventDefault();
         var $container = $(this).closest('.vitrine-aranha-icon-field');
         $container.find('.vitrine-aranha-field[data-aranha-prop="icon"]').val('').trigger('change');
-        $container.find('.vitrine-image-preview').remove();
+        $container.find('.vitrine-icon-current').empty();
         $(this).remove();
+    });
+
+    // Fechar picker ao clicar fora
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('.vitrine-aranha-icon-field').length) {
+            $('.vitrine-icon-picker').hide();
+        }
     });
 
     /* ──────────────────── Toggle: Eventos dos itens dinâmicos ──────────────────── */
@@ -1545,11 +1795,19 @@
         );
 
         // ── Hero Section UI ──
-        var heroImg      = pageSettings.hero_image || '';
-        var heroText     = pageSettings.hero_text || '';
-        var heroTxtColor = pageSettings.hero_text_color || '#ffffff';
-        var heroOpacity  = pageSettings.hero_overlay_opacity || '50';
-        var heroHeight   = pageSettings.hero_height || '400';
+        var heroImg       = pageSettings.hero_image || '';
+        var heroText      = pageSettings.hero_text || '';
+        var heroTxtColor  = pageSettings.hero_text_color || '#ffffff';
+        var heroOpacity   = pageSettings.hero_overlay_opacity || '50';
+        var heroHeight    = pageSettings.hero_height || '400';
+        var heroFontSize  = pageSettings.hero_font_size || '36';
+        var heroTextAlign = pageSettings.hero_text_align || 'center';
+        var heroDesc      = pageSettings.hero_description || '';
+        var heroDescSize  = pageSettings.hero_desc_size || '18';
+        var heroTextBold  = pageSettings.hero_text_bold !== '0';
+        var heroTextItal  = pageSettings.hero_text_italic === '1';
+        var heroDescBold  = false; // formatação agora é inline no HTML
+        var heroDescItal  = false;
 
         $('#vitrine-editor-top').before(
             '<div id="vitrine-hero-settings">' +
@@ -1567,6 +1825,38 @@
                     '<div class="vitrine-hero-field">' +
                         '<label>Frase de destaque</label>' +
                         '<input type="text" id="vitrine-hero-text" value="' + escapeAttr(heroText) + '" placeholder="Título do hero" />' +
+                        '<div class="vitrine-hero-format">' +
+                            '<button type="button" class="vitrine-format-btn' + (heroTextBold ? ' is-active' : '') + '" data-target="text" data-prop="bold" title="Negrito"><b>B</b></button>' +
+                            '<button type="button" class="vitrine-format-btn' + (heroTextItal ? ' is-active' : '') + '" data-target="text" data-prop="italic" title="Itálico"><i>I</i></button>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="vitrine-hero-field vitrine-hero-field--row">' +
+                        '<div>' +
+                            '<label>Tamanho do texto (px)</label>' +
+                            '<input type="number" id="vitrine-hero-font-size" value="' + escapeAttr(heroFontSize) + '" min="12" max="120" step="2" />' +
+                        '</div>' +
+                        '<div>' +
+                            '<label>Alinhamento</label>' +
+                            '<select id="vitrine-hero-text-align">' +
+                                '<option value="left"' + (heroTextAlign === 'left' ? ' selected' : '') + '>Esquerda</option>' +
+                                '<option value="center"' + (heroTextAlign === 'center' ? ' selected' : '') + '>Centro</option>' +
+                                '<option value="right"' + (heroTextAlign === 'right' ? ' selected' : '') + '>Direita</option>' +
+                            '</select>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="vitrine-hero-field vitrine-hero-field--wide">' +
+                        '<label>Descrição</label>' +
+                        '<div class="vitrine-wysiwyg-toolbar" id="vitrine-hero-desc-toolbar">' +
+                            '<button type="button" class="vitrine-wysiwyg-btn" data-cmd="bold" title="Negrito"><b>B</b></button>' +
+                            '<button type="button" class="vitrine-wysiwyg-btn" data-cmd="italic" title="Itálico"><i>I</i></button>' +
+                            '<button type="button" class="vitrine-wysiwyg-btn" data-cmd="underline" title="Sublinhado"><u>U</u></button>' +
+                            '<button type="button" class="vitrine-wysiwyg-btn" data-cmd="removeFormat" title="Limpar formatação">✕</button>' +
+                        '</div>' +
+                        '<div id="vitrine-hero-description" class="vitrine-aranha-wysiwyg" contenteditable="true">' + heroDesc + '</div>' +
+                    '</div>' +
+                    '<div class="vitrine-hero-field">' +
+                        '<label>Tamanho da descrição (px)</label>' +
+                        '<input type="number" id="vitrine-hero-desc-size" value="' + escapeAttr(heroDescSize) + '" min="10" max="60" step="1" />' +
                     '</div>' +
                     '<div class="vitrine-hero-field">' +
                         '<label>Cor do texto</label>' +
@@ -1632,24 +1922,61 @@
             renderHeroPreview();
         });
 
-        $('#vitrine-hero-text').on('input', function () {
+        $(document).on('input', '#vitrine-hero-text', function () {
             pageSettings.hero_text = $(this).val();
             renderHeroPreview();
         });
 
-        $('#vitrine-hero-text-color').on('input change', function () {
+        $(document).on('input change', '#vitrine-hero-text-color', function () {
             pageSettings.hero_text_color = $(this).val();
             renderHeroPreview();
         });
 
-        $('#vitrine-hero-opacity').on('input', function () {
+        $(document).on('input', '#vitrine-hero-opacity', function () {
             pageSettings.hero_overlay_opacity = $(this).val();
             $('#vitrine-hero-opacity-val').text($(this).val() + '%');
             renderHeroPreview();
         });
 
-        $('#vitrine-hero-height').on('input change', function () {
+        $(document).on('input change', '#vitrine-hero-height', function () {
             pageSettings.hero_height = $(this).val();
+            renderHeroPreview();
+        });
+
+        $(document).on('input change', '#vitrine-hero-font-size', function () {
+            pageSettings.hero_font_size = $(this).val();
+            renderHeroPreview();
+        });
+
+        $(document).on('change', '#vitrine-hero-text-align', function () {
+            pageSettings.hero_text_align = $(this).val();
+            renderHeroPreview();
+        });
+
+        $(document).on('input', '#vitrine-hero-description[contenteditable]', function () {
+            pageSettings.hero_description = $(this).html();
+            renderHeroPreview();
+        });
+
+        $(document).on('mousedown', '#vitrine-hero-desc-toolbar .vitrine-wysiwyg-btn', function (e) {
+            e.preventDefault();
+            var cmd = $(this).data('cmd');
+            document.execCommand(cmd, false, null);
+            pageSettings.hero_description = $('#vitrine-hero-description').html();
+            renderHeroPreview();
+        });
+
+        $(document).on('input change', '#vitrine-hero-desc-size', function () {
+            pageSettings.hero_desc_size = $(this).val();
+            renderHeroPreview();
+        });
+
+        $(document).on('click', '.vitrine-format-btn', function () {
+            var target = $(this).data('target'); // 'text' ou 'desc'
+            var prop   = $(this).data('prop');   // 'bold' ou 'italic'
+            var key    = 'hero_' + target + '_' + prop;
+            pageSettings[key] = pageSettings[key] === '1' ? '0' : '1';
+            $(this).toggleClass('is-active', pageSettings[key] === '1');
             renderHeroPreview();
         });
 

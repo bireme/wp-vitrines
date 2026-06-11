@@ -15,16 +15,25 @@
     position: absolute;
     inset: 0;
 }
-.vitrine-hero-text {
+.vitrine-hero-content {
     position: relative;
     z-index: 1;
-    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     padding: 0 24px;
-    font-size: clamp(24px, 5vw, 48px);
-    font-weight: 700;
-    text-align: center;
+    width: 100%;
+}
+.vitrine-hero-text {
+    margin: 0;
     line-height: 1.25;
     text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+}
+.vitrine-hero-desc {
+    margin: 0;
+    line-height: 1.6;
+    opacity: 0.9;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
 
 .vitrine-front {
@@ -213,6 +222,7 @@ a.vitrine-aranha__text:hover {
     position: relative;
     z-index: 1;
     align-self: stretch;
+    overflow: visible;
 }
 /* Arms overlap slightly into the center so lines disappear behind the circle */
 .vitrine-aranha__side--left .vitrine-aranha__arm {
@@ -220,6 +230,23 @@ a.vitrine-aranha__text:hover {
 }
 .vitrine-aranha__side--right .vitrine-aranha__arm {
     margin-left: -20px;
+}
+
+/* Fluid SVG arm paths */
+.vitrine-aranha__arm svg,
+.vitrine-aranha__top-arm svg {
+    display: block;
+    overflow: visible;
+}
+
+@keyframes vitrine-aranha-draw {
+    to { stroke-dashoffset: 0; }
+}
+.vitrine-aranha__arm path,
+.vitrine-aranha__top-arm path {
+    stroke-dasharray: 300;
+    stroke-dashoffset: 300;
+    animation: vitrine-aranha-draw 0.9s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 /* Center — grows with side items via align-self:stretch + aspect-ratio:1 */

@@ -29,11 +29,11 @@ class Vitrine_Element_Title extends Vitrine_Element {
 
     public function fields() {
         return array(
-            array( 'name' => 'text',      'label' => 'Texto',           'type' => 'text' ),
-            array( 'name' => 'tag',       'label' => 'Tag (h1-h6)',    'type' => 'text' ),
-            array( 'name' => 'align',     'label' => 'Alinhamento',    'type' => 'text' ),
-            array( 'name' => 'color',     'label' => 'Cor',            'type' => 'color' ),
-            array( 'name' => 'font_size', 'label' => 'Tamanho (px)',   'type' => 'number' ),
+            array( 'name' => 'text',      'label' => 'Texto',         'type' => 'text' ),
+            array( 'name' => 'tag',       'label' => 'Tag HTML',      'type' => 'select', 'options' => array( 'h1' => 'H1', 'h2' => 'H2', 'h3' => 'H3', 'h4' => 'H4', 'h5' => 'H5', 'h6' => 'H6' ) ),
+            array( 'name' => 'align',     'label' => 'Alinhamento',   'type' => 'select', 'options' => array( 'left' => 'Esquerda', 'center' => 'Centro', 'right' => 'Direita' ) ),
+            array( 'name' => 'color',     'label' => 'Cor',           'type' => 'color' ),
+            array( 'name' => 'font_size', 'label' => 'Tamanho (px)',  'type' => 'number' ),
         );
     }
 
