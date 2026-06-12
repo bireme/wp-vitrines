@@ -19,72 +19,91 @@ class Vitrine_Element_Video extends Vitrine_Element {
 
     public function defaults() {
         return array(
-            'source'     => 'youtube',
-            'youtube_url' => '',
-            'local_url'  => '',
-            'width'      => '100',
-            'aspect'     => '16-9',
-            'autoplay'   => '0',
-            'controls'   => '1',
+            'qty'      => '1',
+            'source_1' => 'youtube',
+            'url_1'    => '',
+            'width_1'  => '100',
+            'source_2' => 'youtube',
+            'url_2'    => '',
+            'width_2'  => '50',
+            'source_3' => 'youtube',
+            'url_3'    => '',
+            'width_3'  => '34',
+            'aspect'   => '16-9',
+            'autoplay' => '0',
+            'controls' => '1',
         );
     }
 
     public function fields() {
         return array(
-            array( 'name' => 'source',      'label' => 'Origem',            'type' => 'select', 'options' => array( 'youtube' => 'YouTube', 'local' => 'Vídeo Local' ) ),
-            array( 'name' => 'youtube_url',  'label' => 'URL do YouTube',    'type' => 'text' ),
-            array( 'name' => 'local_url',    'label' => 'Vídeo Local',       'type' => 'image' ),
-            array( 'name' => 'width',        'label' => 'Largura (%)',       'type' => 'number' ),
-            array( 'name' => 'aspect',       'label' => 'Proporção',         'type' => 'select', 'options' => array( '16-9' => '16:9', '4-3' => '4:3', '1-1' => '1:1' ) ),
-            array( 'name' => 'autoplay',     'label' => 'Autoplay',          'type' => 'select', 'options' => array( '0' => 'Não', '1' => 'Sim' ) ),
-            array( 'name' => 'controls',     'label' => 'Controles',         'type' => 'select', 'options' => array( '1' => 'Sim', '0' => 'Não' ) ),
+            array( 'name' => 'qty',      'label' => 'Quantidade de vídeos', 'type' => 'select', 'options' => array( '1' => '1 vídeo', '2' => '2 vídeos lado a lado', '3' => '3 vídeos lado a lado' ) ),
+            array( 'name' => 'aspect',   'label' => 'Proporção',            'type' => 'select', 'options' => array( '16-9' => '16:9', '4-3' => '4:3', '1-1' => '1:1' ) ),
+            array( 'name' => 'autoplay', 'label' => 'Autoplay',             'type' => 'select', 'options' => array( '0' => 'Não', '1' => 'Sim' ) ),
+            array( 'name' => 'controls', 'label' => 'Controles',            'type' => 'select', 'options' => array( '1' => 'Sim', '0' => 'Não' ) ),
         );
     }
 
     public function render( $settings, $children_html = '' ) {
         $s = wp_parse_args( $settings, $this->defaults() );
 
-        $width    = max( 10, min( 100, intval( $s['width'] ) ) );
+        $qty      = max( 1, min( 3, intval( $s['qty'] ) ) );
         $autoplay = '1' === $s['autoplay'];
         $controls = '1' === $s['controls'];
 
         $aspects = array( '16-9' => '56.25', '4-3' => '75', '1-1' => '100' );
         $padding = isset( $aspects[ $s['aspect'] ] ) ? $aspects[ $s['aspect'] ] : '56.25';
 
-        $output = '<div class="vitrine-el-video" style="max-width:' . $width . '%;margin:0 auto;">';
-        $output .= '<div class="vitrine-el-video__wrapper" style="position:relative;padding-bottom:' . $padding . '%;height:0;overflow:hidden;">';
+        $gap = $qty > 1 ? 16 : 0;
+        $output = '<div class="vitrine-el-video-group" style="display:flex;gap:' . $gap . 'px;align-items:flex-start;">';
 
-        if ( 'youtube' === $s['source'] && ! empty( $s['youtube_url'] ) ) {
-            $video_id = $this->extract_youtube_id( $s['youtube_url'] );
-            if ( $video_id ) {
-                $params = array();
-                if ( $autoplay ) {
-                    $params[] = 'autoplay=1';
-                    $params[] = 'mute=1';
+        for ( $i = 1; $i <= $qty; $i++ ) {
+            $source = isset( $s[ "source_{$i}" ] ) ? $s[ "source_{$i}" ] : 'youtube';
+            $url    = isset( $s[ "url_{$i}" ] )    ? $s[ "url_{$i}" ]    : '';
+            $width  = max( 10, min( 90, intval( isset( $s[ "width_{$i}" ] ) ? $s[ "width_{$i}" ] : ( $qty === 1 ? 100 : ( $qty === 2 ? 50 : 34 ) ) ) ) );
+
+            // Retrocompatibilidade: slot 1 pode ter campos antigos
+            if ( 1 === $i && empty( $url ) ) {
+                if ( ! empty( $s['youtube_url'] ) ) {
+                    $source = 'youtube';
+                    $url    = $s['youtube_url'];
+                } elseif ( ! empty( $s['local_url'] ) ) {
+                    $source = 'local';
+                    $url    = $s['local_url'];
                 }
-                if ( ! $controls ) {
-                    $params[] = 'controls=0';
+            }
+
+            $flex_style = $qty > 1
+                ? "flex:0 1 {$width}%;max-width:{$width}%;min-width:0;"
+                : 'flex:1 1 100%;';
+
+            $output .= '<div class="vitrine-el-video" style="' . $flex_style . '">';
+            $output .= '<div class="vitrine-el-video__wrapper" style="position:relative;padding-bottom:' . $padding . '%;height:0;overflow:hidden;">';
+
+            if ( 'youtube' === $source && ! empty( $url ) ) {
+                $video_id = $this->extract_youtube_id( $url );
+                if ( $video_id ) {
+                    $params = array( 'rel=0' );
+                    if ( $autoplay ) { $params[] = 'autoplay=1'; $params[] = 'mute=1'; }
+                    if ( ! $controls ) { $params[] = 'controls=0'; }
+                    $src = 'https://www.youtube.com/embed/' . $video_id . '?' . implode( '&', $params );
+                    $output .= '<iframe src="' . esc_url( $src ) . '" style="position:absolute;top:0;left:0;width:100%;height:100%;" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+                } else {
+                    $output .= '<p style="text-align:center;color:#999;padding:20px;">URL do YouTube inválida.</p>';
                 }
-                $params[] = 'rel=0';
-                $src = 'https://www.youtube.com/embed/' . $video_id . '?' . implode( '&', $params );
-                $output .= '<iframe src="' . esc_url( $src ) . '" style="position:absolute;top:0;left:0;width:100%;height:100%;" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+            } elseif ( 'local' === $source && ! empty( $url ) ) {
+                $attrs = 'playsinline';
+                if ( $controls ) { $attrs .= ' controls'; }
+                if ( $autoplay ) { $attrs .= ' autoplay muted'; }
+                $output .= '<video src="' . esc_url( $url ) . '" ' . $attrs . ' style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;"></video>';
             } else {
-                $output .= '<p style="text-align:center;color:#999;padding:20px;">URL do YouTube inválida.</p>';
+                $output .= '<p style="text-align:center;color:#999;padding:20px;">Nenhum vídeo selecionado.</p>';
             }
-        } elseif ( 'local' === $s['source'] && ! empty( $s['local_url'] ) ) {
-            $attrs = 'playsinline';
-            if ( $controls ) {
-                $attrs .= ' controls';
-            }
-            if ( $autoplay ) {
-                $attrs .= ' autoplay muted';
-            }
-            $output .= '<video src="' . esc_url( $s['local_url'] ) . '" ' . $attrs . ' style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;"></video>';
-        } else {
-            $output .= '<p style="text-align:center;color:#999;padding:20px;">Nenhum vídeo selecionado.</p>';
+
+            $output .= '</div></div>';
         }
 
-        $output .= '</div></div>';
+        $output .= '</div>';
         return $output;
     }
 

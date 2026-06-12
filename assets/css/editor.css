@@ -69,7 +69,7 @@
     border-radius: 4px;
     background: #f0f0f1;
     min-height: 600px;
-    overflow: hidden;
+    overflow: clip;
 }
 
 /* ── Área superior: sidebar + canvas ── */
@@ -77,7 +77,8 @@
     display: flex;
     flex: 1;
     min-height: 400px;
-    overflow: hidden;
+    overflow: clip; /* clip não cria scroll container → não bloqueia position:sticky */
+    align-items: flex-start;
 }
 
 /* ── Sidebars ── */
@@ -89,6 +90,10 @@
     padding: 16px;
     overflow-y: auto;
     flex-shrink: 0;
+    position: sticky;
+    top: 32px;
+    max-height: calc(100vh - 32px);
+    align-self: flex-start;
 }
 .vitrine-sidebar h3 {
     margin: 0 0 12px;
@@ -193,6 +198,36 @@
     color: #0073aa;
 }
 
+/* ── Collapse de containers no admin ── */
+.vitrine-block-collapse {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px;
+    color: #787c82;
+    line-height: 1;
+}
+.vitrine-block-collapse:hover {
+    color: #0073aa;
+}
+.vitrine-block-collapse .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    transition: transform 0.2s ease;
+}
+.vitrine-canvas-block--container.is-collapsed .vitrine-block-collapse .dashicons {
+    transform: rotate(-90deg);
+}
+.vitrine-canvas-block--container.is-collapsed > .vitrine-container-drop,
+.vitrine-canvas-block--container.is-collapsed > .vitrine-block-preview,
+.vitrine-canvas-block--container.is-collapsed > .vitrine-resize-handle {
+    display: none;
+}
+.vitrine-canvas-block--container.is-collapsed {
+    min-height: 0 !important;
+}
+
 /* ── Canvas central ── */
 #vitrine-canvas-wrapper {
     flex: 1;
@@ -273,6 +308,35 @@
     font-size: 16px;
     width: 16px;
     height: 16px;
+}
+
+/* ── Botão de direção do container ── */
+.vitrine-dir-toggle {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 3px !important;
+    padding: 1px 6px !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    line-height: 1.4 !important;
+    background: #0073aa !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 10px !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+}
+.vitrine-dir-toggle:hover {
+    background: #005a87 !important;
+    color: #fff !important;
+}
+.vitrine-dir-toggle .dashicons {
+    font-size: 12px !important;
+    width: 12px !important;
+    height: 12px !important;
+}
+.vitrine-dir-label {
+    letter-spacing: 0.2px;
 }
 
 /* ── Badge de largura (%) na toolbar ── */
@@ -390,6 +454,7 @@ body.vitrine-resizing-width {
     border: 1px solid #8c8f94;
     border-radius: 3px;
     font-size: 13px;
+    box-sizing: border-box;
 }
 .vitrine-field-group input[type="color"] {
     width: 50px;
@@ -585,8 +650,25 @@ body.vitrine-resizing-width {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 8px;
+    gap: 6px;
+}
+.vitrine-aranha-drag {
+    cursor: grab;
+    color: #b4b9be;
+    font-size: 16px;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    line-height: 1;
+}
+.vitrine-aranha-drag:hover {
+    color: #50575e;
+}
+.vitrine-aranha-drag:active {
+    cursor: grabbing;
 }
 .vitrine-aranha-item-num {
+    flex: 1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -597,6 +679,12 @@ body.vitrine-resizing-width {
     color: #fff;
     font-size: 11px;
     font-weight: 700;
+    flex: 0 0 22px;
+}
+.vitrine-aranha-ghost {
+    opacity: 0.4;
+    background: #e8f0fe;
+    border: 2px dashed #2271b1;
 }
 .vitrine-aranha-item .vitrine-field-group {
     margin-bottom: 8px;
@@ -708,6 +796,98 @@ body.vitrine-resizing-width {
     font-style: italic;
 }
 
+/* ── Icon Picker ── */
+.vitrine-aranha-icon-field {
+    position: relative;
+}
+.vitrine-icon-current {
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+}
+.vitrine-icon-actions {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.vitrine-icon-picker {
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    background: #fff;
+    margin-top: 6px;
+    overflow: hidden;
+    z-index: 100;
+}
+.vitrine-icon-picker-tabs {
+    display: flex;
+    border-bottom: 1px solid #dcdcde;
+}
+.vitrine-icon-tab {
+    flex: 1;
+    padding: 5px 4px;
+    font-size: 11px;
+    border: none;
+    border-right: 1px solid #dcdcde;
+    background: #f0f0f1;
+    cursor: pointer;
+    color: #50575e;
+    line-height: 1.4;
+}
+.vitrine-icon-tab:last-child {
+    border-right: none;
+}
+.vitrine-icon-tab.is-active {
+    background: #fff;
+    color: #0073aa;
+    font-weight: 600;
+}
+.vitrine-icon-tab-panel {
+    padding: 8px;
+}
+.vitrine-icon-search {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 4px 8px;
+    font-size: 12px;
+    border: 1px solid #c3c4c7;
+    border-radius: 3px;
+    margin-bottom: 6px;
+}
+.vitrine-icons-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    max-height: 150px;
+    overflow-y: auto;
+}
+.vitrine-icon-pick {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: 1px solid #dcdcde;
+    border-radius: 3px;
+    background: #f6f7f7;
+    cursor: pointer;
+    color: #50575e;
+    font-size: 16px;
+    padding: 0;
+    transition: background 0.1s, border-color 0.1s, color 0.1s;
+}
+.vitrine-icon-pick:hover {
+    background: #e8f4fc;
+    border-color: #0073aa;
+    color: #0073aa;
+}
+.vitrine-icon-pick .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
 /* ── WYSIWYG Toolbar (aranha items) ── */
 .vitrine-wysiwyg-toolbar {
     display: flex;
@@ -785,6 +965,66 @@ body.vitrine-resizing-width {
 .vitrine-hero-field input[type="range"] {
     width: 140px;
 }
+.vitrine-hero-field--row {
+    flex-direction: row;
+    gap: 12px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+.vitrine-hero-field--row > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.vitrine-hero-field select {
+    min-width: 110px;
+}
+.vitrine-hero-field--wide {
+    flex-basis: 100%;
+    min-width: 100%;
+}
+.vitrine-hero-field--wide textarea {
+    width: 100%;
+    max-width: 100%;
+    resize: vertical;
+    font-size: 13px;
+    line-height: 1.5;
+    padding: 6px 8px;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+.vitrine-hero-format {
+    display: flex;
+    gap: 4px;
+    margin-top: 4px;
+}
+.vitrine-format-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    color: #50575e;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.vitrine-format-btn:hover {
+    background: #f0f0f1;
+    border-color: #8c8f94;
+}
+.vitrine-format-btn.is-active {
+    background: #2271b1;
+    border-color: #2271b1;
+    color: #fff;
+}
+.vitrine-format-btn b { font-weight: 700; }
+.vitrine-format-btn i { font-style: italic; }
 .vitrine-hero-image-field .vitrine-image-preview {
     max-width: 120px;
     max-height: 60px;
