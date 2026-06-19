@@ -145,6 +145,7 @@ class Vitrine_Editor {
                 'hero_text_italic'     => '0',
                 'hero_desc_bold'       => '0',
                 'hero_desc_italic'     => '0',
+                'custom_css'           => '',
             ),
         ) );
     }
@@ -159,7 +160,7 @@ class Vitrine_Editor {
         $elements = Vitrine_Plugin::load_elements();
         ?>
         <div id="vitrine-editor">
-            <!-- Área principal: sidebar + canvas -->
+            <!-- Área principal: sidebar esquerda + canvas + sidebar direita -->
             <div id="vitrine-editor-top">
                 <!-- Sidebar esquerda: elementos disponíveis -->
                 <aside id="vitrine-sidebar-left" class="vitrine-sidebar">
@@ -180,20 +181,26 @@ class Vitrine_Editor {
                         <p class="vitrine-canvas-placeholder">Arraste elementos aqui</p>
                     </div>
                 </main>
-            </div>
 
-            <!-- Painel inferior: configurações do elemento selecionado -->
-            <aside id="vitrine-settings-bottom">
-                <div class="vitrine-settings-bottom-header">
-                    <h3>Configurações</h3>
-                    <button type="button" id="vitrine-settings-toggle" class="button button-small" title="Minimizar/Expandir">
-                        <span class="dashicons dashicons-arrow-down-alt2"></span>
-                    </button>
-                </div>
-                <div id="vitrine-settings-panel">
-                    <p class="vitrine-settings-empty">Selecione um elemento para configurar.</p>
-                </div>
-            </aside>
+                <!-- Sidebar direita: configurações do elemento selecionado -->
+                <aside id="vitrine-settings-sidebar">
+                    <div id="vitrine-settings-sidebar-header">
+                        <div id="vitrine-settings-el-info">
+                            <span id="vitrine-settings-el-icon" class="dashicons dashicons-admin-settings"></span>
+                            <span id="vitrine-settings-el-label">Configurações</span>
+                        </div>
+                        <button type="button" id="vitrine-settings-sidebar-close" title="Fechar painel">
+                            <span class="dashicons dashicons-no-alt"></span>
+                        </button>
+                    </div>
+                    <div id="vitrine-settings-panel">
+                        <div class="vitrine-settings-empty-state">
+                            <span class="dashicons dashicons-edit-large"></span>
+                            <p>Clique em um elemento no canvas para editar as suas configurações.</p>
+                        </div>
+                    </div>
+                </aside>
+            </div>
         </div>
         <?php
     }
@@ -246,6 +253,7 @@ class Vitrine_Editor {
                 'hero_text_italic'      => ! empty( $page_settings['hero_text_italic'] ) ? '1' : '0',
                 'hero_desc_bold'        => ! empty( $page_settings['hero_desc_bold'] ) ? '1' : '0',
                 'hero_desc_italic'      => ! empty( $page_settings['hero_desc_italic'] ) ? '1' : '0',
+                'custom_css'            => isset( $page_settings['custom_css'] ) ? $this->sanitize_page_custom_css( $page_settings['custom_css'] ) : '',
             );
             update_post_meta( $post_id, '_vitrine_page_settings', $clean_page );
         }
@@ -329,5 +337,16 @@ class Vitrine_Editor {
             $clean[] = $clean_item;
         }
         return $clean;
+    }
+
+    /**
+     * Sanitiza CSS personalizado da vitrine (remove tags e padrões perigosos).
+     */
+    private function sanitize_page_custom_css( $css ) {
+        $css = wp_strip_all_tags( (string) $css );
+        $css = preg_replace( '/expression\s*\(/i', '', $css );
+        $css = preg_replace( '/javascript\s*:/i', '', $css );
+        $css = str_replace( array( '<', '>' ), '', $css );
+        return trim( $css );
     }
 }

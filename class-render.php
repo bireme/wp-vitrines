@@ -94,19 +94,44 @@ class Vitrine_Render {
             '6.7.2'
         );
 
+        wp_enqueue_style( 'dashicons' );
+
         wp_enqueue_style(
             'vitrine-front-css',
             VITRINE_URL . 'assets/css/frontend.css',
-            array( 'font-awesome' ),
-            VITRINE_VERSION
+            array( 'font-awesome', 'dashicons' ),
+            file_exists( VITRINE_PATH . 'assets/css/frontend.css' )
+                ? filemtime( VITRINE_PATH . 'assets/css/frontend.css' )
+                : VITRINE_VERSION
         );
 
         wp_enqueue_script(
             'vitrine-front-js',
             VITRINE_URL . 'assets/js/frontend.js',
             array(),
-            VITRINE_VERSION,
+            file_exists( VITRINE_PATH . 'assets/js/frontend.js' )
+                ? filemtime( VITRINE_PATH . 'assets/js/frontend.js' )
+                : VITRINE_VERSION,
             true
         );
+
+        $page_settings = get_post_meta( get_the_ID(), '_vitrine_page_settings', true );
+        if ( is_array( $page_settings ) && ! empty( $page_settings['custom_css'] ) ) {
+            $custom_css = $this->sanitize_page_custom_css( $page_settings['custom_css'] );
+            if ( $custom_css ) {
+                wp_add_inline_style( 'vitrine-front-css', $custom_css );
+            }
+        }
+    }
+
+    /**
+     * Sanitiza CSS personalizado da vitrine.
+     */
+    private function sanitize_page_custom_css( $css ) {
+        $css = wp_strip_all_tags( (string) $css );
+        $css = preg_replace( '/expression\s*\(/i', '', $css );
+        $css = preg_replace( '/javascript\s*:/i', '', $css );
+        $css = str_replace( array( '<', '>' ), '', $css );
+        return trim( $css );
     }
 }

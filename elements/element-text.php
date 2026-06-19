@@ -39,12 +39,15 @@ class Vitrine_Element_Text extends Vitrine_Element {
         $defaults = $this->defaults();
         $s        = wp_parse_args( $settings, $defaults );
 
-        $style = sprintf(
-            'text-align:%s;color:%s;font-size:%spx;',
-            esc_attr( $s['align'] ),
-            esc_attr( $s['color'] ),
-            intval( $s['font_size'] )
-        );
+        $color     = esc_attr( $s['color'] );
+        $font_size = max( 8, intval( $s['font_size'] ) );
+        $align     = esc_attr( $s['align'] );
+
+        $style = 'text-align:' . $align
+            . ';--vitrine-text-color:' . $color
+            . ';color:' . $color
+            . ';--vitrine-text-size:' . $font_size . 'px'
+            . ';font-size:' . $font_size . 'px;';
 
         return sprintf(
             '<div class="vitrine-el-text" style="%s">%s</div>',

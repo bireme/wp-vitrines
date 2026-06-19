@@ -45,7 +45,7 @@ if ( $vitrine_show_header ) {
 $vitrine_body_style = $vitrine_bg_color ? ' style="background-color:' . esc_attr( $vitrine_bg_color ) . ';min-height:100vh;"' : '';
 ?>
 
-<main id="vitrine-single" class="vitrine-single-wrap"<?php echo $vitrine_body_style; ?>>
+<main id="vitrine-single" class="vitrine-single-wrap vitrine-single-wrap--<?php echo esc_attr( get_the_ID() ); ?>"<?php echo $vitrine_body_style; ?>>
     <?php if ( $vitrine_hero_image || $vitrine_hero_text || $vitrine_hero_desc ) : ?>
     <section class="vitrine-hero" style="<?php echo $vitrine_hero_image ? 'background:url(' . esc_url( $vitrine_hero_image ) . ') center/cover no-repeat;' : 'background:#333;'; ?>height:<?php echo esc_attr( $vitrine_hero_height ); ?>px;justify-content:<?php echo 'left' === $vitrine_hero_align ? 'flex-start' : ( 'right' === $vitrine_hero_align ? 'flex-end' : 'center' ); ?>;">
         <div class="vitrine-hero-overlay" style="background:rgba(0,0,0,<?php echo esc_attr( $vitrine_hero_opacity ); ?>);"></div>
