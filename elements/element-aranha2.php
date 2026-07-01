@@ -31,6 +31,7 @@ class Vitrine_Element_Aranha2 extends Vitrine_Element {
             'card_border'     => '#2e7d32',
             'text_color'      => '#1d2327',
             'icon_size'       => '36',
+            'icon_color'      => '#2e7d32',
             'radius'          => '200',
             'items'           => array(),
         );
@@ -44,6 +45,7 @@ class Vitrine_Element_Aranha2 extends Vitrine_Element {
             array( 'name' => 'center_bg_color', 'label' => 'Cor de fundo centro',   'type' => 'color' ),
             array( 'name' => 'radius',          'label' => 'Raio orbital (px)',     'type' => 'number' ),
             array( 'name' => 'icon_size',       'label' => 'Tam. ícones (px)',      'type' => 'number' ),
+            array( 'name' => 'icon_color',      'label' => 'Cor dos ícones',        'type' => 'color' ),
             array( 'name' => 'line_color',      'label' => 'Cor das linhas',        'type' => 'color' ),
             array( 'name' => 'card_bg',         'label' => 'Cor fundo card',        'type' => 'color' ),
             array( 'name' => 'card_border',     'label' => 'Cor borda card',        'type' => 'color' ),
@@ -63,6 +65,7 @@ class Vitrine_Element_Aranha2 extends Vitrine_Element {
         $center_size = max( 60, intval( $s['center_size'] ) );
         $radius      = max( 80, intval( $s['radius'] ) );
         $icon_size   = max( 16, intval( $s['icon_size'] ) );
+        $icon_color  = esc_attr( $s['icon_color'] );
         $line_color  = esc_attr( $s['line_color'] );
         $card_bg     = esc_attr( $s['card_bg'] );
         $card_border = esc_attr( $s['card_border'] );
@@ -184,7 +187,7 @@ class Vitrine_Element_Aranha2 extends Vitrine_Element {
 
             if ( $icon ) {
                 $inner .= '<span class="vitrine-aranha2__card-icon">'
-                    . $this->render_icon( $icon, $icon_size ) . '</span>';
+                    . $this->render_icon( $icon, $icon_size, $icon_color ) . '</span>';
             }
 
             if ( $text ) {
@@ -214,16 +217,17 @@ class Vitrine_Element_Aranha2 extends Vitrine_Element {
         return $output;
     }
 
-    private function render_icon( $icon, $icon_size ) {
+    private function render_icon( $icon, $icon_size, $icon_color = '' ) {
         if ( ! $icon ) {
             return '';
         }
+        $color_style = $icon_color ? 'color:' . esc_attr( $icon_color ) . ';' : '';
         if ( strpos( $icon, 'dashicons-' ) === 0 ) {
             return '<span class="dashicons ' . esc_attr( $icon )
-                . '" style="font-size:' . $icon_size . 'px;width:' . $icon_size . 'px;height:' . $icon_size . 'px;"></span>';
+                . '" style="font-size:' . $icon_size . 'px;width:' . $icon_size . 'px;height:' . $icon_size . 'px;' . $color_style . '"></span>';
         }
         if ( preg_match( '/^fa[srlbd]?\s/', $icon ) ) {
-            return '<i class="' . esc_attr( $icon ) . '" style="font-size:' . $icon_size . 'px;"></i>';
+            return '<i class="' . esc_attr( $icon ) . '" style="font-size:' . $icon_size . 'px;' . $color_style . '"></i>';
         }
         return '<img src="' . esc_url( $icon ) . '" alt=""'
             . ' style="width:' . $icon_size . 'px;height:' . $icon_size . 'px;object-fit:contain;border-radius:4px;" />';

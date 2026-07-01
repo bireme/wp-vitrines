@@ -21,6 +21,7 @@ class Vitrine_Plugin {
 
         if ( is_admin() ) {
             new Vitrine_Editor();
+            new Vitrine_Hero_Meta();
         }
 
         new Vitrine_Render();

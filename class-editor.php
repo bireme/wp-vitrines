@@ -45,7 +45,7 @@ class Vitrine_Editor {
             array( $this, 'render_editor' ),
             'vitrine',
             'normal',
-            'high'
+            'default'
         );
     }
 
@@ -61,6 +61,8 @@ class Vitrine_Editor {
         if ( ! in_array( $hook, array( 'post.php', 'post-new.php' ), true ) ) {
             return;
         }
+
+        wp_enqueue_style( 'dashicons' );
 
         // Font Awesome 6 Free
         wp_enqueue_style(
@@ -120,7 +122,13 @@ class Vitrine_Editor {
 
         $post_id = get_the_ID();
         $layout  = get_post_meta( $post_id, '_vitrine_layout', true );
-        $page_settings = get_post_meta( $post_id, '_vitrine_page_settings', true );
+        $all_settings = Vitrine_Hero_Meta::get_settings( $post_id );
+        $page_settings = array(
+            'show_header'   => $all_settings['show_header'],
+            'show_footer'   => $all_settings['show_footer'],
+            'page_bg_color' => $all_settings['page_bg_color'],
+            'custom_css'    => $all_settings['custom_css'],
+        );
 
         wp_localize_script( 'vitrine-editor-js', 'vitrineData', array(
             'ajaxUrl'      => admin_url( 'admin-ajax.php' ),
@@ -128,25 +136,8 @@ class Vitrine_Editor {
             'postId'       => $post_id,
             'elements'     => $elements_js,
             'layout'       => $layout ? $layout : array(),
-            'pageSettings' => $page_settings ? $page_settings : array(
-                'show_header'          => '1',
-                'show_footer'          => '1',
-                'page_bg_color'        => '',
-                'hero_image'           => '',
-                'hero_text'            => '',
-                'hero_text_color'      => '#ffffff',
-                'hero_overlay_opacity' => '50',
-                'hero_height'          => '400',
-                'hero_font_size'       => '36',
-                'hero_text_align'      => 'center',
-                'hero_description'     => '',
-                'hero_desc_size'       => '18',
-                'hero_text_bold'       => '1',
-                'hero_text_italic'     => '0',
-                'hero_desc_bold'       => '0',
-                'hero_desc_italic'     => '0',
-                'custom_css'           => '',
-            ),
+            'pageSettings' => $page_settings,
+            'iconPicker'   => Vitrine_Icons::get_picker_data(),
         ) );
     }
 
@@ -236,26 +227,14 @@ class Vitrine_Editor {
         $page_raw = isset( $_POST['page_settings'] ) ? wp_unslash( $_POST['page_settings'] ) : '';
         $page_settings = json_decode( $page_raw, true );
         if ( is_array( $page_settings ) ) {
-            $clean_page = array(
-                'show_header'           => ! empty( $page_settings['show_header'] ) ? '1' : '0',
-                'show_footer'           => ! empty( $page_settings['show_footer'] ) ? '1' : '0',
-                'page_bg_color'         => isset( $page_settings['page_bg_color'] ) ? sanitize_hex_color( $page_settings['page_bg_color'] ) : '',
-                'hero_image'            => isset( $page_settings['hero_image'] ) ? esc_url_raw( $page_settings['hero_image'] ) : '',
-                'hero_text'             => isset( $page_settings['hero_text'] ) ? sanitize_text_field( $page_settings['hero_text'] ) : '',
-                'hero_text_color'       => isset( $page_settings['hero_text_color'] ) ? sanitize_hex_color( $page_settings['hero_text_color'] ) : '#ffffff',
-                'hero_overlay_opacity'  => isset( $page_settings['hero_overlay_opacity'] ) ? absint( $page_settings['hero_overlay_opacity'] ) : 50,
-                'hero_height'           => isset( $page_settings['hero_height'] ) ? absint( $page_settings['hero_height'] ) : 400,
-                'hero_font_size'        => isset( $page_settings['hero_font_size'] ) ? absint( $page_settings['hero_font_size'] ) : 36,
-                'hero_text_align'       => isset( $page_settings['hero_text_align'] ) && in_array( $page_settings['hero_text_align'], array( 'left', 'center', 'right' ), true ) ? $page_settings['hero_text_align'] : 'center',
-                'hero_description'      => isset( $page_settings['hero_description'] ) ? wp_kses_post( $page_settings['hero_description'] ) : '',
-                'hero_desc_size'        => isset( $page_settings['hero_desc_size'] ) ? absint( $page_settings['hero_desc_size'] ) : 18,
-                'hero_text_bold'        => isset( $page_settings['hero_text_bold'] ) && $page_settings['hero_text_bold'] === '0' ? '0' : '1',
-                'hero_text_italic'      => ! empty( $page_settings['hero_text_italic'] ) ? '1' : '0',
-                'hero_desc_bold'        => ! empty( $page_settings['hero_desc_bold'] ) ? '1' : '0',
-                'hero_desc_italic'      => ! empty( $page_settings['hero_desc_italic'] ) ? '1' : '0',
-                'custom_css'            => isset( $page_settings['custom_css'] ) ? $this->sanitize_page_custom_css( $page_settings['custom_css'] ) : '',
+            $builder_settings = array(
+                'show_header'   => ! empty( $page_settings['show_header'] ) ? '1' : '0',
+                'show_footer'   => ! empty( $page_settings['show_footer'] ) ? '1' : '0',
+                'page_bg_color' => isset( $page_settings['page_bg_color'] ) ? sanitize_hex_color( $page_settings['page_bg_color'] ) : '',
+                'custom_css'    => isset( $page_settings['custom_css'] ) ? $this->sanitize_page_custom_css( $page_settings['custom_css'] ) : '',
             );
-            update_post_meta( $post_id, '_vitrine_page_settings', $clean_page );
+            $merged = Vitrine_Hero_Meta::merge_settings( $post_id, $builder_settings );
+            update_post_meta( $post_id, '_vitrine_page_settings', $merged );
         }
 
         wp_send_json_success( 'Layout salvo.' );
