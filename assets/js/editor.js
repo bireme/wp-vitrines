@@ -1178,6 +1178,17 @@
                 return;
             }
 
+            if (item.type === 'aranha2' || item.type === 'aranha3') {
+                var cardStyle = item.settings.card_style || 'default';
+                var isPresetCard = cardStyle !== 'default';
+                if (field.name === 'card_min_height' && !isPresetCard) {
+                    return;
+                }
+                if (item.type === 'aranha3' && field.name === 'card_height' && isPresetCard) {
+                    return;
+                }
+            }
+
             var val = item.settings[field.name] !== undefined ? item.settings[field.name] : (elDef.defaults[field.name] || '');
             var inputHtml = '';
 
@@ -1238,6 +1249,9 @@
             var fieldHint = '';
             if (item.type === 'container' && field.name === 'name') {
                 fieldHint = '<p class="vitrine-field-hint">Aparece na barra do bloco no canvas para identificar cada container.</p>';
+            }
+            if ((item.type === 'aranha2' || item.type === 'aranha3') && field.name === 'card_min_height') {
+                fieldHint = '<p class="vitrine-field-hint">Aplica-se aos modelos Escuro, Branco e Borda esquerda.</p>';
             }
             $panel.append(
                 '<div class="vitrine-field-group' + extraClass + '">' +
@@ -1861,6 +1875,11 @@
                 clearWidths(item.id);
             }
             renderCanvas();
+            renderSettings();
+            return;
+        }
+
+        if ((item.type === 'aranha2' || item.type === 'aranha3') && field === 'card_style') {
             renderSettings();
             return;
         }

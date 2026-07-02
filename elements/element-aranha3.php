@@ -43,6 +43,7 @@ class Vitrine_Element_Aranha3 extends Vitrine_Element {
             'card_height'        => '140',
             'card_text_align'    => 'top',
             'card_style'         => 'default',
+            'card_min_height'    => '190',
             'items'              => array(),
         );
     }
@@ -77,6 +78,7 @@ class Vitrine_Element_Aranha3 extends Vitrine_Element {
                 'white'       => 'Branco (ícone ao lado)',
                 'border-left' => 'Borda esquerda',
             ) ),
+            array( 'name' => 'card_min_height',     'label' => 'Altura mínima dos cards (px)', 'type' => 'number' ),
         );
     }
 
@@ -106,6 +108,8 @@ class Vitrine_Element_Aranha3 extends Vitrine_Element {
         $core_max_width     = max( 220, min( 720, $center_size + 120 ) );
         $card_style         = $this->sanitize_card_style( $s['card_style'] );
         $use_preset         = 'default' !== $card_style;
+        $card_min_height    = max( 80, intval( isset( $s['card_min_height'] ) ? $s['card_min_height'] : 190 ) );
+        $card_height        = $use_preset ? $card_min_height : $card_height;
 
         $items   = is_array( $s['items'] ) ? array_values( $s['items'] ) : array();
         $n_items = count( $items );

@@ -1630,7 +1630,7 @@ a.vitrine-aranha__text:hover {
 .vitrine-el-aranha2.vitrine-card-style--border-left .vitrine-aranha2__card {
     min-width: 180px;
     max-width: 280px;
-    min-height: 190px;
+    min-height: var(--a2-card-min-h, 190px);
     padding: 28px;
     text-align: left;
     display: flex;
@@ -1707,7 +1707,7 @@ a.vitrine-aranha__text:hover {
 .vitrine-el-aranha3.vitrine-card-style--dark .vitrine-a3-cell--card,
 .vitrine-el-aranha3.vitrine-card-style--white .vitrine-a3-cell--card,
 .vitrine-el-aranha3.vitrine-card-style--border-left .vitrine-a3-cell--card {
-    min-height: 190px;
+    min-height: var(--a3-card-h, 140px);
 }
 .vitrine-el-aranha3.vitrine-card-style--dark .vitrine-a3-cell--card:hover,
 .vitrine-el-aranha3.vitrine-card-style--white .vitrine-a3-cell--card:hover,

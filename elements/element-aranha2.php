@@ -32,6 +32,7 @@ class Vitrine_Element_Aranha2 extends Vitrine_Element {
             'icon_color'      => '#2e7d32',
             'radius'          => '200',
             'card_style'      => 'default',
+            'card_min_height' => '190',
             'items'           => array(),
         );
     }
@@ -51,6 +52,7 @@ class Vitrine_Element_Aranha2 extends Vitrine_Element {
                 'white'       => 'Branco (ícone ao lado)',
                 'border-left' => 'Borda esquerda',
             ) ),
+            array( 'name' => 'card_min_height', 'label' => 'Altura mínima dos cards (px)', 'type' => 'number' ),
             array( 'name' => 'card_bg',         'label' => 'Cor fundo card',        'type' => 'color' ),
             array( 'name' => 'card_border',     'label' => 'Cor destaque (bordas)', 'type' => 'color' ),
             array( 'name' => 'title_color',     'label' => 'Cor do título',         'type' => 'color' ),
@@ -75,10 +77,11 @@ class Vitrine_Element_Aranha2 extends Vitrine_Element {
         $bg_color    = esc_attr( $s['bg_color'] );
         $center_bg   = esc_attr( $s['center_bg_color'] );
         $center_lbl  = esc_html( $s['center_label'] );
-        $card_style  = $this->sanitize_card_style( $s['card_style'] );
-        $use_preset  = 'default' !== $card_style;
+        $card_style      = $this->sanitize_card_style( $s['card_style'] );
+        $use_preset      = 'default' !== $card_style;
+        $card_min_height = max( 80, intval( isset( $s['card_min_height'] ) ? $s['card_min_height'] : 190 ) );
 
-        $stage       = $this->compute_stage_size( $center_size, $radius, $n, $use_preset );
+        $stage       = $this->compute_stage_size( $center_size, $radius, $n, $use_preset, $card_min_height );
         $stage_w     = $stage['w'];
         $stage_h     = $stage['h'];
         $r_pct_w     = $stage['r_pct_w'];
@@ -88,7 +91,8 @@ class Vitrine_Element_Aranha2 extends Vitrine_Element {
         $wrap_style  = 'background:' . $bg_color
             . ';--a2-accent:' . $accent
             . ';--a2-stage-w:' . $stage_w . 'px'
-            . ';--a2-stage-h:' . $stage_h . 'px;';
+            . ';--a2-stage-h:' . $stage_h . 'px'
+            . ';--a2-card-min-h:' . $card_min_height . 'px;';
 
         $output  = '<div class="vitrine-el-aranha2 vitrine-card-style--' . esc_attr( $card_style ) . '" style="' . esc_attr( $wrap_style ) . '">';
         $output .= '<div class="vitrine-aranha2__stage">';
@@ -182,16 +186,21 @@ class Vitrine_Element_Aranha2 extends Vitrine_Element {
         return $output;
     }
 
-    private function compute_stage_size( $center_size, $radius, $n_items, $use_preset ) {
-        $pad_w           = $use_preset ? 64 : 40;
-        $pad_h           = $use_preset ? 48 : 28;
-        $card_half_h_pct = $use_preset ? 13 : 9;
+    private function compute_stage_size( $center_size, $radius, $n_items, $use_preset, $card_min_height = 190 ) {
+        $pad_w = $use_preset ? 64 : 40;
+        $pad_h = $use_preset ? 48 : 28;
 
         $stage_w = $center_size + 2 * $radius + 2 * $pad_w;
         $stage_h = $stage_w;
 
         $r_pct_h  = $radius / max( 1, $stage_h ) * 100;
         $cs_pct_h = $center_size / max( 1, $stage_h ) * 100;
+
+        if ( $use_preset ) {
+            $card_half_h_pct = min( 22, max( 8, ( $card_min_height / 2 ) / max( 1, $stage_h ) * 100 ) );
+        } else {
+            $card_half_h_pct = 9;
+        }
 
         $y_min = 50 - ( $cs_pct_h / 2 );
         $y_max = 50 + ( $cs_pct_h / 2 );
