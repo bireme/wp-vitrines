@@ -64,7 +64,14 @@ class Vitrine_Render {
                 $custom_css = str_replace( array( '<', '>', '"' ), '', $custom_css );
                 $inline_styles[] = $custom_css;
             }
-            $style = $inline_styles ? ' style="' . implode( ';', $inline_styles ) . '"' : '';
+
+            if ( 'aranha2' === $type ) {
+                $inline_styles[] = 'position:relative';
+                $inline_styles[] = 'z-index:50';
+                $inline_styles[] = 'overflow:visible';
+            }
+
+            $style = $inline_styles ? ' style="' . esc_attr( implode( ';', $inline_styles ) ) . '"' : '';
 
             // Renderiza filhos (para containers)
             $children_html = '';

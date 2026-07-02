@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-$vitrine_page_settings = get_post_meta( get_the_ID(), '_vitrine_page_settings', true );
+$vitrine_page_settings = Vitrine_Hero_Meta::get_settings( get_the_ID() );
 $vitrine_show_header   = ! isset( $vitrine_page_settings['show_header'] ) || '1' === $vitrine_page_settings['show_header'];
 $vitrine_show_footer   = ! isset( $vitrine_page_settings['show_footer'] ) || '1' === $vitrine_page_settings['show_footer'];
 $vitrine_bg_color      = ! empty( $vitrine_page_settings['page_bg_color'] ) ? $vitrine_page_settings['page_bg_color'] : '';
@@ -25,6 +25,19 @@ $vitrine_hero_bold     = isset( $vitrine_page_settings['hero_text_bold'] ) && '0
 $vitrine_hero_italic   = ! empty( $vitrine_page_settings['hero_text_italic'] ) ? 'italic' : 'normal';
 $vitrine_hero_desc     = ! empty( $vitrine_page_settings['hero_description'] ) ? $vitrine_page_settings['hero_description'] : '';
 $vitrine_hero_desc_sz  = ! empty( $vitrine_page_settings['hero_desc_size'] ) ? intval( $vitrine_page_settings['hero_desc_size'] ) : 18;
+
+$vitrine_hero_justify = 'center';
+if ( 'left' === $vitrine_hero_align ) {
+    $vitrine_hero_justify = 'flex-start';
+} elseif ( 'right' === $vitrine_hero_align ) {
+    $vitrine_hero_justify = 'flex-end';
+}
+
+$vitrine_hero_style = $vitrine_hero_image
+    ? 'background:url(' . esc_url( $vitrine_hero_image ) . ') center/cover no-repeat;'
+    : 'background:#333;';
+$vitrine_hero_style .= 'height:' . esc_attr( $vitrine_hero_height ) . 'px;';
+$vitrine_hero_style .= 'justify-content:' . esc_attr( $vitrine_hero_justify ) . ';';
 
 if ( $vitrine_show_header ) {
     get_header();
@@ -47,7 +60,7 @@ $vitrine_body_style = $vitrine_bg_color ? ' style="background-color:' . esc_attr
 
 <main id="vitrine-single" class="vitrine-single-wrap vitrine-single-wrap--<?php echo esc_attr( get_the_ID() ); ?>"<?php echo $vitrine_body_style; ?>>
     <?php if ( $vitrine_hero_image || $vitrine_hero_text || $vitrine_hero_desc ) : ?>
-    <section class="vitrine-hero" style="<?php echo $vitrine_hero_image ? 'background:url(' . esc_url( $vitrine_hero_image ) . ') center/cover no-repeat;' : 'background:#333;'; ?>height:<?php echo esc_attr( $vitrine_hero_height ); ?>px;justify-content:<?php echo 'left' === $vitrine_hero_align ? 'flex-start' : ( 'right' === $vitrine_hero_align ? 'flex-end' : 'center' ); ?>;">
+    <section class="vitrine-hero" style="<?php echo esc_attr( $vitrine_hero_style ); ?>">
         <div class="vitrine-hero-overlay" style="background:rgba(0,0,0,<?php echo esc_attr( $vitrine_hero_opacity ); ?>);"></div>
         <div class="vitrine-hero-content" style="text-align:<?php echo esc_attr( $vitrine_hero_align ); ?>;">
             <?php if ( $vitrine_hero_text ) : ?>

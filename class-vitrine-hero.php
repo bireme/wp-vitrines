@@ -11,7 +11,7 @@ class Vitrine_Hero_Meta {
     const META_KEY = '_vitrine_page_settings';
 
     public function __construct() {
-        add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ), 5 );
+        add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ), 20 );
         add_action( 'save_post_vitrine', array( $this, 'save' ), 10, 2 );
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
     }
@@ -111,7 +111,7 @@ class Vitrine_Hero_Meta {
             array( $this, 'render_meta_box' ),
             'vitrine',
             'normal',
-            'high'
+            'low'
         );
     }
 
