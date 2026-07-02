@@ -522,7 +522,10 @@
                             '<span class="dashicons dashicons-trash"></span>' +
                         '</button>' +
                     '</div>' +
-                    '<div class="vitrine-block-preview">' +
+                    '<div class="vitrine-block-preview"' + (function () {
+                        var previewBg = getTextBlockPreviewBgStyle(item.type, settings);
+                        return previewBg ? ' style="' + previewBg + '"' : '';
+                    })() + '>' +
                         buildPreview(item.type, settings) +
                     '</div>' +
                     (isContainer ? (function() {
@@ -563,6 +566,32 @@
             '<span class="vitrine-block-preview-placeholder__label">' + escapeHtml(labels[type] || type) + '</span>' +
             '<small>Configure no painel lateral · visualização no frontend</small>' +
         '</div>';
+    }
+
+    function isWhiteTextColor(color) {
+        var c = String(color || '').trim().toLowerCase();
+        if (c === 'white') return true;
+        if (/^#fff(f{3})?$/i.test(c)) return true;
+        return /^rgb\(\s*255\s*,\s*255\s*,\s*255\s*\)$/i.test(c);
+    }
+
+    function getTextBlockPreviewBgStyle(type, settings) {
+        if (type !== 'text') return '';
+        var bg = String(settings.bg_color || '').trim();
+        if (bg) {
+            return 'background:' + escapeAttr(bg) + ';';
+        }
+        return isWhiteTextColor(settings.color) ? 'background:#000;' : '';
+    }
+
+    function refreshBlockPreview($block, type, settings) {
+        $block.html(buildPreview(type, settings));
+        var bgStyle = getTextBlockPreviewBgStyle(type, settings);
+        if (bgStyle) {
+            $block.attr('style', bgStyle);
+        } else if (type === 'text') {
+            $block.removeAttr('style');
+        }
     }
 
     /**
@@ -1209,7 +1238,15 @@
                     inputHtml = '<input type="number" class="vitrine-field" data-field="' + escapeAttr(field.name) + '" value="' + escapeAttr(val) + '" />';
                     break;
                 case 'color':
-                    inputHtml = '<input type="color" class="vitrine-field" data-field="' + escapeAttr(field.name) + '" value="' + escapeAttr(val) + '" />';
+                    if (item.type === 'text' && field.name === 'bg_color') {
+                        var bgColorVal = val || '#ffffff';
+                        inputHtml = '<div class="vitrine-color-row">' +
+                            '<input type="color" class="vitrine-field vitrine-field-bg-color" data-field="bg_color" value="' + escapeAttr(bgColorVal) + '" />' +
+                            (val ? '<button type="button" class="button button-small vitrine-field-bg-color-clear" title="Sem fundo">&#10005;</button>' : '') +
+                        '</div>';
+                    } else {
+                        inputHtml = '<input type="color" class="vitrine-field" data-field="' + escapeAttr(field.name) + '" value="' + escapeAttr(val) + '" />';
+                    }
                     break;
                 case 'range': {
                     var rMin = field.min !== undefined ? field.min : 0;
@@ -1585,7 +1622,7 @@
         var elDef  = elements[item.type];
         if ($block.length && elDef) {
             var s = $.extend({}, elDef.defaults, item.settings);
-            $block.html(buildPreview(item.type, s));
+            refreshBlockPreview($block, item.type, s);
         }
     }
 
@@ -1636,7 +1673,7 @@
         var elDef  = elements[item.type];
         if ($block.length && elDef) {
             var s = $.extend(true, {}, elDef.defaults, item.settings);
-            $block.html(buildPreview(item.type, s));
+            refreshBlockPreview($block, item.type, s);
         }
     }
 
@@ -1896,7 +1933,32 @@
         var $block = $('[data-id="' + selectedId + '"]').first().find('> .vitrine-block-preview');
         if ($block.length && elDef) {
             var settings = $.extend({}, elDef.defaults, item.settings);
-            $block.html(buildPreview(item.type, settings));
+            refreshBlockPreview($block, item.type, settings);
+        }
+
+        if (item.type === 'text' && field === 'bg_color' && val) {
+            var $colorInput = $(this);
+            if (!$colorInput.siblings('.vitrine-field-bg-color-clear').length) {
+                $colorInput.after('<button type="button" class="button button-small vitrine-field-bg-color-clear" title="Sem fundo">&#10005;</button>');
+            }
+        }
+    });
+
+    $(document).on('click', '.vitrine-field-bg-color-clear', function (e) {
+        e.preventDefault();
+        if (!selectedId) return;
+        var item = findItemById(selectedId);
+        if (!item || item.type !== 'text') return;
+
+        item.settings.bg_color = '';
+        $(this).siblings('.vitrine-field-bg-color').val('#ffffff');
+        $(this).remove();
+
+        var $block = $('[data-id="' + selectedId + '"]').first().find('> .vitrine-block-preview');
+        var elDef  = elements[item.type];
+        if ($block.length && elDef) {
+            var settings = $.extend({}, elDef.defaults, item.settings);
+            refreshBlockPreview($block, item.type, settings);
         }
     });
 
@@ -2019,7 +2081,7 @@
         var elDef  = elements[item.type];
         if ($block.length && elDef) {
             var s = $.extend(true, {}, elDef.defaults, item.settings);
-            $block.html(buildPreview(item.type, s));
+            refreshBlockPreview($block, item.type, s);
         }
     });
 
@@ -2206,7 +2268,7 @@
         var elDef  = elements[item.type];
         if ($block.length && elDef) {
             var s = $.extend(true, {}, elDef.defaults, item.settings);
-            $block.html(buildPreview(item.type, s));
+            refreshBlockPreview($block, item.type, s);
         }
     });
 

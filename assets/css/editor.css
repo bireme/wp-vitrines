@@ -653,6 +653,17 @@ body.vitrine-resizing-width {
     border-radius: 3px;
     cursor: pointer;
 }
+.vitrine-color-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.vitrine-field-bg-color-clear {
+    font-size: 11px !important;
+    line-height: 1 !important;
+    padding: 2px 6px !important;
+    color: #d63638;
+}
 .vitrine-range-row {
     display: flex;
     align-items: center;
