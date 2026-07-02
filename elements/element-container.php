@@ -19,6 +19,7 @@ class Vitrine_Element_Container extends Vitrine_Element {
 
     public function defaults() {
         return array(
+            'name'          => '',
             'bg_color'      => '#f5f5f5',
             'bg_image'      => '',
             'bg_size'       => 'cover',
@@ -33,6 +34,7 @@ class Vitrine_Element_Container extends Vitrine_Element {
 
     public function fields() {
         return array(
+            array( 'name' => 'name',          'label' => 'Nome do container',               'type' => 'text' ),
             array( 'name' => 'bg_color',      'label' => 'Cor de fundo',                    'type' => 'color' ),
             array( 'name' => 'bg_image',      'label' => 'Imagem de fundo',                 'type' => 'image' ),
             array( 'name' => 'bg_size',       'label' => 'Tamanho do fundo',                'type' => 'select', 'options' => array( 'cover' => 'Cobrir (cover)', 'contain' => 'Conter (contain)', 'auto' => 'Automático' ) ),

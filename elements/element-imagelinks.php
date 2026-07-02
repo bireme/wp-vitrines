@@ -22,26 +22,19 @@ class Vitrine_Element_Imagelinks extends Vitrine_Element {
             'image'               => '',
             'image_height'        => '220',
             'image_fit'           => 'cover',
-            'caption'             => 'Conferências de Saúde',
+            'caption'             => '',
             'caption_bg'          => '#000000',
             'caption_color'       => '#ffffff',
             'caption_font_size'   => '16',
             'box_bg'              => '#e8e8e8',
-            'box_title'           => 'Sites relacionados',
+            'box_title'           => '',
             'box_title_color'     => '#333333',
             'box_title_font_size' => '16',
-            'link_color'          => '#333333',
-            'link_font_size'      => '14',
+            'content'             => '',
+            'content_color'       => '#333333',
+            'content_font_size'   => '14',
             'separator_color'     => '#333333',
             'box_padding'         => '16',
-            'items'               => array(
-                array( 'label' => 'Ministério da Saúde', 'url' => '' ),
-                array( 'label' => 'BVS MS', 'url' => '' ),
-                array( 'label' => 'BVS Brasil', 'url' => '' ),
-                array( 'label' => 'CNS', 'url' => '' ),
-                array( 'label' => 'CONASS', 'url' => '' ),
-                array( 'label' => 'CONASEMS', 'url' => '' ),
-            ),
         );
     }
 
@@ -54,13 +47,14 @@ class Vitrine_Element_Imagelinks extends Vitrine_Element {
             array( 'name' => 'caption_bg',          'label' => 'Fundo da legenda',            'type' => 'color' ),
             array( 'name' => 'caption_color',       'label' => 'Cor da legenda',              'type' => 'color' ),
             array( 'name' => 'caption_font_size',   'label' => 'Tam. legenda (px)',           'type' => 'number' ),
-            array( 'name' => 'box_bg',              'label' => 'Fundo da caixa de links',     'type' => 'color' ),
+            array( 'name' => 'box_bg',              'label' => 'Fundo da caixa de conteúdo',  'type' => 'color' ),
             array( 'name' => 'box_title',           'label' => 'Título da caixa',             'type' => 'text' ),
             array( 'name' => 'box_title_color',     'label' => 'Cor do título',               'type' => 'color' ),
             array( 'name' => 'box_title_font_size', 'label' => 'Tam. título (px)',            'type' => 'number' ),
+            array( 'name' => 'content',             'label' => 'Conteúdo abaixo da imagem',   'type' => 'textarea' ),
+            array( 'name' => 'content_color',       'label' => 'Cor do texto',                'type' => 'color' ),
+            array( 'name' => 'content_font_size',   'label' => 'Tam. texto (px)',             'type' => 'number' ),
             array( 'name' => 'separator_color',     'label' => 'Cor do separador',            'type' => 'color' ),
-            array( 'name' => 'link_color',          'label' => 'Cor dos links',               'type' => 'color' ),
-            array( 'name' => 'link_font_size',      'label' => 'Tam. links (px)',             'type' => 'number' ),
             array( 'name' => 'box_padding',         'label' => 'Espaçamento interno (px)',    'type' => 'number' ),
         );
     }
@@ -79,12 +73,11 @@ class Vitrine_Element_Imagelinks extends Vitrine_Element {
         $box_title         = esc_html( $s['box_title'] );
         $box_title_color   = esc_attr( $s['box_title_color'] );
         $box_title_size    = max( 10, intval( $s['box_title_font_size'] ) ) . 'px';
-        $link_color        = esc_attr( $s['link_color'] );
-        $link_font_size    = max( 10, intval( $s['link_font_size'] ) ) . 'px';
+        $content_color     = esc_attr( isset( $s['content_color'] ) ? $s['content_color'] : ( isset( $s['link_color'] ) ? $s['link_color'] : '#333333' ) );
+        $content_font_size = max( 10, intval( isset( $s['content_font_size'] ) ? $s['content_font_size'] : ( isset( $s['link_font_size'] ) ? $s['link_font_size'] : 14 ) ) ) . 'px';
         $separator_color   = esc_attr( $s['separator_color'] );
         $box_padding       = max( 0, intval( $s['box_padding'] ) ) . 'px';
-
-        $items = is_array( $s['items'] ) ? $s['items'] : array();
+        $content_html      = $this->get_content_html( $s );
 
         $wrap_style = '--il-img-h:' . $image_height . 'px;'
             . '--il-img-fit:' . $image_fit . ';'
@@ -94,8 +87,8 @@ class Vitrine_Element_Imagelinks extends Vitrine_Element {
             . '--il-box-bg:' . $box_bg . ';'
             . '--il-box-title-color:' . $box_title_color . ';'
             . '--il-box-title-size:' . $box_title_size . ';'
-            . '--il-link-color:' . $link_color . ';'
-            . '--il-link-size:' . $link_font_size . ';'
+            . '--il-content-color:' . $content_color . ';'
+            . '--il-content-size:' . $content_font_size . ';'
             . '--il-separator-color:' . $separator_color . ';'
             . '--il-box-padding:' . $box_padding . ';';
 
@@ -119,41 +112,60 @@ class Vitrine_Element_Imagelinks extends Vitrine_Element {
 
         $output .= '</div>';
 
-        $output .= '<div class="vitrine-imagelinks-box" style="background:' . $box_bg . ';padding:' . $box_padding . ';">';
+        if ( $box_title || $content_html ) {
+            $output .= '<div class="vitrine-imagelinks-box" style="background:' . $box_bg . ';padding:' . $box_padding . ';">';
 
-        if ( $box_title ) {
-            $output .= '<h3 class="vitrine-imagelinks-box-title" style="color:' . $box_title_color . ';font-size:' . $box_title_size . ';">'
-                . $box_title
-                . '</h3>';
-        }
-
-        if ( $box_title || ! empty( $items ) ) {
-            $output .= '<hr class="vitrine-imagelinks-separator" style="border-color:' . $separator_color . ';" />';
-        }
-
-        if ( ! empty( $items ) ) {
-            $output .= '<ul class="vitrine-imagelinks-list">';
-            foreach ( $items as $link_item ) {
-                $label = isset( $link_item['label'] ) ? esc_html( $link_item['label'] ) : '';
-                $url   = isset( $link_item['url'] ) ? esc_url( $link_item['url'] ) : '';
-                if ( ! $label ) {
-                    continue;
-                }
-                $output .= '<li class="vitrine-imagelinks-item">';
-                if ( $url ) {
-                    $output .= '<a href="' . $url . '" class="vitrine-imagelinks-link" style="color:' . $link_color . ';font-size:' . $link_font_size . ';">' . $label . '</a>';
-                } else {
-                    $output .= '<span class="vitrine-imagelinks-link vitrine-imagelinks-link--text" style="color:' . $link_color . ';font-size:' . $link_font_size . ';">' . $label . '</span>';
-                }
-                $output .= '</li>';
+            if ( $box_title ) {
+                $output .= '<h3 class="vitrine-imagelinks-box-title" style="color:' . $box_title_color . ';font-size:' . $box_title_size . ';">'
+                    . $box_title
+                    . '</h3>';
             }
-            $output .= '</ul>';
+
+            if ( $box_title && $content_html ) {
+                $output .= '<hr class="vitrine-imagelinks-separator" style="border-color:' . $separator_color . ';" />';
+            }
+
+            if ( $content_html ) {
+                $output .= '<div class="vitrine-imagelinks-content" style="color:' . $content_color . ';font-size:' . $content_font_size . ';">'
+                    . wp_kses_post( $content_html )
+                    . '</div>';
+            }
+
+            $output .= '</div>';
         }
 
-        $output .= '</div>';
         $output .= '</div>';
 
         return $output;
+    }
+
+    /**
+     * Conteúdo livre (WYSIWYG) ou conversão de layouts antigos com lista de links.
+     */
+    private function get_content_html( $settings ) {
+        if ( ! empty( $settings['content'] ) ) {
+            return $settings['content'];
+        }
+
+        if ( empty( $settings['items'] ) || ! is_array( $settings['items'] ) ) {
+            return '';
+        }
+
+        $lines = array();
+        foreach ( $settings['items'] as $link_item ) {
+            $label = isset( $link_item['label'] ) ? trim( (string) $link_item['label'] ) : '';
+            $url   = isset( $link_item['url'] ) ? trim( (string) $link_item['url'] ) : '';
+            if ( ! $label ) {
+                continue;
+            }
+            if ( $url ) {
+                $lines[] = '<a href="' . esc_url( $url ) . '">' . esc_html( $label ) . '</a>';
+            } else {
+                $lines[] = esc_html( $label );
+            }
+        }
+
+        return implode( '<br />', $lines );
     }
 }
 

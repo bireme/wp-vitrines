@@ -26,6 +26,7 @@ class Vitrine_Element_Aranha extends Vitrine_Element {
             'line_color'      => '#8c8c8c',
             'text_color'      => '#333333',
             'icon_size'       => '40',
+            'icon_color'      => '#333333',
             'left_items'      => array(),
             'right_items'     => array(),
             'top_items'       => array(),
@@ -41,6 +42,7 @@ class Vitrine_Element_Aranha extends Vitrine_Element {
             array( 'name' => 'line_color',      'label' => 'Cor das linhas',         'type' => 'color' ),
             array( 'name' => 'text_color',      'label' => 'Cor do texto',           'type' => 'color' ),
             array( 'name' => 'icon_size',       'label' => 'Tamanho ícones (px)',    'type' => 'number' ),
+            array( 'name' => 'icon_color',      'label' => 'Cor dos ícones',         'type' => 'color' ),
         );
     }
 
@@ -49,6 +51,7 @@ class Vitrine_Element_Aranha extends Vitrine_Element {
 
         $center_size = max( 80, intval( $s['center_size'] ) );
         $icon_size   = max( 16, intval( $s['icon_size'] ) );
+        $icon_color  = esc_attr( $s['icon_color'] );
         $line_color  = esc_attr( $s['line_color'] );
         $text_color  = esc_attr( $s['text_color'] );
         $bg_color    = esc_attr( $s['bg_color'] );
@@ -71,7 +74,7 @@ class Vitrine_Element_Aranha extends Vitrine_Element {
         if ( $top_n ) {
             $output .= '<div class="vitrine-aranha__top-row">';
             foreach ( $top_items as $idx => $item ) {
-                $output .= $this->render_top_item( $item, $icon_size, $idx, $top_n );
+                $output .= $this->render_top_item( $item, $icon_size, $icon_color, $idx, $top_n );
             }
             $output .= '</div>';
         }
@@ -82,7 +85,7 @@ class Vitrine_Element_Aranha extends Vitrine_Element {
         // ── Lado Esquerdo ──
         $output .= '<div class="vitrine-aranha__side vitrine-aranha__side--left">';
         foreach ( $left_items as $idx => $item ) {
-            $output .= $this->render_item( $item, 'left', $icon_size, $idx, $left_n );
+            $output .= $this->render_item( $item, 'left', $icon_size, $icon_color, $idx, $left_n );
         }
         if ( ! $left_n ) {
             $output .= '<div class="vitrine-aranha__item vitrine-aranha__item--empty"></div>';
@@ -101,7 +104,7 @@ class Vitrine_Element_Aranha extends Vitrine_Element {
         // ── Lado Direito ──
         $output .= '<div class="vitrine-aranha__side vitrine-aranha__side--right">';
         foreach ( $right_items as $idx => $item ) {
-            $output .= $this->render_item( $item, 'right', $icon_size, $idx, $right_n );
+            $output .= $this->render_item( $item, 'right', $icon_size, $icon_color, $idx, $right_n );
         }
         if ( ! $right_n ) {
             $output .= '<div class="vitrine-aranha__item vitrine-aranha__item--empty"></div>';
@@ -113,7 +116,7 @@ class Vitrine_Element_Aranha extends Vitrine_Element {
         return $output;
     }
 
-    private function render_item( $item, $side, $icon_size, $index = 0, $total = 1 ) {
+    private function render_item( $item, $side, $icon_size, $icon_color, $index = 0, $total = 1 ) {
         $text = wp_kses_post( isset( $item['text'] ) ? $item['text'] : '' );
         $icon = isset( $item['icon'] ) ? $item['icon'] : '';
         $link = isset( $item['link'] ) ? esc_url( $item['link'] ) : '';
@@ -132,13 +135,13 @@ class Vitrine_Element_Aranha extends Vitrine_Element {
         if ( 'left' === $side ) {
             $output .= '<div class="vitrine-aranha__card">';
             $output .= $this->render_text( $text, $link );
-            $output .= $this->render_icon( $icon, $icon_size );
+            $output .= $this->render_icon( $icon, $icon_size, $icon_color );
             $output .= '</div>';
             $output .= $this->render_arm( $bend, 'left' );
         } else {
             $output .= $this->render_arm( $bend, 'right' );
             $output .= '<div class="vitrine-aranha__card">';
-            $output .= $this->render_icon( $icon, $icon_size );
+            $output .= $this->render_icon( $icon, $icon_size, $icon_color );
             $output .= $this->render_text( $text, $link );
             $output .= '</div>';
         }
@@ -147,7 +150,7 @@ class Vitrine_Element_Aranha extends Vitrine_Element {
         return $output;
     }
 
-    private function render_top_item( $item, $icon_size, $index = 0, $total = 1 ) {
+    private function render_top_item( $item, $icon_size, $icon_color, $index = 0, $total = 1 ) {
         $text = wp_kses_post( isset( $item['text'] ) ? $item['text'] : '' );
         $icon = isset( $item['icon'] ) ? $item['icon'] : '';
         $link = isset( $item['link'] ) ? esc_url( $item['link'] ) : '';
@@ -164,7 +167,7 @@ class Vitrine_Element_Aranha extends Vitrine_Element {
 
         $output = '<div class="vitrine-aranha__top-item">';
         $output .= '<div class="vitrine-aranha__card">';
-        $output .= $this->render_icon( $icon, $icon_size );
+        $output .= $this->render_icon( $icon, $icon_size, $icon_color );
         $output .= $this->render_text( $text, $link );
         $output .= '</div>';
         $output .= $this->render_top_arm( $bend );
@@ -209,19 +212,21 @@ class Vitrine_Element_Aranha extends Vitrine_Element {
         return '<span class="vitrine-aranha__text">' . $text . '</span>';
     }
 
-    private function render_icon( $icon, $icon_size ) {
+    private function render_icon( $icon, $icon_size, $icon_color = '' ) {
         if ( ! $icon ) {
             return '';
         }
 
+        $color_style = $icon_color ? 'color:' . esc_attr( $icon_color ) . ';' : '';
+
         // Dashicons (WordPress built-in)
         if ( strpos( $icon, 'dashicons-' ) === 0 ) {
-            return '<span class="dashicons ' . esc_attr( $icon ) . ' vitrine-aranha__icon" style="font-size:' . $icon_size . 'px;width:' . $icon_size . 'px;height:' . $icon_size . 'px;"></span>';
+            return '<span class="dashicons ' . esc_attr( $icon ) . ' vitrine-aranha__icon" style="font-size:' . $icon_size . 'px;width:' . $icon_size . 'px;height:' . $icon_size . 'px;' . $color_style . '"></span>';
         }
 
         // Font Awesome (fas, far, fab, fal, fad…)
         if ( preg_match( '/^fa[srlbd]?\s/', $icon ) ) {
-            return '<i class="' . esc_attr( $icon ) . ' vitrine-aranha__icon" style="font-size:' . $icon_size . 'px;"></i>';
+            return '<i class="' . esc_attr( $icon ) . ' vitrine-aranha__icon" style="font-size:' . $icon_size . 'px;' . $color_style . '"></i>';
         }
 
         // Imagem (URL)

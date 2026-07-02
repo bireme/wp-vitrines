@@ -261,37 +261,33 @@
     width: 100%;
 }
 
-.vitrine-imagelinks-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+.vitrine-imagelinks-content {
+    color: var(--il-content-color, #333);
+    font-size: var(--il-content-size, 14px);
+    line-height: 1.55;
 }
 
-.vitrine-imagelinks-item {
+.vitrine-imagelinks-content p {
     margin: 0 0 8px;
-    padding: 0;
-    line-height: 1.45;
 }
 
-.vitrine-imagelinks-item:last-child {
+.vitrine-imagelinks-content p:last-child {
     margin-bottom: 0;
 }
 
-.vitrine-imagelinks-link {
-    color: var(--il-link-color, #333);
-    font-size: var(--il-link-size, 14px);
-    text-decoration: underline;
-    transition: opacity 0.2s ease;
+.vitrine-imagelinks-content ul,
+.vitrine-imagelinks-content ol {
+    margin: 0 0 8px;
+    padding-left: 1.4em;
 }
 
-.vitrine-imagelinks-link:hover {
+.vitrine-imagelinks-content a {
+    color: inherit;
+    text-decoration: underline;
+}
+
+.vitrine-imagelinks-content a:hover {
     opacity: 0.75;
-    color: var(--il-link-color, #333);
-}
-
-.vitrine-imagelinks-link--text {
-    text-decoration: underline;
-    cursor: default;
 }
 
 /* Imagem */
