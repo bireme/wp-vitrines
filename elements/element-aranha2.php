@@ -5,8 +5,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Vitrine_Element_Aranha2 extends Vitrine_Element {
 
-    private static $uid = 0;
-
     public function slug() {
         return 'aranha2';
     }
@@ -26,13 +24,15 @@ class Vitrine_Element_Aranha2 extends Vitrine_Element {
             'center_label'    => '',
             'center_bg_color' => '#ffffff',
             'bg_color'        => '#f8f9fa',
-            'line_color'      => '#2e7d32',
             'card_bg'         => '#ffffff',
             'card_border'     => '#2e7d32',
-            'text_color'      => '#1d2327',
+            'title_color'     => '#1d2327',
+            'text_color'      => '#555555',
             'icon_size'       => '36',
             'icon_color'      => '#2e7d32',
             'radius'          => '200',
+            'card_style'      => 'default',
+            'card_min_height' => '190',
             'items'           => array(),
         );
     }
@@ -46,9 +46,16 @@ class Vitrine_Element_Aranha2 extends Vitrine_Element {
             array( 'name' => 'radius',          'label' => 'Raio orbital (px)',     'type' => 'number' ),
             array( 'name' => 'icon_size',       'label' => 'Tam. ícones (px)',      'type' => 'number' ),
             array( 'name' => 'icon_color',      'label' => 'Cor dos ícones',        'type' => 'color' ),
-            array( 'name' => 'line_color',      'label' => 'Cor das linhas',        'type' => 'color' ),
+            array( 'name' => 'card_style',      'label' => 'Modelo do card',        'type' => 'select', 'options' => array(
+                'default'     => 'Padrão (orbital)',
+                'dark'        => 'Escuro (ícone acima)',
+                'white'       => 'Branco (ícone ao lado)',
+                'border-left' => 'Borda esquerda',
+            ) ),
+            array( 'name' => 'card_min_height', 'label' => 'Altura mínima dos cards (px)', 'type' => 'number' ),
             array( 'name' => 'card_bg',         'label' => 'Cor fundo card',        'type' => 'color' ),
-            array( 'name' => 'card_border',     'label' => 'Cor borda card',        'type' => 'color' ),
+            array( 'name' => 'card_border',     'label' => 'Cor destaque (bordas)', 'type' => 'color' ),
+            array( 'name' => 'title_color',     'label' => 'Cor do título',         'type' => 'color' ),
             array( 'name' => 'text_color',      'label' => 'Cor do texto',          'type' => 'color' ),
             array( 'name' => 'bg_color',        'label' => 'Cor de fundo',          'type' => 'color' ),
         );
@@ -57,99 +64,42 @@ class Vitrine_Element_Aranha2 extends Vitrine_Element {
     public function render( $settings, $children_html = '' ) {
         $s = wp_parse_args( $settings, $this->defaults() );
 
-        self::$uid++;
-        $uid = 'a2-' . self::$uid;
-
         $items       = is_array( $s['items'] ) ? array_values( $s['items'] ) : array();
         $n           = count( $items );
         $center_size = max( 60, intval( $s['center_size'] ) );
         $radius      = max( 80, intval( $s['radius'] ) );
         $icon_size   = max( 16, intval( $s['icon_size'] ) );
         $icon_color  = esc_attr( $s['icon_color'] );
-        $line_color  = esc_attr( $s['line_color'] );
         $card_bg     = esc_attr( $s['card_bg'] );
-        $card_border = esc_attr( $s['card_border'] );
+        $accent      = esc_attr( ! empty( $s['card_border'] ) ? $s['card_border'] : ( ! empty( $s['line_color'] ) ? $s['line_color'] : '#2e7d32' ) );
+        $title_color = esc_attr( $s['title_color'] );
         $text_color  = esc_attr( $s['text_color'] );
         $bg_color    = esc_attr( $s['bg_color'] );
         $center_bg   = esc_attr( $s['center_bg_color'] );
         $center_lbl  = esc_html( $s['center_label'] );
+        $card_style      = $this->sanitize_card_style( $s['card_style'] );
+        $use_preset      = 'default' !== $card_style;
+        $card_min_height = max( 80, intval( isset( $s['card_min_height'] ) ? $s['card_min_height'] : 190 ) );
 
-        // ── Stage sizing ──────────────────────────────────────────────────
-        // Stage is a square: center_size + 2×radius + 2×card_overflow
-        $card_overflow = 90; // px reserved on each side for card half-width
-        $stage_px      = $center_size + 2 * $radius + 2 * $card_overflow;
+        $stage       = $this->compute_stage_size( $center_size, $radius, $n, $use_preset, $card_min_height );
+        $stage_w     = $stage['w'];
+        $stage_h     = $stage['h'];
+        $r_pct_w     = $stage['r_pct_w'];
+        $r_pct_h     = $stage['r_pct_h'];
+        $cs_pct_w    = $stage['cs_pct_w'];
 
-        // All positions are expressed as % of stage_px so the layout
-        // scales automatically when max-width kicks in on smaller screens.
-        $r_pct  = round( $radius / $stage_px * 100, 4 );   // orbital radius in %
-        $cs_pct = round( $center_size / $stage_px * 100, 4 ); // center diameter in %
+        $wrap_style  = 'background:' . $bg_color
+            . ';--a2-accent:' . $accent
+            . ';--a2-stage-w:' . $stage_w . 'px'
+            . ';--a2-stage-h:' . $stage_h . 'px'
+            . ';--a2-card-min-h:' . $card_min_height . 'px;';
 
-        // ── Outer wrapper ─────────────────────────────────────────────────
-        $output  = '<div class="vitrine-el-aranha2" style="background:' . $bg_color . ';">';
-        $output .= '<div class="vitrine-aranha2__stage" style="max-width:' . $stage_px . 'px;">';
+        $output  = '<div class="vitrine-el-aranha2 vitrine-card-style--' . esc_attr( $card_style ) . '" style="' . esc_attr( $wrap_style ) . '">';
+        $output .= '<div class="vitrine-aranha2__stage">';
 
-        // ── SVG connector lines ───────────────────────────────────────────
-        // viewBox 0 0 100 100 — coordinates map directly to percentages.
-        $output .= '<svg class="vitrine-aranha2__svg" xmlns="http://www.w3.org/2000/svg"'
-            . ' viewBox="0 0 100 100" preserveAspectRatio="none"'
-            . ' aria-hidden="true">';
-
-        $output .= '<defs>';
-        // Radial gradient: fades from transparent at center to full color at edge
-        $output .= '<radialGradient id="' . $uid . '-lg" cx="50%" cy="50%" r="50%">';
-        $output .= '<stop offset="0%" stop-color="' . $line_color . '" stop-opacity="0.15"/>';
-        $output .= '<stop offset="60%" stop-color="' . $line_color . '" stop-opacity="0.6"/>';
-        $output .= '<stop offset="100%" stop-color="' . $line_color . '" stop-opacity="1"/>';
-        $output .= '</radialGradient>';
-        $output .= '</defs>';
-
-        for ( $i = 0; $i < $n; $i++ ) {
-            $angle = - M_PI / 2 + $i * ( 2 * M_PI / max( 1, $n ) );
-            $x     = 50 + $r_pct * cos( $angle );
-            $y     = 50 + $r_pct * sin( $angle );
-
-            // Quadratic Bézier — control point curves outward perpendicular to radius
-            $dx    = $x - 50;
-            $dy    = $y - 50;
-            $len   = sqrt( $dx * $dx + $dy * $dy );
-            $mid_x = ( 50 + $x ) / 2;
-            $mid_y = ( 50 + $y ) / 2;
-            $curve = $r_pct * 0.22;
-            if ( $len > 0.01 ) {
-                $ctrl_x = $mid_x + $curve * ( - $dy / $len );
-                $ctrl_y = $mid_y + $curve * ( $dx / $len );
-            } else {
-                $ctrl_x = $mid_x;
-                $ctrl_y = $mid_y;
-            }
-
-            $delay = number_format( $i * 0.08, 2 );
-
-            $output .= sprintf(
-                '<path d="M 50,50 Q %.3f,%.3f %.3f,%.3f"'
-                . ' fill="none" stroke="url(#%s-lg)" stroke-width="0.6"'
-                . ' stroke-linecap="round"'
-                . ' class="vitrine-aranha2__path"'
-                . ' style="animation-delay:%ss"/>',
-                $ctrl_x, $ctrl_y, $x, $y,
-                $uid,
-                $delay
-            );
-
-            // Dot where line meets card
-            $output .= sprintf(
-                '<circle cx="%.3f" cy="%.3f" r="1.2" fill="%s"'
-                . ' class="vitrine-aranha2__dot" style="animation-delay:%ss"/>',
-                $x, $y, $line_color, $delay
-            );
-        }
-
-        $output .= '</svg>';
-
-        // ── Center circle ─────────────────────────────────────────────────
         $output .= '<div class="vitrine-aranha2__center"'
-            . ' style="width:' . $cs_pct . '%;'
-            . 'border-color:' . $line_color . ';'
+            . ' style="width:' . $cs_pct_w . '%;'
+            . 'border-color:' . $accent . ';'
             . 'background-color:' . $center_bg . ';">';
 
         if ( ! empty( $s['center_image'] ) ) {
@@ -168,30 +118,49 @@ class Vitrine_Element_Aranha2 extends Vitrine_Element {
         for ( $i = 0; $i < $n; $i++ ) {
             $item  = $items[ $i ];
             $angle = - M_PI / 2 + $i * ( 2 * M_PI / max( 1, $n ) );
-            $x_pct = round( 50 + $r_pct * cos( $angle ), 4 );
-            $y_pct = round( 50 + $r_pct * sin( $angle ), 4 );
+            $x_pct = round( 50 + $r_pct_w * cos( $angle ), 4 );
+            $y_pct = round( 50 + $r_pct_h * sin( $angle ), 4 );
 
-            $text  = wp_kses_post( isset( $item['text'] ) ? $item['text'] : '' );
+            $title = isset( $item['title'] ) ? wp_kses_post( $item['title'] ) : '';
+            $text  = isset( $item['text'] )  ? wp_kses_post( $item['text'] )  : '';
+            if ( ! $title && $text ) {
+                $title = $text;
+                $text  = '';
+            }
             $icon  = isset( $item['icon'] ) ? $item['icon'] : '';
             $link  = isset( $item['link'] ) ? esc_url( $item['link'] ) : '';
-            $delay = number_format( $i * 0.08 + 0.3, 2 );
+            $delay = number_format( $i * 0.08 + 0.15, 2 );
+            $card_class = 'vitrine-aranha2__card'
+                . ( $link ? ' vitrine-aranha2__card--linked' : '' )
+                . ( $use_preset ? ' vitrine-card-style-' . esc_attr( $card_style ) : '' );
 
-            $output .= '<div class="vitrine-aranha2__card"'
-                . ' style="left:' . $x_pct . '%;top:' . $y_pct . '%;'
-                . 'background:' . $card_bg . ';'
-                . 'border-color:' . $card_border . ';'
-                . 'color:' . $text_color . ';'
-                . 'animation-delay:' . $delay . 's;">';
+            $card_style_attr = 'left:' . $x_pct . '%;top:' . $y_pct . '%;animation-delay:' . $delay . 's;';
+            if ( ! $use_preset ) {
+                $card_style_attr .= '--a2-card-bg:' . $card_bg . ';'
+                    . '--a2-card-border:' . $accent . ';'
+                    . '--a2-card-text:' . $text_color . ';';
+            }
+
+            $output .= '<div class="' . esc_attr( $card_class ) . '" style="' . esc_attr( $card_style_attr ) . '">';
 
             $inner = '';
 
             if ( $icon ) {
-                $inner .= '<span class="vitrine-aranha2__card-icon">'
+                $icon_wrap = $use_preset ? 'vitrine-card-icon' : 'vitrine-aranha2__card-icon';
+                $inner .= '<span class="' . esc_attr( $icon_wrap ) . '">'
                     . $this->render_icon( $icon, $icon_size, $icon_color ) . '</span>';
             }
 
-            if ( $text ) {
-                $inner .= '<span class="vitrine-aranha2__card-text">' . $text . '</span>';
+            if ( $title || $text ) {
+                $content_class = $use_preset ? 'vitrine-card-content' : 'vitrine-aranha2__card-content';
+                $inner .= '<div class="' . esc_attr( $content_class ) . '">';
+                if ( $title ) {
+                    $inner .= '<h3 class="vitrine-aranha2__card-title" style="color:' . $title_color . ';">' . $title . '</h3>';
+                }
+                if ( $text ) {
+                    $inner .= '<div class="vitrine-aranha2__card-text" style="color:' . $text_color . ';">' . $text . '</div>';
+                }
+                $inner .= '</div>';
             }
 
             if ( $link ) {
@@ -215,6 +184,53 @@ class Vitrine_Element_Aranha2 extends Vitrine_Element {
         $output .= '</div>'; // el-aranha2
 
         return $output;
+    }
+
+    private function compute_stage_size( $center_size, $radius, $n_items, $use_preset, $card_min_height = 190 ) {
+        $pad_w = $use_preset ? 64 : 40;
+        $pad_h = $use_preset ? 48 : 28;
+
+        $stage_w = $center_size + 2 * $radius + 2 * $pad_w;
+        $stage_h = $stage_w;
+
+        $r_pct_h  = $radius / max( 1, $stage_h ) * 100;
+        $cs_pct_h = $center_size / max( 1, $stage_h ) * 100;
+
+        if ( $use_preset ) {
+            $card_half_h_pct = min( 22, max( 8, ( $card_min_height / 2 ) / max( 1, $stage_h ) * 100 ) );
+        } else {
+            $card_half_h_pct = 9;
+        }
+
+        $y_min = 50 - ( $cs_pct_h / 2 );
+        $y_max = 50 + ( $cs_pct_h / 2 );
+
+        if ( $n_items > 0 ) {
+            for ( $i = 0; $i < $n_items; $i++ ) {
+                $angle = - M_PI / 2 + $i * ( 2 * M_PI / max( 1, $n_items ) );
+                $y     = 50 + $r_pct_h * sin( $angle );
+                $y_min = min( $y_min, $y - $card_half_h_pct );
+                $y_max = max( $y_max, $y + $card_half_h_pct );
+            }
+        }
+
+        $span_pct = max( 38, $y_max - $y_min );
+        $stage_h  = (int) ceil( $stage_w * $span_pct / 100 );
+        $stage_h  = max( $stage_h, $center_size + 2 * $pad_h );
+
+        return array(
+            'w'        => $stage_w,
+            'h'        => $stage_h,
+            'r_pct_w'  => round( $radius / max( 1, $stage_w ) * 100, 4 ),
+            'r_pct_h'  => round( $radius / max( 1, $stage_h ) * 100, 4 ),
+            'cs_pct_w' => round( $center_size / max( 1, $stage_w ) * 100, 4 ),
+        );
+    }
+
+    private function sanitize_card_style( $style ) {
+        $allowed = array( 'default', 'dark', 'white', 'border-left' );
+        $style   = sanitize_key( $style );
+        return in_array( $style, $allowed, true ) ? $style : 'default';
     }
 
     private function render_icon( $icon, $icon_size, $icon_color = '' ) {

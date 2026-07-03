@@ -46,14 +46,21 @@ class Vitrine_Plugin {
         );
 
         register_post_type( 'vitrine', array(
-            'labels'       => $labels,
-            'public'       => true,
-            'has_archive'  => true,
-            'show_in_rest' => false,
-            'show_ui'      => true,
-            'supports'     => array( 'title' ),
-            'menu_icon'    => 'dashicons-layout',
-            'rewrite'      => array( 'slug' => 'vitrine' ),
+            'labels'              => $labels,
+            'public'              => true,
+            'publicly_queryable'  => true,
+            'show_ui'             => true,
+            'show_in_menu'        => true,
+            'show_in_nav_menus'   => true,
+            'has_archive'         => true,
+            'exclude_from_search' => false,
+            'show_in_rest'        => false,
+            'capability_type'     => 'post',
+            'map_meta_cap'        => true,
+            'hierarchical'        => false,
+            'supports'            => array( 'title', 'revisions' ),
+            'menu_icon'           => 'dashicons-layout',
+            'rewrite'             => array( 'slug' => 'vitrine' ),
         ) );
     }
 

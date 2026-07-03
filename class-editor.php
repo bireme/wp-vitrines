@@ -7,6 +7,9 @@ class Vitrine_Editor {
 
     public function __construct() {
         add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
+        add_action( 'add_meta_boxes', array( $this, 'register_page_css_meta_box' ), 25 );
+        add_action( 'edit_form_after_title', array( $this, 'render_topbar' ) );
+        add_filter( 'get_user_option_meta-box-order_vitrine', array( $this, 'force_meta_box_order' ) );
         add_action( 'save_post_vitrine', array( $this, 'save' ) );
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
         add_action( 'wp_ajax_vitrine_save_layout', array( $this, 'ajax_save' ) );
@@ -45,8 +48,108 @@ class Vitrine_Editor {
             array( $this, 'render_editor' ),
             'vitrine',
             'normal',
-            'default'
+            'high'
         );
+    }
+
+    /**
+     * Registra meta box de CSS após o Hero.
+     */
+    public function register_page_css_meta_box() {
+        add_meta_box(
+            'vitrine_page_css',
+            'CSS Personalizado da Vitrine',
+            array( $this, 'render_page_css_meta_box' ),
+            'vitrine',
+            'normal',
+            'low'
+        );
+    }
+
+    /**
+     * Meta box de CSS global da vitrine (abaixo do Hero).
+     */
+    public function render_page_css_meta_box( $post ) {
+        $settings   = Vitrine_Hero_Meta::get_settings( $post->ID );
+        $custom_css = isset( $settings['custom_css'] ) ? $settings['custom_css'] : '';
+        ?>
+        <div id="vitrine-page-css-settings" class="vitrine-page-css-metabox">
+            <p class="vitrine-page-css-hint">Aplicado a <strong>toda esta vitrine</strong> no frontend. Use seletores como <code>#vitrine-single</code>, <code>.vitrine-front</code> ou <code>.vitrine-block</code>.</p>
+            <textarea id="vitrine-page-custom-css" class="vitrine-page-css-textarea" rows="8" spellcheck="false" placeholder="#vitrine-single .vitrine-front {&#10;  max-width: 1400px;&#10;}"><?php echo esc_textarea( $custom_css ); ?></textarea>
+        </div>
+        <?php
+    }
+
+    /**
+     * Garante Builder antes do Hero (mesmo com ordem salva pelo usuário).
+     */
+    public function force_meta_box_order( $order ) {
+        $preferred = array( 'vitrine_builder', 'vitrine_hero', 'vitrine_page_css' );
+        $others    = array();
+
+        if ( is_string( $order ) && '' !== $order ) {
+            foreach ( explode( ',', $order ) as $id ) {
+                $id = trim( $id );
+                if ( $id && ! in_array( $id, $preferred, true ) ) {
+                    $others[] = $id;
+                }
+            }
+        }
+
+        return implode( ',', array_merge( $preferred, $others ) );
+    }
+
+    /**
+     * Barra superior fixa abaixo do título (publicar, visualizar, opções da página).
+     */
+    public function render_topbar( $post ) {
+        if ( ! $post || 'vitrine' !== $post->post_type ) {
+            return;
+        }
+
+        $settings = Vitrine_Hero_Meta::get_settings( $post->ID );
+        $show_h   = ! isset( $settings['show_header'] ) || '1' === $settings['show_header'];
+        $show_f   = ! isset( $settings['show_footer'] ) || '1' === $settings['show_footer'];
+        $pg_bg    = ! empty( $settings['page_bg_color'] ) ? $settings['page_bg_color'] : '#ffffff';
+        $has_bg   = ! empty( $settings['page_bg_color'] );
+
+        $status       = get_post_status( $post );
+        $is_published = ( 'publish' === $status );
+        $can_publish  = current_user_can( 'publish_posts' );
+        $publish_text = $is_published ? __( 'Atualizar' ) : __( 'Publicar' );
+        ?>
+        <div id="vitrine-topbar">
+            <div id="vitrine-page-settings">
+                <label class="vitrine-topbar-toggle">
+                    <input type="checkbox" id="vitrine-opt-header"<?php checked( $show_h ); ?> /> Header
+                </label>
+                <label class="vitrine-topbar-toggle">
+                    <input type="checkbox" id="vitrine-opt-footer"<?php checked( $show_f ); ?> /> Footer
+                </label>
+                <label class="vitrine-topbar-color">
+                    Fundo: <input type="color" id="vitrine-opt-bg" value="<?php echo esc_attr( $pg_bg ); ?>" />
+                </label>
+                <?php if ( $has_bg ) : ?>
+                    <button type="button" id="vitrine-opt-bg-clear" class="button button-small" title="Limpar cor">&#10005;</button>
+                <?php endif; ?>
+            </div>
+            <div id="vitrine-topbar-actions">
+                <span class="spinner"></span>
+                <button type="button" id="vitrine-preview-btn" class="button button-large">
+                    <span class="dashicons dashicons-visibility"></span> Visualizar
+                </button>
+                <?php if ( $can_publish && ! $is_published ) : ?>
+                    <input type="submit" name="save" id="save-post" class="button" value="<?php echo esc_attr__( 'Salvar rascunho' ); ?>" />
+                    <input type="submit" name="publish" id="publish" class="button button-primary button-large" value="<?php echo esc_attr( $publish_text ); ?>" />
+                <?php elseif ( $can_publish ) : ?>
+                    <input type="submit" name="save" id="save-post" class="button button-large" value="<?php echo esc_attr__( 'Salvar rascunho' ); ?>" />
+                    <input type="submit" name="publish" id="publish" class="button button-primary button-large" value="<?php echo esc_attr( $publish_text ); ?>" />
+                <?php else : ?>
+                    <input type="submit" name="save" id="save-post" class="button button-primary button-large" value="<?php echo esc_attr__( 'Submeter para revisão' ); ?>" />
+                <?php endif; ?>
+            </div>
+        </div>
+        <?php
     }
 
     /* ──────────────────────────────
@@ -134,6 +237,9 @@ class Vitrine_Editor {
             'ajaxUrl'      => admin_url( 'admin-ajax.php' ),
             'nonce'        => wp_create_nonce( 'vitrine_save' ),
             'postId'       => $post_id,
+            'postStatus'   => $post_id ? get_post_status( $post_id ) : 'auto-draft',
+            'previewUrl'   => $post_id ? get_preview_post_link( $post_id ) : '',
+            'viewUrl'      => ( $post_id && 'publish' === get_post_status( $post_id ) ) ? get_permalink( $post_id ) : '',
             'elements'     => $elements_js,
             'layout'       => $layout ? $layout : array(),
             'pageSettings' => $page_settings,

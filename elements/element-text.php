@@ -23,6 +23,7 @@ class Vitrine_Element_Text extends Vitrine_Element {
             'align'     => 'left',
             'color'     => '#555555',
             'font_size' => '16',
+            'bg_color'  => '',
         );
     }
 
@@ -31,6 +32,7 @@ class Vitrine_Element_Text extends Vitrine_Element {
             array( 'name' => 'content',   'label' => 'Conteúdo',       'type' => 'textarea' ),
             array( 'name' => 'align',     'label' => 'Alinhamento',    'type' => 'text' ),
             array( 'name' => 'color',     'label' => 'Cor',            'type' => 'color' ),
+            array( 'name' => 'bg_color',  'label' => 'Cor de fundo',   'type' => 'color' ),
             array( 'name' => 'font_size', 'label' => 'Tamanho (px)',   'type' => 'number' ),
         );
     }
@@ -48,6 +50,10 @@ class Vitrine_Element_Text extends Vitrine_Element {
             . ';color:' . $color
             . ';--vitrine-text-size:' . $font_size . 'px'
             . ';font-size:' . $font_size . 'px;';
+
+        if ( ! empty( $s['bg_color'] ) ) {
+            $style .= 'background:' . esc_attr( $s['bg_color'] ) . ';';
+        }
 
         return sprintf(
             '<div class="vitrine-el-text" style="%s">%s</div>',

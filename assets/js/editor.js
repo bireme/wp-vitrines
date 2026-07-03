@@ -16,6 +16,7 @@
     var layout     = vitrineData.layout || [];
     var elements   = vitrineData.elements || {};
     var selectedId = null;
+    var collapsedContainerIds = {};
     var rawPage = vitrineData.pageSettings || {};
     var pageSettings = {
         show_header:   rawPage.show_header !== undefined ? rawPage.show_header : '1',
@@ -255,6 +256,48 @@
         return elDef.label;
     }
 
+    function isAranhaType(type) {
+        return type === 'aranha2' || type === 'aranha3';
+    }
+
+    function containerContainsAranha(container) {
+        if (!container || !container.children || !container.children.length) {
+            return false;
+        }
+        for (var i = 0; i < container.children.length; i++) {
+            var child = container.children[i];
+            if (isAranhaType(child.type)) {
+                return true;
+            }
+            if (child.type === 'container' && containerContainsAranha(child)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function enforceContainerColumnForAranha(container) {
+        if (!container || container.type !== 'container' || !containerContainsAranha(container)) {
+            return;
+        }
+        if (container.settings.direction === 'row') {
+            container.settings.direction = 'column';
+            clearWidths(container.id);
+        }
+    }
+
+    function enforceAllContainerAranhaLayouts(items) {
+        items = items || layout;
+        items.forEach(function (item) {
+            if (item.type === 'container') {
+                enforceContainerColumnForAranha(item);
+                if (item.children && item.children.length) {
+                    enforceAllContainerAranhaLayouts(item.children);
+                }
+            }
+        });
+    }
+
     /**
      * Distribui larguras igualmente entre filhos de um container row.
      */
@@ -312,7 +355,7 @@
             name: 'Vitrine Completa',
             desc: 'Aranha + Texto + Toggle + Texto + Banner',
             items: [
-                { type: 'aranha' },
+                { type: 'aranha3' },
                 { type: 'text', overrides: { content: '<p>Escreva um texto descritivo aqui...</p>' } },
                 { type: 'toggle' },
                 { type: 'text', overrides: { content: '<p>Mais informações sobre o assunto...</p>' } },
@@ -360,7 +403,36 @@
 
     /* ──────────────────── Renderização do Canvas ──────────────────── */
 
+    function syncCollapsedContainerIdsFromDOM() {
+        var next = {};
+        $('#vitrine-canvas .vitrine-canvas-block--container.is-collapsed').each(function () {
+            var id = $(this).data('id');
+            if (id) {
+                next[id] = true;
+            }
+        });
+        collapsedContainerIds = next;
+    }
+
+    function applyCollapsedContainers($canvas) {
+        $.each(collapsedContainerIds, function (id) {
+            $canvas.find('.vitrine-canvas-block--container[data-id="' + id + '"]').addClass('is-collapsed');
+        });
+    }
+
+    function purgeCollapsedContainerIdsForItem(item) {
+        if (!item) return;
+        if (item.type === 'container') {
+            delete collapsedContainerIds[item.id];
+            if (item.children && item.children.length) {
+                item.children.forEach(purgeCollapsedContainerIdsForItem);
+            }
+        }
+    }
+
     function renderCanvas() {
+        enforceAllContainerAranhaLayouts();
+        syncCollapsedContainerIdsFromDOM();
         var $canvas = $('#vitrine-canvas');
         $canvas.empty();
 
@@ -380,6 +452,7 @@
             $canvas.append(tplHtml);
         } else {
             renderItems(layout, $canvas);
+            applyCollapsedContainers($canvas);
         }
 
         if (selectedId) {
@@ -433,7 +506,7 @@
                         '<span class="vitrine-drag-handle dashicons dashicons-move"></span>' +
                         '<span class="vitrine-block-label">' + escapeHtml(getBlockToolbarLabel(item, elDef)) + '</span>' +
                         widthBadgeHtml +
-                        (isContainer ? (function() {
+                        (isContainer && !containerContainsAranha(item) ? (function() {
                             var dir = settings.direction || 'column';
                             var isRow = dir === 'row';
                             return '<button type="button" class="vitrine-dir-toggle" title="Alternar layout do container" data-id="' + escapeAttr(item.id) + '">' +
@@ -449,7 +522,10 @@
                             '<span class="dashicons dashicons-trash"></span>' +
                         '</button>' +
                     '</div>' +
-                    '<div class="vitrine-block-preview">' +
+                    '<div class="vitrine-block-preview"' + (function () {
+                        var previewBg = getTextBlockPreviewBgStyle(item.type, settings);
+                        return previewBg ? ' style="' + previewBg + '"' : '';
+                    })() + '>' +
                         buildPreview(item.type, settings) +
                     '</div>' +
                     (isContainer ? (function() {
@@ -483,8 +559,8 @@
     }
 
     function buildAranhaEditorPlaceholder(type) {
-        var icons = { aranha: 'dashicons-networking', aranha2: 'dashicons-chart-pie', aranha3: 'dashicons-grid-view' };
-        var labels = { aranha: 'Aranha', aranha2: 'Aranha Circular', aranha3: 'Aranha Grade' };
+        var icons = { aranha2: 'dashicons-chart-pie', aranha3: 'dashicons-grid-view' };
+        var labels = { aranha2: 'Aranha Circular', aranha3: 'Aranha Grade' };
         return '<div class="vitrine-block-preview-placeholder vitrine-block-preview-placeholder--aranha">' +
             '<span class="dashicons ' + (icons[type] || 'dashicons-layout') + '"></span>' +
             '<span class="vitrine-block-preview-placeholder__label">' + escapeHtml(labels[type] || type) + '</span>' +
@@ -492,11 +568,37 @@
         '</div>';
     }
 
+    function isWhiteTextColor(color) {
+        var c = String(color || '').trim().toLowerCase();
+        if (c === 'white') return true;
+        if (/^#fff(f{3})?$/i.test(c)) return true;
+        return /^rgb\(\s*255\s*,\s*255\s*,\s*255\s*\)$/i.test(c);
+    }
+
+    function getTextBlockPreviewBgStyle(type, settings) {
+        if (type !== 'text') return '';
+        var bg = String(settings.bg_color || '').trim();
+        if (bg) {
+            return 'background:' + escapeAttr(bg) + ';';
+        }
+        return isWhiteTextColor(settings.color) ? 'background:#000;' : '';
+    }
+
+    function refreshBlockPreview($block, type, settings) {
+        $block.html(buildPreview(type, settings));
+        var bgStyle = getTextBlockPreviewBgStyle(type, settings);
+        if (bgStyle) {
+            $block.attr('style', bgStyle);
+        } else if (type === 'text') {
+            $block.removeAttr('style');
+        }
+    }
+
     /**
      * Preview simplificado de cada tipo de elemento dentro do canvas.
      */
     function buildPreview(type, settings) {
-        if (type === 'aranha' || type === 'aranha2' || type === 'aranha3') {
+        if (type === 'aranha2' || type === 'aranha3') {
             return buildAranhaEditorPlaceholder(type);
         }
 
@@ -765,7 +867,13 @@
             } else {
                 targetArray.splice(realIndex, 0, newItem);
                 selectedId = newItem.id;
-                if (toParentId) distributeWidths(toParentId);
+                if (toParentId) {
+                    var parentAfterAdd = findItemById(toParentId);
+                    if (parentAfterAdd) enforceContainerColumnForAranha(parentAfterAdd);
+                    if (parentAfterAdd && parentAfterAdd.settings.direction === 'row') {
+                        distributeWidths(toParentId);
+                    }
+                }
             }
         } else {
             var draggedId   = $item.data('id');
@@ -797,7 +905,13 @@
                     targetArray.splice(realIndex, 0, wrapper2);
                 } else {
                     targetArray.splice(realIndex, 0, draggedItem);
-                    if (toParentId) distributeWidths(toParentId);
+                    if (toParentId) {
+                        var parentAfterMove = findItemById(toParentId);
+                        if (parentAfterMove) enforceContainerColumnForAranha(parentAfterMove);
+                        if (parentAfterMove && parentAfterMove.settings.direction === 'row') {
+                            distributeWidths(toParentId);
+                        }
+                    }
                 }
             }
         }
@@ -838,7 +952,9 @@
 
         var parentContainer = findParentContainer(id);
         var parentContainerId = parentContainer ? parentContainer.id : null;
+        var removedItem = findItemById(id);
 
+        purgeCollapsedContainerIdsForItem(removedItem);
         removeItemById(id);
         if (parentContainerId) redistributeProportional(parentContainerId);
 
@@ -868,7 +984,14 @@
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        $(this).closest('.vitrine-canvas-block--container').toggleClass('is-collapsed');
+        var $block = $(this).closest('.vitrine-canvas-block--container');
+        var id = $block.data('id');
+        $block.toggleClass('is-collapsed');
+        if ($block.hasClass('is-collapsed')) {
+            collapsedContainerIds[id] = true;
+        } else {
+            delete collapsedContainerIds[id];
+        }
     });
 
     $(document).on('click', '.vitrine-block-duplicate', function (e) {
@@ -1080,6 +1203,21 @@
         }
 
         fields.forEach(function (field) {
+            if (item.type === 'container' && field.name === 'direction' && containerContainsAranha(item)) {
+                return;
+            }
+
+            if (item.type === 'aranha2' || item.type === 'aranha3') {
+                var cardStyle = item.settings.card_style || 'default';
+                var isPresetCard = cardStyle !== 'default';
+                if (field.name === 'card_min_height' && !isPresetCard) {
+                    return;
+                }
+                if (item.type === 'aranha3' && field.name === 'card_height' && isPresetCard) {
+                    return;
+                }
+            }
+
             var val = item.settings[field.name] !== undefined ? item.settings[field.name] : (elDef.defaults[field.name] || '');
             var inputHtml = '';
 
@@ -1100,7 +1238,15 @@
                     inputHtml = '<input type="number" class="vitrine-field" data-field="' + escapeAttr(field.name) + '" value="' + escapeAttr(val) + '" />';
                     break;
                 case 'color':
-                    inputHtml = '<input type="color" class="vitrine-field" data-field="' + escapeAttr(field.name) + '" value="' + escapeAttr(val) + '" />';
+                    if (item.type === 'text' && field.name === 'bg_color') {
+                        var bgColorVal = val || '#ffffff';
+                        inputHtml = '<div class="vitrine-color-row">' +
+                            '<input type="color" class="vitrine-field vitrine-field-bg-color" data-field="bg_color" value="' + escapeAttr(bgColorVal) + '" />' +
+                            (val ? '<button type="button" class="button button-small vitrine-field-bg-color-clear" title="Sem fundo">&#10005;</button>' : '') +
+                        '</div>';
+                    } else {
+                        inputHtml = '<input type="color" class="vitrine-field" data-field="' + escapeAttr(field.name) + '" value="' + escapeAttr(val) + '" />';
+                    }
                     break;
                 case 'range': {
                     var rMin = field.min !== undefined ? field.min : 0;
@@ -1141,6 +1287,9 @@
             if (item.type === 'container' && field.name === 'name') {
                 fieldHint = '<p class="vitrine-field-hint">Aparece na barra do bloco no canvas para identificar cada container.</p>';
             }
+            if ((item.type === 'aranha2' || item.type === 'aranha3') && field.name === 'card_min_height') {
+                fieldHint = '<p class="vitrine-field-hint">Aplica-se aos modelos Escuro, Branco e Borda esquerda.</p>';
+            }
             $panel.append(
                 '<div class="vitrine-field-group' + extraClass + '">' +
                     '<label>' + escapeHtml(field.label) + '</label>' +
@@ -1149,18 +1298,6 @@
                 '</div>'
             );
         });
-
-        // ── Aranha: seções de itens dinâmicos ──
-        if (item.type === 'aranha') {
-            $panel.append(
-                '<p class="vitrine-field-hint vitrine-aranha-drag-hint" style="margin:0 0 10px;">' +
-                'Arraste os itens entre <strong>Esquerda</strong>, <strong>Direita</strong> e <strong>Topo</strong> para mudar a posição no layout.' +
-                '</p>'
-            );
-            renderAranhaRepeater($panel, item, 'left_items', 'Itens da Esquerda');
-            renderAranhaRepeater($panel, item, 'right_items', 'Itens da Direita');
-            renderAranhaRepeater($panel, item, 'top_items', 'Itens do Topo');
-        }
 
         // ── Aranha Circular: itens radiais ──
         if (item.type === 'aranha2') {
@@ -1189,7 +1326,7 @@
         );
 
         // Inicializa TinyMCE e drag-sort nos itens das aranhas
-        if (item.type === 'aranha' || item.type === 'aranha2' || item.type === 'aranha3') {
+        if (item.type === 'aranha2' || item.type === 'aranha3') {
             setTimeout(initAranhaMCE, 50);
             setTimeout(initAranhaSort, 80);
         }
@@ -1285,13 +1422,7 @@
 
         if (!fromKey || !toKey) return;
 
-        if (item.type === 'aranha') {
-            if (!item.settings[fromKey]) item.settings[fromKey] = [];
-            if (!item.settings[toKey]) item.settings[toKey] = [];
-            var movedAranha = item.settings[fromKey].splice(oldIndex, 1)[0];
-            if (!movedAranha) return;
-            item.settings[toKey].splice(newIndex, 0, movedAranha);
-        } else if (item.type === 'aranha2') {
+        if (item.type === 'aranha2') {
             var arr = item.settings[fromKey];
             if (!arr) return;
             var movedA2 = arr.splice(oldIndex, 1)[0];
@@ -1319,7 +1450,7 @@
         destroyAranhaSort();
         if (!selectedId) return;
         var item = findItemById(selectedId);
-        if (!item || item.type.indexOf('aranha') !== 0) return;
+        if (!item || !isAranhaType(item.type)) return;
 
         var groupName = 'aranha-items-' + selectedId;
 
@@ -1355,6 +1486,9 @@
     function defaultAranhaItem(type) {
         if (type === 'aranha3') {
             return { title: '', text: '', icon: '', link: '', position: 'auto' };
+        }
+        if (type === 'aranha2') {
+            return { title: '', text: '', icon: '', link: '' };
         }
         return { text: '', icon: '', link: '' };
     }
@@ -1488,7 +1622,7 @@
         var elDef  = elements[item.type];
         if ($block.length && elDef) {
             var s = $.extend({}, elDef.defaults, item.settings);
-            $block.html(buildPreview(item.type, s));
+            refreshBlockPreview($block, item.type, s);
         }
     }
 
@@ -1539,57 +1673,8 @@
         var elDef  = elements[item.type];
         if ($block.length && elDef) {
             var s = $.extend(true, {}, elDef.defaults, item.settings);
-            $block.html(buildPreview(item.type, s));
+            refreshBlockPreview($block, item.type, s);
         }
-    }
-
-    /**
-     * Renderiza a seção de itens repetíveis da aranha.
-     */
-    function renderAranhaRepeater($panel, item, key, sectionLabel) {
-        if (!item.settings[key] || !Array.isArray(item.settings[key])) {
-            item.settings[key] = [];
-        }
-        var items = item.settings[key];
-
-        var html = '<div class="vitrine-aranha-section vitrine-aranha-zone-section" data-aranha-key="' + key + '">';
-        html += '<hr style="border:none;border-top:1px solid #dcdcde;margin:14px 0 10px;" />';
-        html += '<h4 class="vitrine-aranha-section-title">' + escapeHtml(sectionLabel) + ' (' + items.length + ')</h4>';
-        html += '<div class="vitrine-aranha-items-list" data-aranha-key="' + key + '">';
-
-        items.forEach(function (ai, idx) {
-            html += '<div class="vitrine-aranha-item" data-aranha-idx="' + idx + '">';
-            html += '<div class="vitrine-aranha-item-header">';
-            html += '<span class="vitrine-aranha-drag dashicons dashicons-move" title="Arrastar para mover ou reordenar"></span>';
-            html += '<span class="vitrine-aranha-item-num">' + (idx + 1) + '</span>';
-            html += '<button type="button" class="button button-small vitrine-aranha-remove-item" title="Remover">&times;</button>';
-            html += '</div>';
-            html += '<div class="vitrine-field-group vitrine-field-group--full"><label>Texto</label>';
-            html += '<textarea id="' + aranhaMceId(key, idx, 'text') + '" class="vitrine-aranha-mce" data-aranha-prop="text" rows="4">' + (ai.text || '') + '</textarea>';
-            html += '</div>';
-            html += '<div class="vitrine-field-group"><label>Link</label>';
-            html += '<input type="text" class="vitrine-aranha-field" data-aranha-prop="link" value="' + escapeAttr(ai.link || '') + '" placeholder="https://" /></div>';
-            html += '<div class="vitrine-field-group vitrine-field-group--full"><label>Ícone</label>';
-            html += '<div class="vitrine-aranha-icon-field">';
-            // Preview do ícone atual
-            html += '<div class="vitrine-icon-current">' + renderIconPreviewHtml(ai.icon || '') + '</div>';
-            html += '<input type="hidden" class="vitrine-aranha-field" data-aranha-prop="icon" value="' + escapeAttr(ai.icon || '') + '" />';
-            html += '<div class="vitrine-icon-actions">';
-            html += '<button type="button" class="button vitrine-aranha-open-picker">Escolher Ícone ▾</button>';
-            if (ai.icon) {
-                html += ' <button type="button" class="button vitrine-aranha-remove-icon">Remover</button>';
-            }
-            html += '</div>';
-            html += buildIconPickerHtml();
-            html += '</div></div>'; // icon-field + field-group
-            html += '</div>';
-        });
-
-        html += '</div>';
-        html += '<button type="button" class="button vitrine-aranha-add-item">+ Adicionar Item</button>';
-        html += '</div>';
-
-        $panel.append(html);
     }
 
     /**
@@ -1628,6 +1713,13 @@
         }
         var items = item.settings.items;
 
+        items.forEach(function (ai) {
+            if (!stripHtmlPreview(ai.title) && stripHtmlPreview(ai.text)) {
+                ai.title = ai.text;
+                ai.text = '';
+            }
+        });
+
         // Cabeçalho da seção
         var html = '<div class="vitrine-aranha-section vitrine-a2-section" data-aranha-key="items">';
         html += '<hr style="border:none;border-top:1px solid #dcdcde;margin:14px 0 12px;" />';
@@ -1643,71 +1735,7 @@
         html += '<div class="vitrine-aranha-items-list vitrine-a2-items-list" data-aranha-key="items">';
 
         items.forEach(function (ai, idx) {
-            var hasIcon = !!ai.icon;
-            var hasLink = !!ai.link;
-
-            html += '<div class="vitrine-aranha-item vitrine-a2-item" data-aranha-idx="' + idx + '">';
-
-            // ── Cabeçalho do item: drag + número + preview text + badges + remover ──
-            html += '<div class="vitrine-a2-item-header">';
-            html += '<span class="vitrine-aranha-drag dashicons dashicons-move" title="Arrastar para reordenar"></span>';
-            html += '<span class="vitrine-aranha-item-num">' + (idx + 1) + '</span>';
-            html += '<span class="vitrine-a2-item-preview-text">' + escapeHtml(stripHtmlPreview(ai.text) || ('Item ' + (idx + 1))) + '</span>';
-            if (hasIcon) { html += '<span class="vitrine-a2-badge vitrine-a2-badge--icon" title="Tem ícone"><span class="dashicons dashicons-format-image"></span></span>'; }
-            if (hasLink) { html += '<span class="vitrine-a2-badge vitrine-a2-badge--link" title="Tem link"><span class="dashicons dashicons-admin-links"></span></span>'; }
-            html += '<button type="button" class="button button-small vitrine-aranha-remove-item" title="Remover item">&times;</button>';
-            html += '</div>';
-
-            // ── Corpo do item: 2 colunas ──
-            html += '<div class="vitrine-a2-item-body">';
-
-            // Coluna esquerda: ícone clicável + botões
-            html += '<div class="vitrine-aranha-icon-field vitrine-a2-icon-col">';
-
-            // Display grande clicável
-            var iconPreview = hasIcon
-                ? renderIconPreviewHtml(ai.icon)
-                : '<span class="dashicons dashicons-format-image" style="font-size:28px;width:28px;height:28px;color:#c3c4c7;"></span>';
-
-            html += '<div class="vitrine-a2-icon-display vitrine-aranha-open-picker" title="Clique para escolher ícone ou imagem">';
-            html += '<div class="vitrine-icon-current">' + iconPreview + '</div>';
-            html += '<span class="vitrine-a2-icon-hint">' + (hasIcon ? 'Trocar' : 'Adicionar') + '</span>';
-            html += '</div>';
-
-            html += '<input type="hidden" class="vitrine-aranha-field" data-aranha-prop="icon" value="' + escapeAttr(ai.icon || '') + '" />';
-
-            // Botão remover ícone (visível só quando tem ícone)
-            html += '<div class="vitrine-icon-actions vitrine-a2-icon-actions">';
-            if (hasIcon) {
-                html += '<button type="button" class="button vitrine-aranha-remove-icon">Remover</button>';
-            }
-            html += '</div>';
-
-            // Picker
-            html += buildIconPickerHtml();
-            html += '</div>'; // icon-col
-
-            // Coluna direita: rótulo + link
-            html += '<div class="vitrine-a2-fields-col">';
-
-            // Campo: rótulo/texto
-            html += '<div class="vitrine-field-group vitrine-field-group--full">';
-            html += '<label>Rótulo</label>';
-            html += '<textarea id="' + aranhaMceId('items', idx, 'text') + '" class="vitrine-aranha-mce" data-aranha-prop="text" rows="4">' + (ai.text || '') + '</textarea>';
-            html += '</div>';
-
-            // Campo: link
-            html += '<div class="vitrine-field-group">';
-            html += '<label><span class="dashicons dashicons-admin-links" style="font-size:13px;vertical-align:middle;margin-right:3px;color:#0073aa;"></span>Link <span style="font-weight:400;color:#8c8f94;">(opcional)</span></label>';
-            html += '<input type="text" class="vitrine-aranha-field" data-aranha-prop="link"'
-                + ' value="' + escapeAttr(ai.link || '') + '"'
-                + ' placeholder="https://..." />';
-            html += '<p class="vitrine-field-hint">Torna o card clicável como botão.</p>';
-            html += '</div>';
-
-            html += '</div>'; // fields-col
-            html += '</div>'; // item-body
-            html += '</div>'; // item
+            html += buildAranhaCardItemHtml(ai, idx, 'aranha2');
         });
 
         html += '</div>'; // items-list
@@ -1722,15 +1750,18 @@
         $panel.append(html);
     }
 
-    function buildAranha3ItemHtml(ai, idx) {
+    function buildAranhaCardItemHtml(ai, idx, itemType) {
+        var isGrade = itemType === 'aranha3';
+        var itemClass = isGrade ? 'vitrine-a3-item' : 'vitrine-a2-item';
         var hasIcon = !!ai.icon;
         var hasLink = !!ai.link;
-        var html = '<div class="vitrine-aranha-item vitrine-a3-item" data-aranha-idx="' + idx + '">';
+        var previewLabel = stripHtmlPreview(ai.title) || (isGrade ? ('Card ' + (idx + 1)) : ('Item ' + (idx + 1)));
+        var html = '<div class="vitrine-aranha-item ' + itemClass + '" data-aranha-idx="' + idx + '">';
 
         html += '<div class="vitrine-a2-item-header">';
-        html += '<span class="vitrine-aranha-drag dashicons dashicons-move" title="Arrastar para mover entre posições"></span>';
+        html += '<span class="vitrine-aranha-drag dashicons dashicons-move" title="Arrastar para reordenar"></span>';
         html += '<span class="vitrine-aranha-item-num">' + (idx + 1) + '</span>';
-        html += '<span class="vitrine-a2-item-preview-text">' + escapeHtml(stripHtmlPreview(ai.title) || ('Card ' + (idx + 1))) + '</span>';
+        html += '<span class="vitrine-a2-item-preview-text">' + escapeHtml(previewLabel) + '</span>';
         if (hasIcon) { html += '<span class="vitrine-a2-badge vitrine-a2-badge--icon" title="Tem ícone"><span class="dashicons dashicons-format-image"></span></span>'; }
         if (hasLink) { html += '<span class="vitrine-a2-badge vitrine-a2-badge--link" title="Tem link"><span class="dashicons dashicons-admin-links"></span></span>'; }
         html += '<button type="button" class="button button-small vitrine-aranha-remove-item" title="Remover">&times;</button>';
@@ -1738,7 +1769,9 @@
 
         html += '<div class="vitrine-a2-item-body vitrine-a3-item-body">';
 
-        html += '<div class="vitrine-aranha-icon-field vitrine-a2-icon-col vitrine-a3-icon-col">';
+        html += '<div class="vitrine-aranha-icon-field vitrine-a3-icon-row">';
+        html += '<label class="vitrine-a3-icon-row-label">Ícone / Imagem do card</label>';
+        html += '<div class="vitrine-a3-icon-row-inner">';
         var iconPreview = hasIcon
             ? renderIconPreviewHtml(ai.icon)
             : '<span class="dashicons dashicons-format-image" style="font-size:28px;width:28px;height:28px;color:#c3c4c7;"></span>';
@@ -1758,21 +1791,24 @@
 
         html += buildIconPickerHtml();
         html += '</div>';
-
-        html += '<div class="vitrine-a2-fields-col vitrine-a3-fields-col">';
-
-        html += '<div class="vitrine-field-group">';
-        html += '<label>Posição no grid</label>';
-        html += '<select class="vitrine-aranha-field" data-aranha-prop="position">';
-        var posVal = ai.position || 'auto';
-        html += '<option value="auto"' + (posVal === 'auto' ? ' selected' : '') + '>Automático</option>';
-        html += '<option value="top"' + (posVal === 'top' ? ' selected' : '') + '>Topo</option>';
-        html += '<option value="bottom"' + (posVal === 'bottom' ? ' selected' : '') + '>Base</option>';
-        html += '<option value="left"' + (posVal === 'left' ? ' selected' : '') + '>Esquerda</option>';
-        html += '<option value="right"' + (posVal === 'right' ? ' selected' : '') + '>Direita</option>';
-        html += '</select>';
-        html += '<p class="vitrine-field-hint">Ou arraste o card para outra zona abaixo.</p>';
         html += '</div>';
+
+        html += '<div class="vitrine-a3-fields-stack">';
+
+        if (isGrade) {
+            html += '<div class="vitrine-field-group vitrine-field-group--full">';
+            html += '<label>Posição no grid</label>';
+            html += '<select class="vitrine-aranha-field" data-aranha-prop="position">';
+            var posVal = ai.position || 'auto';
+            html += '<option value="auto"' + (posVal === 'auto' ? ' selected' : '') + '>Automático</option>';
+            html += '<option value="top"' + (posVal === 'top' ? ' selected' : '') + '>Topo</option>';
+            html += '<option value="bottom"' + (posVal === 'bottom' ? ' selected' : '') + '>Base</option>';
+            html += '<option value="left"' + (posVal === 'left' ? ' selected' : '') + '>Esquerda</option>';
+            html += '<option value="right"' + (posVal === 'right' ? ' selected' : '') + '>Direita</option>';
+            html += '</select>';
+            html += '<p class="vitrine-field-hint">Ou arraste o card para outra zona abaixo.</p>';
+            html += '</div>';
+        }
 
         html += '<div class="vitrine-field-group vitrine-field-group--full">';
         html += '<label>Título</label>';
@@ -1784,7 +1820,7 @@
         html += '<textarea id="' + aranhaMceId('items', idx, 'text') + '" class="vitrine-aranha-mce" data-aranha-prop="text" rows="5">' + (ai.text || '') + '</textarea>';
         html += '</div>';
 
-        html += '<div class="vitrine-field-group">';
+        html += '<div class="vitrine-field-group vitrine-field-group--full">';
         html += '<label><span class="dashicons dashicons-admin-links" style="font-size:13px;vertical-align:middle;margin-right:3px;color:#0073aa;"></span>Link <span style="font-weight:400;color:#8c8f94;">(opcional)</span></label>';
         html += '<input type="text" class="vitrine-aranha-field" data-aranha-prop="link"'
             + ' value="' + escapeAttr(ai.link || '') + '"'
@@ -1797,6 +1833,10 @@
         html += '</div>';
 
         return html;
+    }
+
+    function buildAranha3ItemHtml(ai, idx) {
+        return buildAranhaCardItemHtml(ai, idx, 'aranha3');
     }
 
     /* ──────────────────────────────────────────────────────
@@ -1876,6 +1916,11 @@
             return;
         }
 
+        if ((item.type === 'aranha2' || item.type === 'aranha3') && field === 'card_style') {
+            renderSettings();
+            return;
+        }
+
         if (item.type === 'container' && field === 'name') {
             var mergedSettings = $.extend({}, elDef.defaults, item.settings);
             var displayName = getContainerDisplayName(mergedSettings);
@@ -1888,7 +1933,32 @@
         var $block = $('[data-id="' + selectedId + '"]').first().find('> .vitrine-block-preview');
         if ($block.length && elDef) {
             var settings = $.extend({}, elDef.defaults, item.settings);
-            $block.html(buildPreview(item.type, settings));
+            refreshBlockPreview($block, item.type, settings);
+        }
+
+        if (item.type === 'text' && field === 'bg_color' && val) {
+            var $colorInput = $(this);
+            if (!$colorInput.siblings('.vitrine-field-bg-color-clear').length) {
+                $colorInput.after('<button type="button" class="button button-small vitrine-field-bg-color-clear" title="Sem fundo">&#10005;</button>');
+            }
+        }
+    });
+
+    $(document).on('click', '.vitrine-field-bg-color-clear', function (e) {
+        e.preventDefault();
+        if (!selectedId) return;
+        var item = findItemById(selectedId);
+        if (!item || item.type !== 'text') return;
+
+        item.settings.bg_color = '';
+        $(this).siblings('.vitrine-field-bg-color').val('#ffffff');
+        $(this).remove();
+
+        var $block = $('[data-id="' + selectedId + '"]').first().find('> .vitrine-block-preview');
+        var elDef  = elements[item.type];
+        if ($block.length && elDef) {
+            var settings = $.extend({}, elDef.defaults, item.settings);
+            refreshBlockPreview($block, item.type, settings);
         }
     });
 
@@ -2011,7 +2081,7 @@
         var elDef  = elements[item.type];
         if ($block.length && elDef) {
             var s = $.extend(true, {}, elDef.defaults, item.settings);
-            $block.html(buildPreview(item.type, s));
+            refreshBlockPreview($block, item.type, s);
         }
     });
 
@@ -2198,7 +2268,7 @@
         var elDef  = elements[item.type];
         if ($block.length && elDef) {
             var s = $.extend(true, {}, elDef.defaults, item.settings);
-            $block.html(buildPreview(item.type, s));
+            refreshBlockPreview($block, item.type, s);
         }
     });
 
@@ -2244,13 +2314,11 @@
         };
     }
 
-    function saveLayout() {
+    function saveLayout(onDone) {
         syncAllAranhaMCE();
         syncAllFieldMCE();
-        var $btn = $('#vitrine-save-btn');
-        $btn.prop('disabled', true).text('Salvando…');
 
-        $.ajax({
+        return $.ajax({
             url: vitrineData.ajaxUrl,
             method: 'POST',
             data: {
@@ -2259,51 +2327,182 @@
                 post_id:       vitrineData.postId,
                 layout:        JSON.stringify(layout),
                 page_settings: JSON.stringify(getBuilderPageSettings())
-            },
-            success: function (res) {
-                if (res.success) {
-                    $btn.text("\u2714 Salvo!");
-                } else {
-                    $btn.text('Erro ao salvar');
-                }
-                setTimeout(function () {
-                    $btn.prop('disabled', false).text('Salvar Layout');
-                }, 1500);
-            },
-            error: function () {
-                $btn.prop('disabled', false).text('Erro – tentar novamente');
             }
+        }).done(function (res) {
+            if (typeof onDone === 'function') {
+                onDone(!!(res && res.success), res);
+            }
+        }).fail(function () {
+            if (typeof onDone === 'function') {
+                onDone(false);
+            }
+        });
+    }
+
+    function getVitrinePreviewUrl() {
+        return vitrineData.viewUrl || vitrineData.previewUrl || '';
+    }
+
+    function openVitrinePreview() {
+        var url = getVitrinePreviewUrl();
+        if (!url) {
+            window.alert('Salve a vitrine como rascunho antes de visualizar.');
+            return;
+        }
+
+        var $previewBtn = $('#vitrine-preview-btn');
+        $previewBtn.prop('disabled', true);
+
+        saveLayout(function (success) {
+            $previewBtn.prop('disabled', false);
+            if (success) {
+                window.open(url, '_blank', 'noopener,noreferrer');
+            } else {
+                window.alert('Não foi possível salvar o layout antes de visualizar.');
+            }
+        });
+    }
+
+    function syncHeroFieldsBeforeSave() {
+        if (!$('#vitrine-hero-description').length) {
+            return;
+        }
+        $('#vitrine-hero-description-input').val($('#vitrine-hero-description').html());
+    }
+
+    function mountWordPressPublishActions() {
+        var $submit = $('#submitdiv');
+
+        if (!$submit.length) {
+            return !!$('#vitrine-topbar-actions #publish, #vitrine-topbar-actions #save-post').length;
+        }
+
+        $submit.find('input[type="hidden"]').each(function () {
+            var name = this.name;
+            if (!name) {
+                return;
+            }
+            if (!$('#post input[type="hidden"][name="' + name + '"]').length) {
+                $(this).appendTo('#post');
+            }
+        });
+
+        $submit.find('#post-status-select').appendTo('#post');
+
+        if (!$('#vitrine-topbar-actions #publish, #vitrine-topbar-actions #save-post').length) {
+            var $actions = $('#vitrine-topbar-actions');
+            var $inside  = $submit.find('.inside').first();
+            if ($actions.length) {
+                if ($inside.length) {
+                    $inside.children().appendTo($actions);
+                } else {
+                    $submit.children().appendTo($actions);
+                }
+            }
+        }
+
+        $submit.remove();
+        return true;
+    }
+
+    function ensurePublishActionsMounted(retry) {
+        retry = retry || 0;
+        if (mountWordPressPublishActions()) {
+            return;
+        }
+        if (retry < 15) {
+            setTimeout(function () {
+                ensurePublishActionsMounted(retry + 1);
+            }, 100);
+        }
+    }
+
+    function bindLayoutSaveOnPostSubmit() {
+        var bypassLayoutSave = false;
+        var submitIntent     = null;
+
+        $(document).on('click', '#publish', function () {
+            submitIntent = {
+                name:  this.name || 'publish',
+                value: this.value || '1'
+            };
+            $('#hidden_post_status').val('publish');
+            if ($('#post_status').length) {
+                $('#post_status').val('publish');
+            }
+        });
+
+        $(document).on('click', '#save-post', function () {
+            submitIntent = {
+                name:  this.name || 'save',
+                value: this.value || '1'
+            };
+            if (this.name === 'save' || this.id === 'save-post') {
+                $('#hidden_post_status').val('draft');
+                if ($('#post_status').length) {
+                    $('#post_status').val('draft');
+                }
+            }
+        });
+
+        $('#post').on('submit', function (e) {
+            if (bypassLayoutSave) {
+                return true;
+            }
+
+            e.preventDefault();
+
+            var $form     = $(this);
+            var $publish  = $('#publish');
+            var $savePost = $('#save-post');
+            var $spinner  = $('#vitrine-topbar-actions .spinner').first();
+
+            syncHeroFieldsBeforeSave();
+
+            $publish.prop('disabled', true);
+            if ($savePost.length) {
+                $savePost.prop('disabled', true);
+            }
+            if ($spinner.length) {
+                $spinner.addClass('is-active');
+            }
+
+            saveLayout(function (success) {
+                if (!success) {
+                    $publish.prop('disabled', false);
+                    if ($savePost.length) {
+                        $savePost.prop('disabled', false);
+                    }
+                    if ($spinner.length) {
+                        $spinner.removeClass('is-active');
+                    }
+                    window.alert('Erro ao salvar o layout. Tente novamente.');
+                    return;
+                }
+
+                $('#vitrine-submit-intent').remove();
+                if (submitIntent && submitIntent.name) {
+                    $('<input>', {
+                        type:  'hidden',
+                        id:    'vitrine-submit-intent',
+                        name:  submitIntent.name,
+                        value: submitIntent.value
+                    }).appendTo($form);
+                }
+
+                bypassLayoutSave = true;
+                $form[0].submit();
+            });
+
+            return false;
         });
     }
 
     /* ──────────────────── Inicialização ──────────────────── */
 
     $(function () {
-        var showH  = pageSettings.show_header !== '0';
-        var showF  = pageSettings.show_footer !== '0';
-        var pgBg   = pageSettings.page_bg_color || '';
-
-        $('#vitrine-editor').before(
-            '<div id="vitrine-topbar">' +
-                '<div id="vitrine-page-settings">' +
-                    '<label class="vitrine-topbar-toggle"><input type="checkbox" id="vitrine-opt-header"' + (showH ? ' checked' : '') + ' /> Header</label>' +
-                    '<label class="vitrine-topbar-toggle"><input type="checkbox" id="vitrine-opt-footer"' + (showF ? ' checked' : '') + ' /> Footer</label>' +
-                    '<label class="vitrine-topbar-color">Fundo: <input type="color" id="vitrine-opt-bg" value="' + escapeAttr(pgBg || '#ffffff') + '" /></label>' +
-                    (pgBg ? '<button type="button" id="vitrine-opt-bg-clear" class="button button-small" title="Limpar cor">&#10005;</button>' : '') +
-                '</div>' +
-                '<button type="button" id="vitrine-save-btn" class="button button-primary button-large">Salvar Layout</button>' +
-            '</div>'
-        );
-
-        var pageCustomCss = pageSettings.custom_css || '';
-
-        $('#vitrine-editor').before(
-            '<div id="vitrine-page-css-settings">' +
-                '<h4>CSS Personalizado da Vitrine</h4>' +
-                '<p class="vitrine-page-css-hint">Aplicado a <strong>toda esta vitrine</strong> no frontend. Use seletores como <code>#vitrine-single</code>, <code>.vitrine-front</code> ou <code>.vitrine-block</code>.</p>' +
-                '<textarea id="vitrine-page-custom-css" class="vitrine-page-css-textarea" rows="8" spellcheck="false" placeholder="#vitrine-single .vitrine-front {&#10;  max-width: 1400px;&#10;}">' + escapeHtml(pageCustomCss) + '</textarea>' +
-            '</div>'
-        );
+        ensurePublishActionsMounted();
+        bindLayoutSaveOnPostSubmit();
 
         $(document).on('input change', '#vitrine-page-custom-css', function () {
             pageSettings.custom_css = $(this).val();
@@ -2344,9 +2543,9 @@
             applyTemplate(idx);
         });
 
-        $(document).on('click', '#vitrine-save-btn', function (e) {
+        $(document).on('click', '#vitrine-preview-btn', function (e) {
             e.preventDefault();
-            saveLayout();
+            openVitrinePreview();
         });
     });
 

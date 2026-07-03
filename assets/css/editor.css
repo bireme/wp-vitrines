@@ -14,14 +14,106 @@
     width: 100% !important;
 }
 
-/* ── Topbar ── */
+/* ── Topbar (abaixo do título) ── */
+.post-type-vitrine #submitdiv {
+    display: none !important;
+}
+
 #vitrine-topbar {
-    margin: 12px 0;
+    margin: 0 0 16px;
+    padding: 12px 16px;
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+    border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+    flex-wrap: wrap;
+    position: sticky;
+    top: 32px;
+    z-index: 100;
 }
+#vitrine-topbar-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-left: auto;
+}
+
+#vitrine-topbar-actions .spinner {
+    float: none;
+    margin: 0;
+    visibility: hidden;
+}
+#vitrine-topbar-actions .spinner.is-active {
+    visibility: visible;
+}
+
+#vitrine-preview-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+#vitrine-preview-btn .dashicons {
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+    line-height: 1;
+}
+
+#vitrine-topbar-actions #misc-publishing-actions {
+    display: none;
+}
+
+#vitrine-topbar-actions .submitbox {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 0;
+}
+
+#vitrine-topbar-actions #minor-publishing-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
+    margin: 0;
+    float: none;
+}
+
+#vitrine-topbar-actions #major-publishing-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
+    margin: 0;
+    float: none;
+}
+
+#vitrine-topbar-actions #publishing-action {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    float: none;
+    line-height: 1;
+}
+
+#vitrine-topbar-actions #save-post {
+    height: auto;
+}
+
+#vitrine-topbar-actions .spinner {
+    float: none;
+    margin: 0;
+}
+
 #vitrine-page-settings {
     display: flex;
     align-items: center;
@@ -560,6 +652,17 @@ body.vitrine-resizing-width {
     border: 1px solid #8c8f94;
     border-radius: 3px;
     cursor: pointer;
+}
+.vitrine-color-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.vitrine-field-bg-color-clear {
+    font-size: 11px !important;
+    line-height: 1 !important;
+    padding: 2px 6px !important;
+    color: #d63638;
 }
 .vitrine-range-row {
     display: flex;
@@ -1169,6 +1272,68 @@ body.vitrine-resizing-width {
     height: 16px;
 }
 
+/* Aranha Grade: card empilhado (ícone no topo, campos 100%) */
+.vitrine-a3-item-body {
+    flex-direction: column;
+    gap: 12px;
+}
+.vitrine-a3-icon-row {
+    width: 100%;
+    position: relative;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #ececec;
+}
+.vitrine-a3-icon-row-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    margin: 0 0 8px;
+    color: #1d2327;
+}
+.vitrine-a3-icon-row-inner {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.vitrine-a3-icon-row .vitrine-a2-icon-display {
+    width: 72px;
+    height: 72px;
+    flex-shrink: 0;
+}
+.vitrine-a3-icon-row .vitrine-a2-icon-actions {
+    width: auto;
+    flex: 1;
+    min-width: 120px;
+}
+.vitrine-a3-icon-row .vitrine-icon-picker {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    width: min(100%, 320px);
+    z-index: 200;
+    margin-top: 4px;
+}
+.vitrine-a3-fields-stack {
+    width: 100%;
+    min-width: 0;
+}
+.vitrine-a3-fields-stack .vitrine-field-group,
+.vitrine-a3-fields-stack .vitrine-field-group--full {
+    width: 100%;
+    margin-bottom: 10px;
+}
+.vitrine-a3-fields-stack .vitrine-field-group:last-child {
+    margin-bottom: 0;
+}
+.vitrine-a3-fields-stack .wp-editor-wrap,
+.vitrine-a3-fields-stack select,
+.vitrine-a3-fields-stack input[type="text"] {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
 /* ── Icon Picker ── */
 .vitrine-aranha-icon-field {
     position: relative;
@@ -1399,18 +1564,13 @@ body.vitrine-resizing-width {
     display: none;
 }
 
-/* ── CSS personalizado da vitrine (editor admin) ── */
-#vitrine-page-css-settings {
-    background: #f6f7f7;
-    border: 1px solid #c3c4c7;
-    border-radius: 6px;
-    padding: 12px 16px;
-    margin-bottom: 12px;
-}
-#vitrine-page-css-settings h4 {
-    margin: 0 0 8px;
-    font-size: 13px;
-    font-weight: 600;
+/* ── CSS personalizado da vitrine (meta box admin) ── */
+#vitrine-page-css-settings,
+.vitrine-page-css-metabox {
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
 }
 .vitrine-page-css-hint {
     margin: 0 0 10px;
