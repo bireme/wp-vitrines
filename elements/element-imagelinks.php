@@ -33,8 +33,14 @@ class Vitrine_Element_Imagelinks extends Vitrine_Element {
             'content'             => '',
             'content_color'       => '#333333',
             'content_font_size'   => '14',
+            'content_heading_size'=> '',
+            'content_link_size'   => '',
+            'content_link_color'  => '',
+            'content_link_underline' => 'underline',
             'separator_color'     => '#333333',
             'box_padding'         => '16',
+            'media_radius_top'    => '0',
+            'box_radius_bottom'   => '0',
         );
     }
 
@@ -54,8 +60,14 @@ class Vitrine_Element_Imagelinks extends Vitrine_Element {
             array( 'name' => 'content',             'label' => 'Conteúdo abaixo da imagem',   'type' => 'textarea' ),
             array( 'name' => 'content_color',       'label' => 'Cor do texto',                'type' => 'color' ),
             array( 'name' => 'content_font_size',   'label' => 'Tam. texto (px)',             'type' => 'number' ),
+            array( 'name' => 'content_heading_size','label' => 'Tam. títulos no conteúdo (px)', 'type' => 'number' ),
+            array( 'name' => 'content_link_size',   'label' => 'Tam. links (px)',             'type' => 'number' ),
+            array( 'name' => 'content_link_color',  'label' => 'Cor dos links',               'type' => 'color' ),
+            array( 'name' => 'content_link_underline', 'label' => 'Sublinhado dos links',    'type' => 'select', 'options' => array( 'inherit' => 'Herdar do texto', 'underline' => 'Sublinhado', 'none' => 'Sem sublinhado' ) ),
             array( 'name' => 'separator_color',     'label' => 'Cor do separador',            'type' => 'color' ),
             array( 'name' => 'box_padding',         'label' => 'Espaçamento interno (px)',    'type' => 'number' ),
+            array( 'name' => 'media_radius_top',    'label' => 'Arred. superior da imagem (px)', 'type' => 'number' ),
+            array( 'name' => 'box_radius_bottom',   'label' => 'Arred. inferior da caixa (px)', 'type' => 'number' ),
         );
     }
 
@@ -63,7 +75,7 @@ class Vitrine_Element_Imagelinks extends Vitrine_Element {
         $s = wp_parse_args( $settings, $this->defaults() );
 
         $image             = $s['image'] ? esc_url( $s['image'] ) : '';
-        $image_height      = max( 80, intval( $s['image_height'] ) );
+        $image_height      = max( 0, intval( $s['image_height'] ) );
         $image_fit         = ( 'contain' === $s['image_fit'] ) ? 'contain' : 'cover';
         $caption           = esc_html( $s['caption'] );
         $caption_bg        = esc_attr( $s['caption_bg'] );
@@ -77,6 +89,17 @@ class Vitrine_Element_Imagelinks extends Vitrine_Element {
         $content_font_size = max( 10, intval( isset( $s['content_font_size'] ) ? $s['content_font_size'] : ( isset( $s['link_font_size'] ) ? $s['link_font_size'] : 14 ) ) ) . 'px';
         $separator_color   = esc_attr( $s['separator_color'] );
         $box_padding       = max( 0, intval( $s['box_padding'] ) ) . 'px';
+        $media_radius_top  = max( 0, intval( $s['media_radius_top'] ) ) . 'px';
+        $box_radius_bottom = max( 0, intval( $s['box_radius_bottom'] ) ) . 'px';
+        $content_heading_size = ( '' !== $s['content_heading_size'] && null !== $s['content_heading_size'] )
+            ? max( 8, intval( $s['content_heading_size'] ) ) . 'px' : '';
+        $content_link_size = ( '' !== $s['content_link_size'] && null !== $s['content_link_size'] )
+            ? max( 8, intval( $s['content_link_size'] ) ) . 'px' : '';
+        $content_link_color = ! empty( $s['content_link_color'] ) ? esc_attr( $s['content_link_color'] ) : 'inherit';
+        $link_underline = isset( $s['content_link_underline'] ) ? sanitize_key( $s['content_link_underline'] ) : 'underline';
+        if ( ! in_array( $link_underline, array( 'inherit', 'underline', 'none' ), true ) ) {
+            $link_underline = 'underline';
+        }
         $content_html      = $this->get_content_html( $s );
 
         $wrap_style = '--il-img-h:' . $image_height . 'px;'
@@ -90,12 +113,18 @@ class Vitrine_Element_Imagelinks extends Vitrine_Element {
             . '--il-content-color:' . $content_color . ';'
             . '--il-content-size:' . $content_font_size . ';'
             . '--il-separator-color:' . $separator_color . ';'
-            . '--il-box-padding:' . $box_padding . ';';
+            . '--il-box-padding:' . $box_padding . ';'
+            . '--il-media-radius-top:' . $media_radius_top . ';'
+            . '--il-box-radius-bottom:' . $box_radius_bottom . ';'
+            . ( $content_heading_size ? '--il-content-h-size:' . $content_heading_size . ';' : '' )
+            . ( $content_link_size ? '--il-link-size:' . $content_link_size . ';' : '' )
+            . '--il-link-color:' . $content_link_color . ';'
+            . '--il-link-decoration:' . ( 'inherit' === $link_underline ? 'inherit' : $link_underline ) . ';';
 
         $output  = '<div class="vitrine-el-imagelinks" style="' . esc_attr( $wrap_style ) . '">';
         $output .= '<div class="vitrine-imagelinks-hero">';
 
-        $output .= '<div class="vitrine-imagelinks-media" style="height:' . $image_height . 'px;min-height:' . $image_height . 'px;">';
+        $output .= '<div class="vitrine-imagelinks-media"' . ( $image_height > 0 ? ' style="height:' . $image_height . 'px;min-height:' . $image_height . 'px;"' : ' style="height:0;min-height:0;"' ) . '>';
         if ( $image ) {
             $img_style = 'object-fit:' . $image_fit . ';object-position:center;width:100%;height:100%;display:block;';
             $output   .= '<img src="' . $image . '" alt="" class="vitrine-imagelinks-img" style="' . esc_attr( $img_style ) . '" />';

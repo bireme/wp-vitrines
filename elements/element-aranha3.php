@@ -18,7 +18,7 @@ class Vitrine_Element_Aranha3 extends Vitrine_Element {
     }
 
     public function defaults() {
-        return array(
+        return array_merge( array(
             'center_image'       => '',
             'center_image_fit'   => 'cover',
             'center_size'        => '240',
@@ -44,12 +44,14 @@ class Vitrine_Element_Aranha3 extends Vitrine_Element {
             'card_text_align'    => 'top',
             'card_style'         => 'default',
             'card_min_height'    => '190',
+            'wrapper_padding'    => '28',
+            'wrapper_border_style' => 'none',
             'items'              => array(),
-        );
+        ), self::card_preset_defaults() );
     }
 
     public function fields() {
-        return array(
+        return array_merge( array(
             array( 'name' => 'center_image',        'label' => 'Imagem Central',              'type' => 'image' ),
             array( 'name' => 'center_image_fit',    'label' => 'Ajuste da imagem central',    'type' => 'select', 'options' => array( 'cover' => 'Cover (preenche)', 'contain' => 'Contain (inteira)' ) ),
             array( 'name' => 'center_size',         'label' => 'Tamanho imagem central (px)', 'type' => 'number' ),
@@ -79,7 +81,9 @@ class Vitrine_Element_Aranha3 extends Vitrine_Element {
                 'border-left' => 'Borda esquerda',
             ) ),
             array( 'name' => 'card_min_height',     'label' => 'Altura mínima dos cards (px)', 'type' => 'number' ),
-        );
+            array( 'name' => 'wrapper_padding',     'label' => 'Padding do bloco (px)',        'type' => 'number' ),
+            array( 'name' => 'wrapper_border_style', 'label' => 'Borda do bloco',              'type' => 'select', 'options' => array( 'none' => 'Nenhuma', 'solid' => 'Sólida' ) ),
+        ), self::card_preset_fields() );
     }
 
     public function render( $settings, $children_html = '' ) {
@@ -110,6 +114,10 @@ class Vitrine_Element_Aranha3 extends Vitrine_Element {
         $use_preset         = 'default' !== $card_style;
         $card_min_height    = max( 80, intval( isset( $s['card_min_height'] ) ? $s['card_min_height'] : 190 ) );
         $card_height        = $use_preset ? $card_min_height : $card_height;
+        $wrapper_padding    = max( 0, intval( isset( $s['wrapper_padding'] ) ? $s['wrapper_padding'] : 28 ) );
+        $wrapper_border     = ( isset( $s['wrapper_border_style'] ) && 'solid' === $s['wrapper_border_style'] )
+            ? 'border:1px solid #d0d0d0;'
+            : 'border:none;';
 
         $items   = is_array( $s['items'] ) ? array_values( $s['items'] ) : array();
         $n_items = count( $items );
@@ -128,7 +136,13 @@ class Vitrine_Element_Aranha3 extends Vitrine_Element {
             . '--a3-card-border-width:' . $card_border['width'] . 'px;'
             . '--a3-card-border-style:' . $card_border['style'] . ';'
             . '--a3-card-border-color:' . $card_border['color'] . ';'
-            . ( $bg_color ? 'background:' . $bg_color . ';' : '' );
+            . ( $bg_color ? 'background:' . $bg_color . ';' : '' )
+            . 'padding:' . $wrapper_padding . 'px;'
+            . $wrapper_border;
+
+        if ( $use_preset ) {
+            $wrap_style .= $this->build_card_preset_style( $s, $icon_color );
+        }
 
         $output = '<div class="vitrine-el-aranha3 vitrine-a3--animate vitrine-card-style--' . esc_attr( $card_style ) . '" style="' . esc_attr( $wrap_style ) . '">';
 

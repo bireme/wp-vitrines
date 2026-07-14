@@ -18,7 +18,7 @@ class Vitrine_Element_Aranha2 extends Vitrine_Element {
     }
 
     public function defaults() {
-        return array(
+        return array_merge( array(
             'center_image'    => '',
             'center_size'     => '160',
             'center_label'    => '',
@@ -34,11 +34,11 @@ class Vitrine_Element_Aranha2 extends Vitrine_Element {
             'card_style'      => 'default',
             'card_min_height' => '190',
             'items'           => array(),
-        );
+        ), self::card_preset_defaults() );
     }
 
     public function fields() {
-        return array(
+        return array_merge( array(
             array( 'name' => 'center_image',    'label' => 'Imagem Central',        'type' => 'image' ),
             array( 'name' => 'center_size',     'label' => 'Tamanho central (px)',  'type' => 'number' ),
             array( 'name' => 'center_label',    'label' => 'Rótulo central',        'type' => 'text' ),
@@ -58,7 +58,7 @@ class Vitrine_Element_Aranha2 extends Vitrine_Element {
             array( 'name' => 'title_color',     'label' => 'Cor do título',         'type' => 'color' ),
             array( 'name' => 'text_color',      'label' => 'Cor do texto',          'type' => 'color' ),
             array( 'name' => 'bg_color',        'label' => 'Cor de fundo',          'type' => 'color' ),
-        );
+        ), self::card_preset_fields() );
     }
 
     public function render( $settings, $children_html = '' ) {
@@ -93,6 +93,10 @@ class Vitrine_Element_Aranha2 extends Vitrine_Element {
             . ';--a2-stage-w:' . $stage_w . 'px'
             . ';--a2-stage-h:' . $stage_h . 'px'
             . ';--a2-card-min-h:' . $card_min_height . 'px;';
+
+        if ( $use_preset ) {
+            $wrap_style .= $this->build_card_preset_style( $s, $icon_color );
+        }
 
         $output  = '<div class="vitrine-el-aranha2 vitrine-card-style--' . esc_attr( $card_style ) . '" style="' . esc_attr( $wrap_style ) . '">';
         $output .= '<div class="vitrine-aranha2__stage">';

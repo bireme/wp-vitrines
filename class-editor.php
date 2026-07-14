@@ -126,8 +126,8 @@ class Vitrine_Editor {
                 <label class="vitrine-topbar-toggle">
                     <input type="checkbox" id="vitrine-opt-footer"<?php checked( $show_f ); ?> /> Footer
                 </label>
-                <label class="vitrine-topbar-color">
-                    Fundo: <input type="color" id="vitrine-opt-bg" value="<?php echo esc_attr( $pg_bg ); ?>" />
+                <label class="vitrine-topbar-color" title="Cor de fundo da página publicada (body)">
+                    Fundo da página: <input type="color" id="vitrine-opt-bg" value="<?php echo esc_attr( $pg_bg ); ?>" />
                 </label>
                 <?php if ( $has_bg ) : ?>
                     <button type="button" id="vitrine-opt-bg-clear" class="button button-small" title="Limpar cor">&#10005;</button>

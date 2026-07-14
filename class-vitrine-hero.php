@@ -30,6 +30,8 @@ class Vitrine_Hero_Meta {
             'hero_text_align'      => 'center',
             'hero_description'     => '',
             'hero_desc_size'       => '18',
+            'hero_desc_color'      => '',
+            'hero_desc_max_width'  => '',
             'hero_text_bold'       => '1',
             'hero_text_italic'     => '0',
             'hero_desc_bold'       => '0',
@@ -65,6 +67,8 @@ class Vitrine_Hero_Meta {
             'hero_text_align',
             'hero_description',
             'hero_desc_size',
+            'hero_desc_color',
+            'hero_desc_max_width',
             'hero_text_bold',
             'hero_text_italic',
             'hero_desc_bold',
@@ -97,6 +101,8 @@ class Vitrine_Hero_Meta {
             'hero_text_align'      => $align,
             'hero_description'     => isset( $input['hero_description'] ) ? wp_kses_post( $input['hero_description'] ) : '',
             'hero_desc_size'       => isset( $input['hero_desc_size'] ) ? absint( $input['hero_desc_size'] ) : 18,
+            'hero_desc_color'      => isset( $input['hero_desc_color'] ) ? sanitize_hex_color( $input['hero_desc_color'] ) : '',
+            'hero_desc_max_width'  => isset( $input['hero_desc_max_width'] ) ? absint( $input['hero_desc_max_width'] ) : 0,
             'hero_text_bold'       => ! empty( $input['hero_text_bold'] ) ? '1' : '0',
             'hero_text_italic'     => ! empty( $input['hero_text_italic'] ) ? '1' : '0',
             'hero_desc_bold'       => ! empty( $input['hero_desc_bold'] ) ? '1' : '0',
@@ -206,6 +212,18 @@ class Vitrine_Hero_Meta {
                 <div class="vitrine-hero-field">
                     <label for="vitrine-hero-desc-size">Tamanho da descrição (px)</label>
                     <input type="number" name="vitrine_hero[hero_desc_size]" id="vitrine-hero-desc-size" value="<?php echo esc_attr( $s['hero_desc_size'] ); ?>" min="10" max="60" step="1" class="small-text" />
+                </div>
+
+                <div class="vitrine-hero-field vitrine-hero-field--row">
+                    <div>
+                        <label for="vitrine-hero-desc-color">Cor da descrição</label>
+                        <input type="color" name="vitrine_hero[hero_desc_color]" id="vitrine-hero-desc-color" value="<?php echo esc_attr( ! empty( $s['hero_desc_color'] ) ? $s['hero_desc_color'] : ( $s['hero_text_color'] ?: '#ffffff' ) ); ?>" />
+                        <p class="description">Deixe igual à cor do título ou escolha outra.</p>
+                    </div>
+                    <div>
+                        <label for="vitrine-hero-desc-max-width">Largura máxima da descrição (px)</label>
+                        <input type="number" name="vitrine_hero[hero_desc_max_width]" id="vitrine-hero-desc-max-width" value="<?php echo esc_attr( $s['hero_desc_max_width'] ); ?>" min="0" max="1400" step="10" class="small-text" placeholder="auto" />
+                    </div>
                 </div>
 
                 <div class="vitrine-hero-field">

@@ -305,7 +305,76 @@
     gap: 10px 12px;
     align-content: start;
 }
-#vitrine-settings-panel > .vitrine-field-group {
+#vitrine-settings-panel.has-tabs {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    gap: 0;
+}
+.vitrine-settings-main-tabs {
+    display: flex;
+    flex-shrink: 0;
+    border-bottom: 1px solid #dcdcde;
+    background: #f6f7f7;
+}
+.vitrine-settings-main-tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 10px 8px;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    background: transparent;
+    cursor: pointer;
+    color: #646970;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.vitrine-settings-main-tab .dashicons {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+.vitrine-settings-main-tab:hover {
+    color: #2271b1;
+    background: #fff;
+}
+.vitrine-settings-main-tab.is-active {
+    color: #2271b1;
+    border-bottom-color: #2271b1;
+    background: #fff;
+}
+.vitrine-settings-tab-pane {
+    display: none;
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 14px 24px;
+    min-height: 0;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: min-content;
+    gap: 10px 12px;
+    align-content: start;
+}
+.vitrine-settings-tab-pane.is-active {
+    display: grid;
+}
+.vitrine-settings-tab-empty {
+    grid-column: 1 / -1;
+    margin: 8px 0 0;
+    color: #8c8f94;
+    font-size: 13px;
+    font-style: italic;
+}
+#vitrine-settings-panel > .vitrine-field-group,
+#vitrine-settings-panel .vitrine-settings-tab-pane > .vitrine-field-group {
     min-width: 0;
 }
 #vitrine-settings-panel > .vitrine-field-group--full,
@@ -314,8 +383,21 @@
 #vitrine-settings-panel > .vitrine-toggle-section,
 #vitrine-settings-panel > .vitrine-a2-section,
 #vitrine-settings-panel > .vitrine-a3-section,
+#vitrine-settings-panel > .vitrine-ig-section,
+#vitrine-settings-panel > .vitrine-ic-section,
 #vitrine-settings-panel > hr,
-#vitrine-settings-panel > .vitrine-settings-empty {
+#vitrine-settings-panel > .vitrine-settings-empty,
+#vitrine-settings-panel .vitrine-settings-tab-pane > .vitrine-field-group--full,
+#vitrine-settings-panel .vitrine-settings-tab-pane > .vitrine-field-group--width,
+#vitrine-settings-panel .vitrine-settings-tab-pane > .vitrine-aranha-section,
+#vitrine-settings-panel .vitrine-settings-tab-pane > .vitrine-toggle-section,
+#vitrine-settings-panel .vitrine-settings-tab-pane > .vitrine-a2-section,
+#vitrine-settings-panel .vitrine-settings-tab-pane > .vitrine-a3-section,
+#vitrine-settings-panel .vitrine-settings-tab-pane > .vitrine-ig-section,
+#vitrine-settings-panel .vitrine-settings-tab-pane > .vitrine-ic-section,
+#vitrine-settings-panel .vitrine-settings-tab-pane > hr,
+#vitrine-settings-panel .vitrine-settings-tab-pane > .vitrine-settings-empty,
+#vitrine-settings-panel .vitrine-settings-tab-pane > .vitrine-settings-tab-empty {
     grid-column: 1 / -1;
 }
 #vitrine-settings-panel > hr {
@@ -1616,4 +1698,327 @@ body.vitrine-resizing-width {
     box-sizing: border-box;
     resize: vertical;
     min-height: 80px;
+}
+
+/* ── Grade de Itens — editor UX ── */
+.vitrine-ig-section {
+    margin-top: 4px;
+}
+.vitrine-ig-section-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+.vitrine-ig-section-head h4 {
+    margin: 0 0 4px;
+    font-size: 13px;
+}
+.vitrine-ig-count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 26px;
+    height: 26px;
+    padding: 0 8px;
+    border-radius: 13px;
+    background: #2271b1;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+.vitrine-ig-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.vitrine-ig-item {
+    border: 1px solid #dcdcde;
+    border-radius: 8px;
+    background: #fff;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    transition: box-shadow 0.15s, border-color 0.15s;
+}
+.vitrine-ig-item.is-expanded {
+    border-color: #2271b1;
+    box-shadow: 0 2px 10px rgba(34, 113, 177, 0.12);
+}
+.vitrine-ig-item-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    background: #f6f7f7;
+    cursor: pointer;
+    user-select: none;
+}
+.vitrine-ig-item.is-expanded .vitrine-ig-item-header {
+    background: #eef5fc;
+    border-bottom: 1px solid #dcdcde;
+}
+.vitrine-ig-item-thumb {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    background: #e8e8e8;
+    overflow: hidden;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.vitrine-ig-item-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.vitrine-ig-item-thumb .dashicons {
+    color: #a7aaad;
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+}
+.vitrine-ig-item-summary {
+    flex: 1;
+    min-width: 0;
+}
+.vitrine-ig-item-title-preview {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #1d2327;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.vitrine-ig-item-meta {
+    font-size: 11px;
+    color: #646970;
+}
+.vitrine-ig-item-badges {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
+.vitrine-ig-badge {
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.vitrine-ig-badge--img {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+.vitrine-ig-badge--link {
+    background: #e8f4fc;
+    color: #0073aa;
+}
+.vitrine-ig-badge .dashicons {
+    font-size: 13px;
+    width: 13px;
+    height: 13px;
+}
+.vitrine-ig-item-chevron {
+    color: #646970;
+    transition: transform 0.2s;
+    flex-shrink: 0;
+}
+.vitrine-ig-item.is-expanded .vitrine-ig-item-chevron {
+    transform: rotate(180deg);
+}
+.vitrine-ig-item-remove {
+    flex-shrink: 0;
+    color: #b32d2e !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 4px !important;
+    min-height: 0 !important;
+    line-height: 1 !important;
+    font-size: 18px !important;
+}
+.vitrine-ig-item-body {
+    display: none;
+    padding: 0;
+}
+.vitrine-ig-item.is-expanded .vitrine-ig-item-body {
+    display: block;
+}
+.vitrine-ig-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid #dcdcde;
+    background: #fafafa;
+    padding: 0 8px;
+}
+.vitrine-ig-tab {
+    border: none;
+    background: transparent;
+    padding: 10px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #646970;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.15s, border-color 0.15s;
+}
+.vitrine-ig-tab:hover {
+    color: #1d2327;
+}
+.vitrine-ig-tab.is-active {
+    color: #2271b1;
+    border-bottom-color: #2271b1;
+}
+.vitrine-ig-tab-panel {
+    display: none;
+    padding: 14px 12px 16px;
+}
+.vitrine-ig-tab-panel.is-active {
+    display: block;
+}
+.vitrine-ig-image-picker {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+.vitrine-ig-image-preview-wrap {
+    width: 96px;
+    height: 72px;
+    border-radius: 8px;
+    border: 2px dashed #c3c4c7;
+    background: #f6f7f7;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.vitrine-ig-image-preview-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.vitrine-ig-image-actions {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.vitrine-ig-type-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+.vitrine-ig-type-block {
+    padding: 12px;
+    border: 1px solid #dcdcde;
+    border-radius: 8px;
+    background: #fafafa;
+}
+.vitrine-ig-type-block h5 {
+    margin: 0 0 10px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: #646970;
+}
+.vitrine-ig-type-field {
+    margin-bottom: 10px;
+}
+.vitrine-ig-type-field:last-child {
+    margin-bottom: 0;
+}
+.vitrine-ig-type-field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #1d2327;
+}
+.vitrine-ig-type-field input[type="number"],
+.vitrine-ig-type-field input[type="text"],
+.vitrine-ig-type-field select,
+.vitrine-ig-type-field input[type="color"] {
+    width: 100%;
+    box-sizing: border-box;
+}
+.vitrine-ig-type-field input[type="color"] {
+    height: 32px;
+    padding: 2px;
+    cursor: pointer;
+}
+.vitrine-ig-add-btn {
+    width: 100%;
+    margin-top: 10px;
+    justify-content: center;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.vitrine-ig-ghost {
+    opacity: 0.45;
+    background: #eef5fc;
+}
+#vitrine-settings-panel > .vitrine-ig-section,
+#vitrine-settings-panel .vitrine-settings-tab-pane > .vitrine-ig-section {
+    display: block;
+}
+
+/* Carrossel — tipo imagem/ícone */
+.vitrine-ic-type-switch {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+.vitrine-ic-type-btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 12px;
+    border: 1px solid #dcdcde;
+    border-radius: 8px;
+    background: #fafafa;
+    font-size: 12px;
+    font-weight: 600;
+    color: #646970;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.vitrine-ic-type-btn:hover {
+    border-color: #2271b1;
+    color: #2271b1;
+}
+.vitrine-ic-type-btn.is-active {
+    border-color: #2271b1;
+    background: #eef5fc;
+    color: #2271b1;
+}
+.vitrine-ic-type-btn .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+.vitrine-ic-thumb-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+.vitrine-ic-thumb-icon .dashicons,
+.vitrine-ic-thumb-icon i {
+    font-size: 20px !important;
+    width: 20px !important;
+    height: 20px !important;
 }
