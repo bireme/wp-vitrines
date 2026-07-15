@@ -16,6 +16,11 @@
     var layout     = vitrineData.layout || [];
     var elements   = vitrineData.elements || {};
     var selectedId = null;
+    var itemgridExpandedIdx = null;
+    var itemgridSortInstances = [];
+    var itemcarouselExpandedIdx = null;
+    var itemcarouselSortInstances = [];
+    var settingsPanelTab = 'content';
     var collapsedContainerIds = {};
     var rawPage = vitrineData.pageSettings || {};
     var pageSettings = {
@@ -643,7 +648,7 @@
                 return tiHtml;
             }
             case 'imagelinks': {
-                var ilImgH    = Math.max(60, Math.min(280, parseInt(settings.image_height || 220, 10)));
+                var ilImgH    = Math.max(0, Math.min(280, parseInt(settings.image_height || 220, 10)));
                 var ilImgFit  = settings.image_fit === 'contain' ? 'contain' : 'cover';
                 var ilCapBg   = escapeAttr(settings.caption_bg || '#000000');
                 var ilCapCl   = escapeAttr(settings.caption_color || '#ffffff');
@@ -658,9 +663,11 @@
                 var ilTextSz  = parseInt(settings.content_font_size || settings.link_font_size || 14, 10);
                 var ilSepCl   = escapeAttr(settings.separator_color || '#333333');
                 var ilPad     = parseInt(settings.box_padding || 16, 10);
+                var ilMediaRad = parseInt(settings.media_radius_top || 0, 10);
+                var ilBoxRad  = parseInt(settings.box_radius_bottom || 0, 10);
 
                 var ilHtml = '<div style="max-width:100%;overflow:hidden;font-family:inherit;">';
-                ilHtml += '<div style="height:' + ilImgH + 'px;background:#ddd;overflow:hidden;">';
+                ilHtml += '<div style="' + (ilImgH > 0 ? 'height:' + ilImgH + 'px;' : 'height:0;min-height:0;') + 'background:#ddd;overflow:hidden;border-top-left-radius:' + ilMediaRad + 'px;border-top-right-radius:' + ilMediaRad + 'px;">';
                 if (settings.image) {
                     ilHtml += '<img src="' + escapeAttr(settings.image) + '" style="width:100%;height:100%;object-fit:' + ilImgFit + ';object-position:center;display:block;" alt="" />';
                 } else {
@@ -671,7 +678,7 @@
                     ilHtml += '<div style="background:' + ilCapBg + ';color:' + ilCapCl + ';font-size:' + ilCapSz + 'px;font-weight:700;text-align:center;padding:8px 10px;line-height:1.3;">' + escapeHtml(ilCap) + '</div>';
                 }
                 if (ilBoxTit || ilContent) {
-                    ilHtml += '<div style="background:' + ilBoxBg + ';padding:' + ilPad + 'px;">';
+                    ilHtml += '<div style="background:' + ilBoxBg + ';padding:' + ilPad + 'px;border-bottom-left-radius:' + ilBoxRad + 'px;border-bottom-right-radius:' + ilBoxRad + 'px;">';
                     if (ilBoxTit) {
                         ilHtml += '<div style="color:' + ilTitCl + ';font-size:' + ilTitSz + 'px;font-weight:700;margin:0 0 8px;line-height:1.3;">' + escapeHtml(ilBoxTit) + '</div>';
                     }
@@ -685,6 +692,97 @@
                 }
                 ilHtml += '</div>';
                 return ilHtml;
+            }
+            case 'itemgrid': {
+                var igItems = settings.items || [];
+                var igCols  = Math.max(1, Math.min(4, parseInt(settings.columns || 3, 10)));
+                var igGap   = parseInt(settings.gap || 24, 10);
+                var igBg    = escapeAttr(settings.card_bg || '#ffffff');
+                var igRad   = parseInt(settings.card_radius || 12, 10);
+                var igPad   = parseInt(settings.card_padding || 20, 10);
+                var igImgH  = Math.max(0, parseInt(settings.image_height || 180, 10));
+                var igTitCl = escapeAttr(settings.title_color || '#1a1a1a');
+                var igTitSz = parseInt(settings.title_size || 20, 10);
+                var igTitWt = escapeAttr(settings.title_weight || '700');
+                var igDescCl = escapeAttr(settings.desc_color || '#555555');
+                var igDescSz = parseInt(settings.desc_size || 15, 10);
+                var igDescWt = escapeAttr(settings.desc_weight || '400');
+
+                if (!igItems.length) {
+                    return '<div style="text-align:center;padding:20px;color:#999;font-size:12px;border:1px dashed #c3c4c7;border-radius:6px;">Adicione cards na grade</div>';
+                }
+
+                var igHtml = '<div style="display:grid;grid-template-columns:repeat(' + igCols + ',1fr);gap:' + igGap + 'px;">';
+                igItems.slice(0, 6).forEach(function (ci) {
+                    var cTitle = stripHtmlPreview(ci.title) || 'Card';
+                    var cDesc  = stripHtmlPreview(ci.description);
+                    var tCl = ci.title_color || igTitCl;
+                    var tSz = ci.title_size || igTitSz;
+                    var tWt = ci.title_weight || igTitWt;
+                    var dCl = ci.desc_color || igDescCl;
+                    var dSz = ci.desc_size || igDescSz;
+                    var dWt = ci.desc_weight || igDescWt;
+
+                    igHtml += '<div style="background:' + igBg + ';border-radius:' + igRad + 'px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.08);">';
+                    if (ci.image && igImgH > 0) {
+                        igHtml += '<div style="height:' + Math.min(igImgH, 80) + 'px;overflow:hidden;background:#ddd;">';
+                        igHtml += '<img src="' + escapeAttr(ci.image) + '" style="width:100%;height:100%;object-fit:cover;display:block;" alt="" />';
+                        igHtml += '</div>';
+                    }
+                    igHtml += '<div style="padding:' + Math.min(igPad, 14) + 'px;">';
+                    igHtml += '<div style="color:' + escapeAttr(tCl) + ';font-size:' + Math.min(tSz, 16) + 'px;font-weight:' + escapeAttr(tWt) + ';margin:0 0 4px;line-height:1.3;">' + escapeHtml(cTitle) + '</div>';
+                    if (cDesc) {
+                        igHtml += '<div style="color:' + escapeAttr(dCl) + ';font-size:' + Math.min(dSz, 13) + 'px;font-weight:' + escapeAttr(dWt) + ';line-height:1.4;opacity:.9;">' + escapeHtml(cDesc.substring(0, 60)) + (cDesc.length > 60 ? '…' : '') + '</div>';
+                    }
+                    igHtml += '</div></div>';
+                });
+                if (igItems.length > 6) {
+                    igHtml += '<div style="grid-column:1/-1;text-align:center;font-size:11px;color:#8c8f94;">+' + (igItems.length - 6) + ' cards</div>';
+                }
+                igHtml += '</div>';
+                return igHtml;
+            }
+            case 'itemcarousel': {
+                var icItems = settings.items || [];
+                var icSpv   = Math.max(1, Math.min(3, parseInt(settings.slides_per_view || 3, 10)));
+                var icGap   = parseInt(settings.gap || 20, 10);
+                var icBg    = escapeAttr(settings.card_bg || '#ffffff');
+                var icRad   = parseInt(settings.card_radius || 12, 10);
+                var icPad   = parseInt(settings.card_padding || 20, 10);
+                var icImgH  = Math.max(0, parseInt(settings.image_height || 160, 10));
+                var icTitCl = escapeAttr(settings.title_color || '#1a1a1a');
+                var icTitSz = parseInt(settings.title_size || 18, 10);
+                var icTxtCl = escapeAttr(settings.text_color || '#555555');
+                var icTxtSz = parseInt(settings.text_size || 14, 10);
+
+                if (!icItems.length) {
+                    return '<div style="text-align:center;padding:20px;color:#999;font-size:12px;border:1px dashed #c3c4c7;border-radius:6px;">Adicione slides ao carrossel</div>';
+                }
+
+                var icHtml = '<div style="display:flex;gap:' + icGap + 'px;overflow:hidden;padding:4px 0;">';
+                icItems.slice(0, icSpv + 1).forEach(function (si) {
+                    var isIcon = si.item_type === 'icon';
+                    var sTitle = stripHtmlPreview(si.title) || 'Slide';
+                    var sText  = stripHtmlPreview(si.text || si.description || '');
+
+                    icHtml += '<div style="flex:0 0 calc(' + (100 / icSpv) + '% - ' + icGap + 'px);min-width:0;background:' + icBg + ';border-radius:' + icRad + 'px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.08);">';
+                    if (isIcon && si.icon) {
+                        icHtml += '<div style="display:flex;justify-content:center;padding:12px 10px 0;"><span style="display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:#eef5fc;">' + renderIconPreviewHtml(si.icon) + '</span></div>';
+                    } else if (!isIcon && si.image && icImgH > 0) {
+                        icHtml += '<div style="height:' + Math.min(icImgH, 70) + 'px;overflow:hidden;background:#ddd;"><img src="' + escapeAttr(si.image) + '" style="width:100%;height:100%;object-fit:cover;display:block;" alt="" /></div>';
+                    }
+                    icHtml += '<div style="padding:' + Math.min(icPad, 12) + 'px;text-align:center;">';
+                    icHtml += '<div style="color:' + icTitCl + ';font-size:' + Math.min(icTitSz, 15) + 'px;font-weight:700;margin:0 0 4px;">' + escapeHtml(sTitle) + '</div>';
+                    if (sText) {
+                        icHtml += '<div style="color:' + icTxtCl + ';font-size:' + Math.min(icTxtSz, 12) + 'px;line-height:1.35;">' + escapeHtml(sText.substring(0, 50)) + (sText.length > 50 ? '…' : '') + '</div>';
+                    }
+                    icHtml += '</div></div>';
+                });
+                if (icItems.length > icSpv) {
+                    icHtml += '<div style="flex:0 0 24px;display:flex;align-items:center;justify-content:center;color:#8c8f94;font-size:18px;">›</div>';
+                }
+                icHtml += '</div>';
+                return icHtml;
             }
             case 'image':
                 if (settings.url) {
@@ -1145,12 +1243,183 @@
 
     /* ──────────────────── Sidebar de Configurações ──────────────────── */
 
+    function shouldSkipSettingsField(item, field) {
+        if (item.type === 'container' && field.name === 'direction' && containerContainsAranha(item)) {
+            return true;
+        }
+
+        if (item.type === 'aranha2' || item.type === 'aranha3') {
+            var cardStyle = item.settings.card_style || 'default';
+            var isPresetCard = cardStyle !== 'default';
+            if (field.name.indexOf('preset_') === 0 && !isPresetCard) {
+                return true;
+            }
+            if (isPresetCard && (
+                field.name === 'card_bg' ||
+                field.name === 'card_border' ||
+                field.name === 'card_border_style' ||
+                field.name === 'card_border_width' ||
+                field.name === 'card_border_color' ||
+                field.name === 'card_height'
+            )) {
+                return true;
+            }
+            if (field.name === 'card_min_height' && !isPresetCard) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    function getFieldSettingsTab(itemType, field) {
+        var name = field.name;
+
+        if (field.type === 'textarea' || field.type === 'plaintextarea') {
+            return 'content';
+        }
+        if (/^(text|title|content|url|caption|box_title|center_label|name|alt)$/.test(name)) {
+            return 'content';
+        }
+        if (name === 'center_image' || name === 'image' || name === 'bg_image') {
+            return 'content';
+        }
+        if (field.type === 'image') {
+            return 'content';
+        }
+        if (name === 'qty' || name === 'tag' || name === 'title_tag') {
+            return 'content';
+        }
+        if (/^url_\d+$/.test(name) || /^source_\d+$/.test(name)) {
+            return 'content';
+        }
+
+        if (name === 'custom_css') {
+            return 'style';
+        }
+        if (field.type === 'color' || field.type === 'range') {
+            return 'style';
+        }
+        if (/^preset_/.test(name)) {
+            return 'style';
+        }
+
+        if (/(^|_)(color|bg|size|weight|radius|shadow|padding|gap|border|fit|height|width|opacity|align|font_size|style|min_height|max_width|aspect|autoplay|controls|show_|slides_|wrapper_|direction|columns|icon_size|link_color|link_size|link_underline|heading_size|image_position|full_width|bg_size|align_items)$/.test(name) ||
+            name === 'align' || name === 'color' || name === 'radius' || name === 'padding' || name === 'gap' ||
+            name === 'card_style' || name === 'card_min_height' || /^width_\d+$/.test(name)) {
+            return 'style';
+        }
+
+        return 'content';
+    }
+
+    function buildSettingsFieldGroup(item, elDef, field) {
+        var val = item.settings[field.name] !== undefined ? item.settings[field.name] : (elDef.defaults[field.name] || '');
+        var inputHtml = '';
+
+        switch (field.type) {
+            case 'textarea':
+                inputHtml = '<textarea id="vitrine-field-mce-' + escapeAttr(field.name) + '" class="vitrine-field-mce" data-field="' + escapeAttr(field.name) + '" rows="4">' + safeTextareaHtml(val) + '</textarea>';
+                if (item.type === 'imagelinks' && field.name === 'content') {
+                    inputHtml += '<p class="vitrine-field-hint">Editor livre abaixo da imagem — negrito, itálico, links, listas etc.</p>';
+                }
+                break;
+            case 'plaintextarea':
+                inputHtml = '<textarea class="vitrine-field vitrine-field-plaintextarea" data-field="' + escapeAttr(field.name) + '" rows="5" spellcheck="false" placeholder="[meu_shortcode attr=&quot;valor&quot;]">' + escapeHtml(val) + '</textarea>';
+                if (field.name === 'content' && item.type === 'shortcode') {
+                    inputHtml += '<p class="vitrine-field-hint">Cole o shortcode do WordPress ou de outro plugin. Será executado na página publicada.</p>';
+                }
+                break;
+            case 'number':
+                inputHtml = '<input type="number" class="vitrine-field" data-field="' + escapeAttr(field.name) + '" value="' + escapeAttr(val) + '" />';
+                break;
+            case 'color':
+                if (item.type === 'text' && field.name === 'bg_color') {
+                    var bgColorVal = val || '#ffffff';
+                    inputHtml = '<div class="vitrine-color-row">' +
+                        '<input type="color" class="vitrine-field vitrine-field-bg-color" data-field="bg_color" value="' + escapeAttr(bgColorVal) + '" />' +
+                        (val ? '<button type="button" class="button button-small vitrine-field-bg-color-clear" title="Sem fundo">&#10005;</button>' : '') +
+                    '</div>';
+                } else {
+                    inputHtml = '<input type="color" class="vitrine-field" data-field="' + escapeAttr(field.name) + '" value="' + escapeAttr(val) + '" />';
+                }
+                break;
+            case 'range': {
+                var rMin = field.min !== undefined ? field.min : 0;
+                var rMax = field.max !== undefined ? field.max : 100;
+                var rVal = val !== '' && val !== undefined ? val : rMin;
+                inputHtml = '<div class="vitrine-range-row">' +
+                    '<input type="range" class="vitrine-field vitrine-field-range" data-field="' + escapeAttr(field.name) + '" min="' + rMin + '" max="' + rMax + '" value="' + escapeAttr(rVal) + '" />' +
+                    '<span class="vitrine-range-val">' + escapeHtml(String(rVal)) + '</span>' +
+                '</div>';
+                break;
+            }
+            case 'select':
+                var opts = field.options || {};
+                inputHtml = '<select class="vitrine-field" data-field="' + escapeAttr(field.name) + '">';
+                for (var optKey in opts) {
+                    if (opts.hasOwnProperty(optKey)) {
+                        inputHtml += '<option value="' + escapeAttr(optKey) + '"' + (val === optKey ? ' selected' : '') + '>' + escapeHtml(opts[optKey]) + '</option>';
+                    }
+                }
+                inputHtml += '</select>';
+                break;
+            case 'image':
+                inputHtml =
+                    '<div class="vitrine-image-field">' +
+                        (val ? '<img src="' + escapeAttr(val) + '" class="vitrine-image-preview" />' : '') +
+                        '<input type="hidden" class="vitrine-field" data-field="' + escapeAttr(field.name) + '" value="' + escapeAttr(val) + '" />' +
+                        '<button type="button" class="button vitrine-select-image">Selecionar Imagem</button>' +
+                        (val ? ' <button type="button" class="button vitrine-remove-image">Remover</button>' : '') +
+                        '<input type="text" class="vitrine-image-url-input" placeholder="ou cole a URL da imagem" value="' + escapeAttr(val) + '" />' +
+                    '</div>';
+                break;
+            default:
+                inputHtml = '<input type="text" class="vitrine-field" data-field="' + escapeAttr(field.name) + '" value="' + escapeAttr(val) + '" />';
+        }
+
+        var extraClass = (field.type === 'textarea' || field.type === 'image') ? ' vitrine-field-group--full' : '';
+        var fieldHint = '';
+        if (item.type === 'container' && field.name === 'name') {
+            fieldHint = '<p class="vitrine-field-hint">Aparece na barra do bloco no canvas para identificar cada container.</p>';
+        }
+        if ((item.type === 'aranha2' || item.type === 'aranha3') && field.name === 'card_min_height') {
+            fieldHint = '<p class="vitrine-field-hint">Aplica-se aos modelos Escuro, Branco e Borda esquerda.</p>';
+        }
+        if ((item.type === 'aranha2' || item.type === 'aranha3') && field.name.indexOf('preset_') === 0) {
+            fieldHint = '<p class="vitrine-field-hint">Personaliza o modelo de card selecionado (substitui o CSS manual).</p>';
+        }
+        if (item.type === 'imagelinks' && field.name === 'image_height') {
+            fieldHint = '<p class="vitrine-field-hint">Use 0 para ocultar a área da imagem (só legenda/conteúdo).</p>';
+        }
+
+        return '<div class="vitrine-field-group' + extraClass + '">' +
+            '<label>' + escapeHtml(field.label) + '</label>' +
+            inputHtml +
+            fieldHint +
+        '</div>';
+    }
+
+    function buildSettingsWidthField(item) {
+        var widthVal = item.width || '';
+        return '<div class="vitrine-field-group vitrine-field-group--width">' +
+            '<label>Largura</label>' +
+            '<div class="vitrine-width-input-row">' +
+                '<input type="text" class="vitrine-field-width" value="' + escapeAttr(widthVal) + '" placeholder="auto" />' +
+                '<button type="button" class="button button-small vitrine-btn-distribute" title="Distribuir igualmente">&#8862;</button>' +
+            '</div>' +
+            '<p class="vitrine-field-hint">Arraste o divisor entre elementos para ajustar visualmente.</p>' +
+        '</div>';
+    }
+
     function renderSettings() {
         syncAllAranhaMCE();
+        syncAllItemgridMCE();
+        syncAllItemcarouselMCE();
         syncAllFieldMCE();
         destroyAllMCE();
         var $panel = $('#vitrine-settings-panel');
-        $panel.empty();
+        $panel.empty().removeClass('has-tabs');
 
         if (!selectedId) {
             $('#vitrine-settings-el-icon').attr('class', 'dashicons dashicons-admin-settings');
@@ -1168,6 +1437,13 @@
         var item = findItemById(selectedId);
         if (!item) return;
 
+        if (item.type !== 'itemgrid') {
+            itemgridExpandedIdx = null;
+        }
+        if (item.type !== 'itemcarousel') {
+            itemcarouselExpandedIdx = null;
+        }
+
         var elDef = elements[item.type];
         if (!elDef) return;
 
@@ -1180,155 +1456,103 @@
         $('#vitrine-settings-sidebar').addClass('has-selection');
 
         var fields = elDef.fields;
+        var contentTabActive = settingsPanelTab === 'style' ? '' : ' is-active';
+        var styleTabActive = settingsPanelTab === 'style' ? ' is-active' : '';
+
+        $panel.addClass('has-tabs');
+        $panel.append(
+            '<div class="vitrine-settings-main-tabs">' +
+                '<button type="button" class="vitrine-settings-main-tab' + contentTabActive + '" data-settings-tab="content" title="Conteúdo">' +
+                    '<span class="dashicons dashicons-edit"></span>' +
+                    '<span class="vitrine-settings-main-tab-label">Conteúdo</span>' +
+                '</button>' +
+                '<button type="button" class="vitrine-settings-main-tab' + styleTabActive + '" data-settings-tab="style" title="Estilos">' +
+                    '<span class="dashicons dashicons-admin-appearance"></span>' +
+                    '<span class="vitrine-settings-main-tab-label">Estilos</span>' +
+                '</button>' +
+            '</div>' +
+            '<div class="vitrine-settings-tab-pane' + contentTabActive + '" data-settings-pane="content"></div>' +
+            '<div class="vitrine-settings-tab-pane' + styleTabActive + '" data-settings-pane="style"></div>'
+        );
+
+        var $contentPane = $panel.find('[data-settings-pane="content"]');
+        var $stylePane = $panel.find('[data-settings-pane="style"]');
 
         // Verifica se está dentro de um container row
         var parentContainer = findParentContainer(selectedId);
         var isInsideRowContainer = parentContainer &&
             parentContainer.settings && parentContainer.settings.direction === 'row';
 
-        // Campo de largura para itens em row container
         if (isInsideRowContainer) {
-            var widthVal = item.width || '';
-            $panel.append(
-                '<div class="vitrine-field-group vitrine-field-group--width">' +
-                    '<label>Largura</label>' +
-                    '<div class="vitrine-width-input-row">' +
-                        '<input type="text" class="vitrine-field-width" value="' + escapeAttr(widthVal) + '" placeholder="auto" />' +
-                        '<button type="button" class="button button-small vitrine-btn-distribute" title="Distribuir igualmente">&#8862;</button>' +
-                    '</div>' +
-                    '<p class="vitrine-field-hint">Arraste o divisor entre elementos para ajustar visualmente.</p>' +
-                '</div>' +
-                '<hr style="border:none;border-top:1px solid #dcdcde;margin:12px 0;" />'
-            );
+            $stylePane.append(buildSettingsWidthField(item));
         }
 
         fields.forEach(function (field) {
-            if (item.type === 'container' && field.name === 'direction' && containerContainsAranha(item)) {
+            if (shouldSkipSettingsField(item, field)) {
                 return;
             }
 
-            if (item.type === 'aranha2' || item.type === 'aranha3') {
-                var cardStyle = item.settings.card_style || 'default';
-                var isPresetCard = cardStyle !== 'default';
-                if (field.name === 'card_min_height' && !isPresetCard) {
-                    return;
-                }
-                if (item.type === 'aranha3' && field.name === 'card_height' && isPresetCard) {
-                    return;
-                }
-            }
-
-            var val = item.settings[field.name] !== undefined ? item.settings[field.name] : (elDef.defaults[field.name] || '');
-            var inputHtml = '';
-
-            switch (field.type) {
-                case 'textarea':
-                    inputHtml = '<textarea id="vitrine-field-mce-' + escapeAttr(field.name) + '" class="vitrine-field-mce" data-field="' + escapeAttr(field.name) + '" rows="4">' + safeTextareaHtml(val) + '</textarea>';
-                    if (item.type === 'imagelinks' && field.name === 'content') {
-                        inputHtml += '<p class="vitrine-field-hint">Editor livre abaixo da imagem — negrito, itálico, links, listas etc.</p>';
-                    }
-                    break;
-                case 'plaintextarea':
-                    inputHtml = '<textarea class="vitrine-field vitrine-field-plaintextarea" data-field="' + escapeAttr(field.name) + '" rows="5" spellcheck="false" placeholder="[meu_shortcode attr=&quot;valor&quot;]">' + escapeHtml(val) + '</textarea>';
-                    if (field.name === 'content' && item.type === 'shortcode') {
-                        inputHtml += '<p class="vitrine-field-hint">Cole o shortcode do WordPress ou de outro plugin. Será executado na página publicada.</p>';
-                    }
-                    break;
-                case 'number':
-                    inputHtml = '<input type="number" class="vitrine-field" data-field="' + escapeAttr(field.name) + '" value="' + escapeAttr(val) + '" />';
-                    break;
-                case 'color':
-                    if (item.type === 'text' && field.name === 'bg_color') {
-                        var bgColorVal = val || '#ffffff';
-                        inputHtml = '<div class="vitrine-color-row">' +
-                            '<input type="color" class="vitrine-field vitrine-field-bg-color" data-field="bg_color" value="' + escapeAttr(bgColorVal) + '" />' +
-                            (val ? '<button type="button" class="button button-small vitrine-field-bg-color-clear" title="Sem fundo">&#10005;</button>' : '') +
-                        '</div>';
-                    } else {
-                        inputHtml = '<input type="color" class="vitrine-field" data-field="' + escapeAttr(field.name) + '" value="' + escapeAttr(val) + '" />';
-                    }
-                    break;
-                case 'range': {
-                    var rMin = field.min !== undefined ? field.min : 0;
-                    var rMax = field.max !== undefined ? field.max : 100;
-                    var rVal = val !== '' && val !== undefined ? val : rMin;
-                    inputHtml = '<div class="vitrine-range-row">' +
-                        '<input type="range" class="vitrine-field vitrine-field-range" data-field="' + escapeAttr(field.name) + '" min="' + rMin + '" max="' + rMax + '" value="' + escapeAttr(rVal) + '" />' +
-                        '<span class="vitrine-range-val">' + escapeHtml(String(rVal)) + '</span>' +
-                    '</div>';
-                    break;
-                }
-                case 'select':
-                    var opts = field.options || {};
-                    inputHtml = '<select class="vitrine-field" data-field="' + escapeAttr(field.name) + '">';
-                    for (var optKey in opts) {
-                        if (opts.hasOwnProperty(optKey)) {
-                            inputHtml += '<option value="' + escapeAttr(optKey) + '"' + (val === optKey ? ' selected' : '') + '>' + escapeHtml(opts[optKey]) + '</option>';
-                        }
-                    }
-                    inputHtml += '</select>';
-                    break;
-                case 'image':
-                    inputHtml =
-                        '<div class="vitrine-image-field">' +
-                            (val ? '<img src="' + escapeAttr(val) + '" class="vitrine-image-preview" />' : '') +
-                            '<input type="hidden" class="vitrine-field" data-field="' + escapeAttr(field.name) + '" value="' + escapeAttr(val) + '" />' +
-                            '<button type="button" class="button vitrine-select-image">Selecionar Imagem</button>' +
-                            (val ? ' <button type="button" class="button vitrine-remove-image">Remover</button>' : '') +
-                            '<input type="text" class="vitrine-image-url-input" placeholder="ou cole a URL da imagem" value="' + escapeAttr(val) + '" />' +
-                        '</div>';
-                    break;
-                default:
-                    inputHtml = '<input type="text" class="vitrine-field" data-field="' + escapeAttr(field.name) + '" value="' + escapeAttr(val) + '" />';
-            }
-
-            var extraClass = (field.type === 'textarea' || field.type === 'image') ? ' vitrine-field-group--full' : '';
-            var fieldHint = '';
-            if (item.type === 'container' && field.name === 'name') {
-                fieldHint = '<p class="vitrine-field-hint">Aparece na barra do bloco no canvas para identificar cada container.</p>';
-            }
-            if ((item.type === 'aranha2' || item.type === 'aranha3') && field.name === 'card_min_height') {
-                fieldHint = '<p class="vitrine-field-hint">Aplica-se aos modelos Escuro, Branco e Borda esquerda.</p>';
-            }
-            $panel.append(
-                '<div class="vitrine-field-group' + extraClass + '">' +
-                    '<label>' + escapeHtml(field.label) + '</label>' +
-                    inputHtml +
-                    fieldHint +
-                '</div>'
-            );
+            var tab = getFieldSettingsTab(item.type, field);
+            var $targetPane = tab === 'style' ? $stylePane : $contentPane;
+            $targetPane.append(buildSettingsFieldGroup(item, elDef, field));
         });
 
         // ── Aranha Circular: itens radiais ──
         if (item.type === 'aranha2') {
-            renderAranha2Repeater($panel, item);
+            renderAranha2Repeater($contentPane, item);
         }
 
         // ── Aranha Grade: itens do grid ──
         if (item.type === 'aranha3') {
-            renderAranha3Repeater($panel, item);
+            renderAranha3Repeater($contentPane, item);
+        }
+
+        // ── Grade de Itens: cards com abas ──
+        if (item.type === 'itemgrid') {
+            renderItemgridRepeater($contentPane, item);
+        }
+
+        // ── Carrossel de Itens: slides com abas ──
+        if (item.type === 'itemcarousel') {
+            renderItemcarouselRepeater($contentPane, item);
         }
 
         // ── Toggle: seção de itens repetíveis ──
         if (item.type === 'toggle') {
-            renderToggleRepeater($panel, item);
+            renderToggleRepeater($contentPane, item);
         }
 
         // ── CSS Personalizado (todos os elementos) ──
         var customCss = item.settings.custom_css || '';
-        $panel.append(
-            '<hr style="border:none;border-top:1px solid #dcdcde;margin:4px 0;" />' +
-            '<div class="vitrine-field-group vitrine-field-group--custom-css">' +
+        $stylePane.append(
+            '<div class="vitrine-field-group vitrine-field-group--full vitrine-field-group--custom-css">' +
                 '<label>CSS Personalizado</label>' +
                 '<textarea class="vitrine-field" data-field="custom_css" rows="3" placeholder="ex: background: #f00; border-radius: 8px;">' + escapeHtml(customCss) + '</textarea>' +
                 '<p class="vitrine-field-hint">Estilos aplicados diretamente neste elemento.</p>' +
             '</div>'
         );
 
+        if (!$contentPane.children().length) {
+            $contentPane.append('<p class="vitrine-settings-tab-empty">Nenhuma opção de conteúdo para este elemento.</p>');
+        }
+        if (!$stylePane.children().length) {
+            $stylePane.append('<p class="vitrine-settings-tab-empty">Nenhuma opção de estilo para este elemento.</p>');
+        }
+
         // Inicializa TinyMCE e drag-sort nos itens das aranhas
         if (item.type === 'aranha2' || item.type === 'aranha3') {
             setTimeout(initAranhaMCE, 50);
             setTimeout(initAranhaSort, 80);
+        }
+
+        if (item.type === 'itemgrid') {
+            setTimeout(initItemgridMCE, 50);
+            setTimeout(initItemgridSort, 80);
+        }
+
+        if (item.type === 'itemcarousel') {
+            setTimeout(initItemcarouselMCE, 50);
+            setTimeout(initItemcarouselSort, 80);
         }
 
         // Inicializa TinyMCE nos campos textarea genéricos
@@ -1436,8 +1660,16 @@
 
     function destroyAllMCE() {
         destroyAranhaSort();
+        itemgridSortInstances.forEach(function (inst) {
+            if (inst && inst.destroy) inst.destroy();
+        });
+        itemgridSortInstances = [];
+        itemcarouselSortInstances.forEach(function (inst) {
+            if (inst && inst.destroy) inst.destroy();
+        });
+        itemcarouselSortInstances = [];
         _skipMCESync = true;
-        $('.vitrine-aranha-mce, .vitrine-field-mce, .vitrine-toggle-mce').each(function () {
+        $('.vitrine-aranha-mce, .vitrine-field-mce, .vitrine-toggle-mce, .vitrine-ig-mce, .vitrine-ic-mce').each(function () {
             var id = $(this).attr('id');
             if (id && typeof wp !== 'undefined' && wp.editor) {
                 try { wp.editor.remove(id); } catch (e) {}
@@ -1887,6 +2119,681 @@
         $panel.append(html);
     }
 
+    /* ──────────────────────────────────────────────────────
+       Grade de Itens — repeater com abas (Conteúdo / Tipografia / Link)
+    ────────────────────────────────────────────────────── */
+
+    var IG_WEIGHT_OPTS = {
+        '': 'Padrão do bloco',
+        '300': 'Leve (300)',
+        '400': 'Normal (400)',
+        '500': 'Médio (500)',
+        '600': 'Semi-negrito (600)',
+        '700': 'Negrito (700)',
+        '800': 'Extra-negrito (800)'
+    };
+
+    function defaultItemgridItem() {
+        return {
+            image: '',
+            title: '',
+            description: '',
+            link: '',
+            link_new_tab: '0',
+            title_color: '',
+            title_size: '',
+            title_weight: '',
+            desc_color: '',
+            desc_size: '',
+            desc_weight: ''
+        };
+    }
+
+    function itemgridMceId(idx) {
+        return 'vitrine-ig-mce-' + idx;
+    }
+
+    function buildIgWeightSelect(prop, val) {
+        var html = '<select class="vitrine-ig-field" data-ig-prop="' + escapeAttr(prop) + '">';
+        for (var k in IG_WEIGHT_OPTS) {
+            if (IG_WEIGHT_OPTS.hasOwnProperty(k)) {
+                html += '<option value="' + escapeAttr(k) + '"' + (String(val || '') === k ? ' selected' : '') + '>' + escapeHtml(IG_WEIGHT_OPTS[k]) + '</option>';
+            }
+        }
+        html += '</select>';
+        return html;
+    }
+
+    function buildItemgridCardHtml(ci, idx, isExpanded) {
+        var titlePreview = stripHtmlPreview(ci.title) || ('Card ' + (idx + 1));
+        var hasImage = !!ci.image;
+        var hasLink  = !!ci.link;
+        var hasCustomType = !!(ci.title_color || ci.title_size || ci.title_weight || ci.desc_color || ci.desc_size || ci.desc_weight);
+        var expandedClass = isExpanded ? ' is-expanded' : '';
+
+        var html = '<div class="vitrine-ig-item' + expandedClass + '" data-ig-idx="' + idx + '">';
+
+        html += '<div class="vitrine-ig-item-header">';
+        html += '<span class="vitrine-ig-drag dashicons dashicons-move" title="Arrastar"></span>';
+        html += '<div class="vitrine-ig-item-thumb">';
+        if (hasImage) {
+            html += '<img src="' + escapeAttr(ci.image) + '" alt="" />';
+        } else {
+            html += '<span class="dashicons dashicons-format-image"></span>';
+        }
+        html += '</div>';
+        html += '<div class="vitrine-ig-item-summary">';
+        html += '<span class="vitrine-ig-item-title-preview">' + escapeHtml(titlePreview) + '</span>';
+        html += '<span class="vitrine-ig-item-meta">Card ' + (idx + 1) + (hasCustomType ? ' · tipografia personalizada' : '') + '</span>';
+        html += '</div>';
+        html += '<div class="vitrine-ig-item-badges">';
+        if (hasImage) { html += '<span class="vitrine-ig-badge vitrine-ig-badge--img" title="Com imagem"><span class="dashicons dashicons-format-image"></span></span>'; }
+        if (hasLink)  { html += '<span class="vitrine-ig-badge vitrine-ig-badge--link" title="Com link"><span class="dashicons dashicons-admin-links"></span></span>'; }
+        html += '</div>';
+        html += '<span class="vitrine-ig-item-chevron dashicons dashicons-arrow-down-alt2"></span>';
+        html += '<button type="button" class="button button-small vitrine-ig-item-remove" title="Remover">&times;</button>';
+        html += '</div>';
+
+        html += '<div class="vitrine-ig-item-body">';
+        html += '<div class="vitrine-ig-tabs">';
+        html += '<button type="button" class="vitrine-ig-tab is-active" data-ig-tab="content">Conteúdo</button>';
+        html += '<button type="button" class="vitrine-ig-tab" data-ig-tab="type">Tipografia</button>';
+        html += '<button type="button" class="vitrine-ig-tab" data-ig-tab="link">Link</button>';
+        html += '</div>';
+
+        // Aba Conteúdo
+        html += '<div class="vitrine-ig-tab-panel is-active" data-ig-panel="content">';
+        html += '<div class="vitrine-ig-image-picker">';
+        html += '<div class="vitrine-ig-image-preview-wrap">';
+        if (hasImage) {
+            html += '<img src="' + escapeAttr(ci.image) + '" alt="" class="vitrine-ig-preview-img" />';
+        } else {
+            html += '<span class="dashicons dashicons-format-image"></span>';
+        }
+        html += '</div>';
+        html += '<div class="vitrine-ig-image-actions">';
+        html += '<input type="hidden" class="vitrine-ig-field" data-ig-prop="image" value="' + escapeAttr(ci.image || '') + '" />';
+        html += '<button type="button" class="button vitrine-ig-select-image">' + (hasImage ? 'Trocar imagem' : 'Adicionar imagem') + '</button>';
+        if (hasImage) {
+            html += ' <button type="button" class="button vitrine-ig-remove-image">Remover</button>';
+        }
+        html += '<p class="vitrine-field-hint" style="margin:4px 0 0;">Opcional. Deixe vazio para card só com texto.</p>';
+        html += '</div></div>';
+
+        html += '<div class="vitrine-field-group" style="margin-top:14px;">';
+        html += '<label>Título</label>';
+        html += '<input type="text" class="vitrine-ig-field widefat" data-ig-prop="title" value="' + escapeAttr(ci.title || '') + '" placeholder="Título do card" />';
+        html += '</div>';
+
+        html += '<div class="vitrine-field-group vitrine-field-group--full">';
+        html += '<label>Descrição</label>';
+        html += '<textarea id="' + itemgridMceId(idx) + '" class="vitrine-ig-mce" data-ig-prop="description" rows="4">' + escapeHtml(ci.description || '') + '</textarea>';
+        html += '</div>';
+        html += '</div>';
+
+        // Aba Tipografia
+        html += '<div class="vitrine-ig-tab-panel" data-ig-panel="type">';
+        html += '<p class="vitrine-field-hint" style="margin:0 0 12px;">Deixe em branco ou “Padrão do bloco” para usar os valores gerais do elemento.</p>';
+        html += '<div class="vitrine-ig-type-row">';
+        html += '<div class="vitrine-ig-type-block">';
+        html += '<h5>Título</h5>';
+        html += '<div class="vitrine-ig-type-field"><label>Cor</label>';
+        html += '<input type="color" class="vitrine-ig-field" data-ig-prop="title_color" value="' + escapeAttr(ci.title_color || '#1a1a1a') + '" /></div>';
+        html += '<div class="vitrine-ig-type-field"><label>Tamanho (px)</label>';
+        html += '<input type="number" class="vitrine-ig-field" data-ig-prop="title_size" value="' + escapeAttr(ci.title_size || '') + '" min="10" max="72" placeholder="padrão" /></div>';
+        html += '<div class="vitrine-ig-type-field"><label>Peso</label>' + buildIgWeightSelect('title_weight', ci.title_weight) + '</div>';
+        html += '</div>';
+        html += '<div class="vitrine-ig-type-block">';
+        html += '<h5>Descrição</h5>';
+        html += '<div class="vitrine-ig-type-field"><label>Cor</label>';
+        html += '<input type="color" class="vitrine-ig-field" data-ig-prop="desc_color" value="' + escapeAttr(ci.desc_color || '#555555') + '" /></div>';
+        html += '<div class="vitrine-ig-type-field"><label>Tamanho (px)</label>';
+        html += '<input type="number" class="vitrine-ig-field" data-ig-prop="desc_size" value="' + escapeAttr(ci.desc_size || '') + '" min="10" max="48" placeholder="padrão" /></div>';
+        html += '<div class="vitrine-ig-type-field"><label>Peso</label>' + buildIgWeightSelect('desc_weight', ci.desc_weight) + '</div>';
+        html += '</div></div></div>';
+
+        // Aba Link
+        html += '<div class="vitrine-ig-tab-panel" data-ig-panel="link">';
+        html += '<div class="vitrine-field-group">';
+        html += '<label><span class="dashicons dashicons-admin-links" style="font-size:13px;vertical-align:middle;margin-right:3px;color:#0073aa;"></span> URL do link</label>';
+        html += '<input type="text" class="vitrine-ig-field widefat" data-ig-prop="link" value="' + escapeAttr(ci.link || '') + '" placeholder="https://..." />';
+        html += '</div>';
+        html += '<label style="display:flex;align-items:center;gap:6px;font-size:12px;margin-top:8px;">';
+        html += '<input type="checkbox" class="vitrine-ig-field-check" data-ig-prop="link_new_tab"' + (ci.link_new_tab === '1' ? ' checked' : '') + ' />';
+        html += ' Abrir em nova aba</label>';
+        html += '<p class="vitrine-field-hint">Torna o card inteiro clicável.</p>';
+        html += '</div>';
+
+        html += '</div></div>';
+        return html;
+    }
+
+    function renderItemgridRepeater($panel, item) {
+        if (!item.settings.items || !Array.isArray(item.settings.items)) {
+            item.settings.items = [];
+        }
+        var items = item.settings.items;
+        if (itemgridExpandedIdx === null && items.length) {
+            itemgridExpandedIdx = 0;
+        }
+        if (itemgridExpandedIdx !== null && itemgridExpandedIdx >= items.length) {
+            itemgridExpandedIdx = items.length ? items.length - 1 : null;
+        }
+
+        var html = '<div class="vitrine-ig-section" data-ig-key="items">';
+        html += '<hr style="border:none;border-top:1px solid #dcdcde;margin:14px 0 12px;" />';
+        html += '<div class="vitrine-ig-section-head">';
+        html += '<div>';
+        html += '<h4>Cards da Grade</h4>';
+        html += '<p class="vitrine-field-hint" style="margin:0;">Clique em um card para editar. Arraste para reordenar.</p>';
+        html += '</div>';
+        html += '<span class="vitrine-ig-count-badge">' + items.length + '</span>';
+        html += '</div>';
+
+        html += '<div class="vitrine-ig-items-list" data-ig-key="items">';
+        items.forEach(function (ci, idx) {
+            html += buildItemgridCardHtml(ci, idx, itemgridExpandedIdx === idx);
+        });
+        html += '</div>';
+
+        html += '<button type="button" class="button vitrine-ig-add-btn">';
+        html += '<span class="dashicons dashicons-plus-alt2"></span> Adicionar card';
+        html += '</button></div>';
+
+        $panel.append(html);
+    }
+
+    function initItemgridMCE() {
+        $('.vitrine-ig-mce').each(function () {
+            var id = $(this).attr('id');
+            if (!id || typeof wp === 'undefined' || !wp.editor) return;
+            if (tinymce.get(id)) return;
+
+            wp.editor.initialize(id, {
+                tinymce: {
+                    toolbar1: 'bold,italic,underline,link,bullist,numlist',
+                    menubar: false,
+                    branding: false,
+                    resize: false,
+                    height: 120,
+                    setup: function (editor) {
+                        editor.on('change keyup', function () {
+                            editor.save();
+                            syncItemgridMCE(editor.id);
+                        });
+                    }
+                },
+                quicktags: true,
+                mediaButtons: false
+            });
+        });
+    }
+
+    function syncItemgridMCE(editorId) {
+        if (!selectedId) return;
+        var item = findItemById(selectedId);
+        if (!item || item.type !== 'itemgrid') return;
+
+        var $ta = $('#' + editorId);
+        var idx = $ta.closest('.vitrine-ig-item').data('ig-idx');
+        if (idx === undefined) return;
+
+        if (!item.settings.items) item.settings.items = [];
+        if (!item.settings.items[idx]) item.settings.items[idx] = defaultItemgridItem();
+
+        item.settings.items[idx].description = wp.editor.getContent(editorId);
+
+        updateItemgridPreview();
+        updateItemgridItemHeader(idx);
+    }
+
+    function syncAllItemgridMCE() {
+        if (_skipMCESync) return;
+        $('.vitrine-ig-mce').each(function () {
+            var id = $(this).attr('id');
+            if (id) syncItemgridMCE(id);
+        });
+    }
+
+    function initItemgridSort() {
+        itemgridSortInstances.forEach(function (inst) {
+            if (inst && inst.destroy) inst.destroy();
+        });
+        itemgridSortInstances = [];
+
+        var $list = $('#vitrine-settings-panel .vitrine-ig-items-list');
+        if (!$list.length || typeof Sortable === 'undefined') return;
+
+        var instance = Sortable.create($list[0], {
+            handle: '.vitrine-ig-drag',
+            draggable: '.vitrine-ig-item',
+            animation: 150,
+            ghostClass: 'vitrine-ig-ghost',
+            onEnd: function (evt) {
+                if (evt.oldIndex === evt.newIndex) return;
+                var current = findItemById(selectedId);
+                if (!current || !current.settings.items) return;
+
+                var moved = current.settings.items.splice(evt.oldIndex, 1)[0];
+                current.settings.items.splice(evt.newIndex, 0, moved);
+
+                if (itemgridExpandedIdx === evt.oldIndex) {
+                    itemgridExpandedIdx = evt.newIndex;
+                } else if (itemgridExpandedIdx !== null) {
+                    if (evt.oldIndex < itemgridExpandedIdx && evt.newIndex >= itemgridExpandedIdx) {
+                        itemgridExpandedIdx--;
+                    } else if (evt.oldIndex > itemgridExpandedIdx && evt.newIndex <= itemgridExpandedIdx) {
+                        itemgridExpandedIdx++;
+                    }
+                }
+
+                renderSettings();
+                updateItemgridPreview();
+            }
+        });
+        itemgridSortInstances.push(instance);
+    }
+
+    function updateItemgridPreview() {
+        if (!selectedId) return;
+        var item = findItemById(selectedId);
+        if (!item || item.type !== 'itemgrid') return;
+        var elDef = elements[item.type];
+        var $block = $('[data-id="' + selectedId + '"]').first().find('> .vitrine-block-preview');
+        if ($block.length && elDef) {
+            var s = $.extend(true, {}, elDef.defaults, item.settings);
+            refreshBlockPreview($block, item.type, s);
+        }
+    }
+
+    function updateItemgridItemHeader(idx) {
+        if (!selectedId) return;
+        var item = findItemById(selectedId);
+        if (!item || !item.settings.items || !item.settings.items[idx]) return;
+        var ci = item.settings.items[idx];
+        var $card = $('.vitrine-ig-item[data-ig-idx="' + idx + '"]');
+        if (!$card.length) return;
+
+        var titlePreview = stripHtmlPreview(ci.title) || ('Card ' + (idx + 1));
+        $card.find('.vitrine-ig-item-title-preview').text(titlePreview);
+
+        var hasCustom = !!(ci.title_color || ci.title_size || ci.title_weight || ci.desc_color || ci.desc_size || ci.desc_weight);
+        $card.find('.vitrine-ig-item-meta').text('Card ' + (idx + 1) + (hasCustom ? ' · tipografia personalizada' : ''));
+
+        var $thumb = $card.find('.vitrine-ig-item-thumb');
+        if (ci.image) {
+            $thumb.html('<img src="' + escapeAttr(ci.image) + '" alt="" />');
+            if (!$card.find('.vitrine-ig-badge--img').length) {
+                $card.find('.vitrine-ig-item-badges').prepend('<span class="vitrine-ig-badge vitrine-ig-badge--img" title="Com imagem"><span class="dashicons dashicons-format-image"></span></span>');
+            }
+        } else {
+            $thumb.html('<span class="dashicons dashicons-format-image"></span>');
+            $card.find('.vitrine-ig-badge--img').remove();
+        }
+
+        if (ci.link) {
+            if (!$card.find('.vitrine-ig-badge--link').length) {
+                $card.find('.vitrine-ig-item-badges').append('<span class="vitrine-ig-badge vitrine-ig-badge--link" title="Com link"><span class="dashicons dashicons-admin-links"></span></span>');
+            }
+        } else {
+            $card.find('.vitrine-ig-badge--link').remove();
+        }
+    }
+
+    function syncItemgridField($el) {
+        if (!selectedId) return;
+        var item = findItemById(selectedId);
+        if (!item || item.type !== 'itemgrid') return;
+
+        var $card = $el.closest('.vitrine-ig-item');
+        var idx  = $card.data('ig-idx');
+        var prop = $el.data('ig-prop');
+        if (idx === undefined || !prop) return;
+
+        if (!item.settings.items) item.settings.items = [];
+        if (!item.settings.items[idx]) item.settings.items[idx] = defaultItemgridItem();
+
+        if ($el.is(':checkbox')) {
+            item.settings.items[idx][prop] = $el.is(':checked') ? '1' : '0';
+        } else {
+            var val = $el.val();
+            if (prop === 'title_size' || prop === 'desc_size') {
+                item.settings.items[idx][prop] = val === '' ? '' : val;
+            } else if (prop === 'title_color' || prop === 'desc_color') {
+                item.settings.items[idx][prop] = val;
+            } else if (prop === 'title_weight' || prop === 'desc_weight') {
+                item.settings.items[idx][prop] = val;
+            } else {
+                item.settings.items[idx][prop] = val;
+            }
+        }
+
+        updateItemgridPreview();
+        updateItemgridItemHeader(idx);
+    }
+
+    /* ──────────────────────────────────────────────────────
+       Carrossel de Itens — repeater com abas (Conteúdo / Link)
+    ────────────────────────────────────────────────────── */
+
+    function defaultItemcarouselItem() {
+        return {
+            item_type: 'image',
+            image: '',
+            icon: '',
+            title: '',
+            text: '',
+            link: '',
+            link_new_tab: '0'
+        };
+    }
+
+    function itemcarouselMceId(idx) {
+        return 'vitrine-ic-mce-' + idx;
+    }
+
+    function buildItemcarouselSlideHtml(si, idx, isExpanded) {
+        var itemType = si.item_type === 'icon' ? 'icon' : 'image';
+        var titlePreview = stripHtmlPreview(si.title) || ('Slide ' + (idx + 1));
+        var hasImage = !!si.image;
+        var hasIcon  = !!si.icon;
+        var hasLink  = !!si.link;
+        var expandedClass = isExpanded ? ' is-expanded' : '';
+        var typeLabel = itemType === 'icon' ? 'Ícone + texto' : 'Imagem + texto';
+
+        var html = '<div class="vitrine-ic-item vitrine-ig-item' + expandedClass + '" data-ic-idx="' + idx + '">';
+
+        html += '<div class="vitrine-ic-item-header vitrine-ig-item-header">';
+        html += '<span class="vitrine-ic-drag vitrine-ig-drag dashicons dashicons-move" title="Arrastar"></span>';
+        html += '<div class="vitrine-ic-item-thumb vitrine-ig-item-thumb">';
+        if (itemType === 'icon' && hasIcon) {
+            html += '<span class="vitrine-ic-thumb-icon">' + renderIconPreviewHtml(si.icon) + '</span>';
+        } else if (hasImage) {
+            html += '<img src="' + escapeAttr(si.image) + '" alt="" />';
+        } else {
+            html += '<span class="dashicons dashicons-' + (itemType === 'icon' ? 'star-filled' : 'format-image') + '"></span>';
+        }
+        html += '</div>';
+        html += '<div class="vitrine-ic-item-summary vitrine-ig-item-summary">';
+        html += '<span class="vitrine-ic-item-title-preview vitrine-ig-item-title-preview">' + escapeHtml(titlePreview) + '</span>';
+        html += '<span class="vitrine-ic-item-meta vitrine-ig-item-meta">' + escapeHtml(typeLabel) + ' · Slide ' + (idx + 1) + '</span>';
+        html += '</div>';
+        html += '<div class="vitrine-ic-item-badges vitrine-ig-item-badges">';
+        if (hasLink) { html += '<span class="vitrine-ig-badge vitrine-ig-badge--link" title="Com link"><span class="dashicons dashicons-admin-links"></span></span>'; }
+        html += '</div>';
+        html += '<span class="vitrine-ic-item-chevron vitrine-ig-item-chevron dashicons dashicons-arrow-down-alt2"></span>';
+        html += '<button type="button" class="button button-small vitrine-ic-item-remove vitrine-ig-item-remove" title="Remover">&times;</button>';
+        html += '</div>';
+
+        html += '<div class="vitrine-ic-item-body vitrine-ig-item-body">';
+        html += '<div class="vitrine-ic-tabs vitrine-ig-tabs">';
+        html += '<button type="button" class="vitrine-ic-tab vitrine-ig-tab is-active" data-ic-tab="content">Conteúdo</button>';
+        html += '<button type="button" class="vitrine-ic-tab vitrine-ig-tab" data-ic-tab="link">Link</button>';
+        html += '</div>';
+
+        html += '<div class="vitrine-ic-tab-panel vitrine-ig-tab-panel is-active" data-ic-panel="content">';
+
+        html += '<div class="vitrine-ic-type-switch">';
+        html += '<button type="button" class="vitrine-ic-type-btn' + (itemType === 'image' ? ' is-active' : '') + '" data-ic-type="image"><span class="dashicons dashicons-format-image"></span> Imagem + texto</button>';
+        html += '<button type="button" class="vitrine-ic-type-btn' + (itemType === 'icon' ? ' is-active' : '') + '" data-ic-type="icon"><span class="dashicons dashicons-star-filled"></span> Ícone + texto</button>';
+        html += '</div>';
+        html += '<input type="hidden" class="vitrine-ic-field" data-ic-prop="item_type" value="' + escapeAttr(itemType) + '" />';
+
+        html += '<div class="vitrine-ic-type-panel vitrine-ic-type-panel--image"' + (itemType === 'image' ? '' : ' style="display:none;"') + '>';
+        html += '<div class="vitrine-ig-image-picker vitrine-ic-image-picker">';
+        html += '<div class="vitrine-ig-image-preview-wrap vitrine-ic-image-preview-wrap">';
+        if (hasImage) {
+            html += '<img src="' + escapeAttr(si.image) + '" alt="" />';
+        } else {
+            html += '<span class="dashicons dashicons-format-image"></span>';
+        }
+        html += '</div>';
+        html += '<div class="vitrine-ig-image-actions vitrine-ic-image-actions">';
+        html += '<input type="hidden" class="vitrine-ic-field" data-ic-prop="image" value="' + escapeAttr(si.image || '') + '" />';
+        html += '<button type="button" class="button vitrine-ic-select-image">' + (hasImage ? 'Trocar imagem' : 'Adicionar imagem') + '</button>';
+        if (hasImage) {
+            html += ' <button type="button" class="button vitrine-ic-remove-image">Remover</button>';
+        }
+        html += '</div></div></div>';
+
+        html += '<div class="vitrine-ic-type-panel vitrine-ic-type-panel--icon"' + (itemType === 'icon' ? '' : ' style="display:none;"') + '>';
+        html += '<div class="vitrine-aranha-icon-field vitrine-ic-icon-field">';
+        html += '<label class="vitrine-a3-icon-row-label">Ícone do slide</label>';
+        html += '<div class="vitrine-a3-icon-row-inner">';
+        var iconPreview = hasIcon ? renderIconPreviewHtml(si.icon) : '<span class="dashicons dashicons-star-filled" style="font-size:28px;width:28px;height:28px;color:#c3c4c7;"></span>';
+        html += '<div class="vitrine-a2-icon-display vitrine-ic-open-picker" title="Escolher ícone">';
+        html += '<div class="vitrine-icon-current">' + iconPreview + '</div>';
+        html += '<span class="vitrine-a2-icon-hint">' + (hasIcon ? 'Trocar' : 'Adicionar') + '</span>';
+        html += '</div>';
+        html += '<input type="hidden" class="vitrine-ic-field" data-ic-prop="icon" value="' + escapeAttr(si.icon || '') + '" />';
+        html += '<div class="vitrine-icon-actions vitrine-a2-icon-actions">';
+        if (hasIcon) {
+            html += '<button type="button" class="button vitrine-ic-remove-icon">Remover</button>';
+        }
+        html += '</div>';
+        html += buildIconPickerHtml();
+        html += '</div></div></div>';
+
+        html += '<div class="vitrine-field-group" style="margin-top:14px;">';
+        html += '<label>Título</label>';
+        html += '<input type="text" class="vitrine-ic-field widefat" data-ic-prop="title" value="' + escapeAttr(si.title || '') + '" placeholder="Título do slide" />';
+        html += '</div>';
+
+        html += '<div class="vitrine-field-group vitrine-field-group--full">';
+        html += '<label>Texto / descrição</label>';
+        html += '<textarea id="' + itemcarouselMceId(idx) + '" class="vitrine-ic-mce" data-ic-prop="text" rows="4">' + escapeHtml(si.text || si.description || '') + '</textarea>';
+        html += '</div>';
+        html += '</div>';
+
+        html += '<div class="vitrine-ic-tab-panel vitrine-ig-tab-panel" data-ic-panel="link">';
+        html += '<div class="vitrine-field-group">';
+        html += '<label><span class="dashicons dashicons-admin-links" style="font-size:13px;vertical-align:middle;margin-right:3px;color:#0073aa;"></span> URL do link</label>';
+        html += '<input type="text" class="vitrine-ic-field widefat" data-ic-prop="link" value="' + escapeAttr(si.link || '') + '" placeholder="https://..." />';
+        html += '</div>';
+        html += '<label style="display:flex;align-items:center;gap:6px;font-size:12px;margin-top:8px;">';
+        html += '<input type="checkbox" class="vitrine-ic-field-check" data-ic-prop="link_new_tab"' + (si.link_new_tab === '1' ? ' checked' : '') + ' />';
+        html += ' Abrir em nova aba</label>';
+        html += '<p class="vitrine-field-hint">Torna o slide inteiro clicável.</p>';
+        html += '</div>';
+
+        html += '</div></div>';
+        return html;
+    }
+
+    function renderItemcarouselRepeater($panel, item) {
+        if (!item.settings.items || !Array.isArray(item.settings.items)) {
+            item.settings.items = [];
+        }
+        var items = item.settings.items;
+        if (itemcarouselExpandedIdx === null && items.length) {
+            itemcarouselExpandedIdx = 0;
+        }
+        if (itemcarouselExpandedIdx !== null && itemcarouselExpandedIdx >= items.length) {
+            itemcarouselExpandedIdx = items.length ? items.length - 1 : null;
+        }
+
+        var html = '<div class="vitrine-ic-section vitrine-ig-section" data-ic-key="items">';
+        html += '<hr style="border:none;border-top:1px solid #dcdcde;margin:14px 0 12px;" />';
+        html += '<div class="vitrine-ic-section-head vitrine-ig-section-head">';
+        html += '<div>';
+        html += '<h4>Slides do Carrossel</h4>';
+        html += '<p class="vitrine-field-hint" style="margin:0;">Clique no slide para editar. Escolha imagem ou ícone em cada item.</p>';
+        html += '</div>';
+        html += '<span class="vitrine-ic-count-badge vitrine-ig-count-badge">' + items.length + '</span>';
+        html += '</div>';
+
+        html += '<div class="vitrine-ic-items-list vitrine-ig-items-list" data-ic-key="items">';
+        items.forEach(function (si, idx) {
+            html += buildItemcarouselSlideHtml(si, idx, itemcarouselExpandedIdx === idx);
+        });
+        html += '</div>';
+
+        html += '<button type="button" class="button vitrine-ic-add-btn vitrine-ig-add-btn">';
+        html += '<span class="dashicons dashicons-plus-alt2"></span> Adicionar slide';
+        html += '</button></div>';
+
+        $panel.append(html);
+    }
+
+    function initItemcarouselMCE() {
+        $('.vitrine-ic-mce').each(function () {
+            var id = $(this).attr('id');
+            if (!id || typeof wp === 'undefined' || !wp.editor) return;
+            if (tinymce.get(id)) return;
+
+            wp.editor.initialize(id, {
+                tinymce: {
+                    toolbar1: 'bold,italic,underline,link,bullist',
+                    menubar: false,
+                    branding: false,
+                    resize: false,
+                    height: 100,
+                    setup: function (editor) {
+                        editor.on('change keyup', function () {
+                            editor.save();
+                            syncItemcarouselMCE(editor.id);
+                        });
+                    }
+                },
+                quicktags: true,
+                mediaButtons: false
+            });
+        });
+    }
+
+    function syncItemcarouselMCE(editorId) {
+        if (!selectedId) return;
+        var item = findItemById(selectedId);
+        if (!item || item.type !== 'itemcarousel') return;
+
+        var $ta = $('#' + editorId);
+        var idx = $ta.closest('.vitrine-ic-item').data('ic-idx');
+        if (idx === undefined) return;
+
+        if (!item.settings.items) item.settings.items = [];
+        if (!item.settings.items[idx]) item.settings.items[idx] = defaultItemcarouselItem();
+
+        item.settings.items[idx].text = wp.editor.getContent(editorId);
+
+        updateItemcarouselPreview();
+        updateItemcarouselItemHeader(idx);
+    }
+
+    function syncAllItemcarouselMCE() {
+        if (_skipMCESync) return;
+        $('.vitrine-ic-mce').each(function () {
+            var id = $(this).attr('id');
+            if (id) syncItemcarouselMCE(id);
+        });
+    }
+
+    function initItemcarouselSort() {
+        itemcarouselSortInstances.forEach(function (inst) {
+            if (inst && inst.destroy) inst.destroy();
+        });
+        itemcarouselSortInstances = [];
+
+        var $list = $('#vitrine-settings-panel .vitrine-ic-items-list');
+        if (!$list.length || typeof Sortable === 'undefined') return;
+
+        var instance = Sortable.create($list[0], {
+            handle: '.vitrine-ic-drag',
+            draggable: '.vitrine-ic-item',
+            animation: 150,
+            ghostClass: 'vitrine-ig-ghost',
+            onEnd: function (evt) {
+                if (evt.oldIndex === evt.newIndex) return;
+                var current = findItemById(selectedId);
+                if (!current || !current.settings.items) return;
+
+                var moved = current.settings.items.splice(evt.oldIndex, 1)[0];
+                current.settings.items.splice(evt.newIndex, 0, moved);
+
+                if (itemcarouselExpandedIdx === evt.oldIndex) {
+                    itemcarouselExpandedIdx = evt.newIndex;
+                } else if (itemcarouselExpandedIdx !== null) {
+                    if (evt.oldIndex < itemcarouselExpandedIdx && evt.newIndex >= itemcarouselExpandedIdx) {
+                        itemcarouselExpandedIdx--;
+                    } else if (evt.oldIndex > itemcarouselExpandedIdx && evt.newIndex <= itemcarouselExpandedIdx) {
+                        itemcarouselExpandedIdx++;
+                    }
+                }
+
+                renderSettings();
+                updateItemcarouselPreview();
+            }
+        });
+        itemcarouselSortInstances.push(instance);
+    }
+
+    function updateItemcarouselPreview() {
+        if (!selectedId) return;
+        var item = findItemById(selectedId);
+        if (!item || item.type !== 'itemcarousel') return;
+        var elDef = elements[item.type];
+        var $block = $('[data-id="' + selectedId + '"]').first().find('> .vitrine-block-preview');
+        if ($block.length && elDef) {
+            var s = $.extend(true, {}, elDef.defaults, item.settings);
+            refreshBlockPreview($block, item.type, s);
+        }
+    }
+
+    function updateItemcarouselItemHeader(idx) {
+        if (!selectedId) return;
+        var item = findItemById(selectedId);
+        if (!item || !item.settings.items || !item.settings.items[idx]) return;
+        var si = item.settings.items[idx];
+        var $card = $('.vitrine-ic-item[data-ic-idx="' + idx + '"]');
+        if (!$card.length) return;
+
+        var itemType = si.item_type === 'icon' ? 'icon' : 'image';
+        var typeLabel = itemType === 'icon' ? 'Ícone + texto' : 'Imagem + texto';
+        var titlePreview = stripHtmlPreview(si.title) || ('Slide ' + (idx + 1));
+
+        $card.find('.vitrine-ic-item-title-preview').text(titlePreview);
+        $card.find('.vitrine-ic-item-meta').text(typeLabel + ' · Slide ' + (idx + 1));
+
+        var $thumb = $card.find('.vitrine-ic-item-thumb');
+        if (itemType === 'icon' && si.icon) {
+            $thumb.html('<span class="vitrine-ic-thumb-icon">' + renderIconPreviewHtml(si.icon) + '</span>');
+        } else if (si.image) {
+            $thumb.html('<img src="' + escapeAttr(si.image) + '" alt="" />');
+        } else {
+            $thumb.html('<span class="dashicons dashicons-' + (itemType === 'icon' ? 'star-filled' : 'format-image') + '"></span>');
+        }
+
+        if (si.link) {
+            if (!$card.find('.vitrine-ig-badge--link').length) {
+                $card.find('.vitrine-ic-item-badges').append('<span class="vitrine-ig-badge vitrine-ig-badge--link" title="Com link"><span class="dashicons dashicons-admin-links"></span></span>');
+            }
+        } else {
+            $card.find('.vitrine-ig-badge--link').remove();
+        }
+    }
+
+    function syncItemcarouselField($el) {
+        if (!selectedId) return;
+        var item = findItemById(selectedId);
+        if (!item || item.type !== 'itemcarousel') return;
+
+        var $slide = $el.closest('.vitrine-ic-item');
+        var idx  = $slide.data('ic-idx');
+        var prop = $el.data('ic-prop');
+        if (idx === undefined || !prop) return;
+
+        if (!item.settings.items) item.settings.items = [];
+        if (!item.settings.items[idx]) item.settings.items[idx] = defaultItemcarouselItem();
+
+        if ($el.is(':checkbox')) {
+            item.settings.items[idx][prop] = $el.is(':checked') ? '1' : '0';
+        } else {
+            item.settings.items[idx][prop] = $el.val();
+        }
+
+        updateItemcarouselPreview();
+        updateItemcarouselItemHeader(idx);
+    }
+
     /* ──────────────────── Event Handlers ──────────────────── */
 
     // Atualiza settings ao modificar campo
@@ -2167,6 +3074,24 @@
     $(document).on('click', '.vitrine-icon-pick', function (e) {
         e.preventDefault();
         var icon = $(this).data('icon');
+        var $icField = $(this).closest('.vitrine-ic-icon-field');
+        if ($icField.length) {
+            var $slide = $icField.closest('.vitrine-ic-item');
+            var idx = $slide.data('ic-idx');
+            var item = findItemById(selectedId);
+            if (item && item.settings.items && item.settings.items[idx]) {
+                item.settings.items[idx].icon = icon;
+                $icField.find('.vitrine-ic-field[data-ic-prop="icon"]').val(icon);
+                $icField.find('.vitrine-icon-current').html(renderIconPreviewHtml(icon));
+                $icField.find('.vitrine-icon-picker').hide();
+                if (!$icField.find('.vitrine-ic-remove-icon').length) {
+                    $icField.find('.vitrine-icon-actions').append(' <button type="button" class="button vitrine-ic-remove-icon">Remover</button>');
+                }
+                updateItemcarouselPreview();
+                updateItemcarouselItemHeader(idx);
+            }
+            return;
+        }
         var $field = $(this).closest('.vitrine-aranha-icon-field');
         $field.find('.vitrine-aranha-field[data-aranha-prop="icon"]').val(icon).trigger('change');
         $field.find('.vitrine-icon-current').html(renderIconPreviewHtml(icon));
@@ -2179,6 +3104,28 @@
     // Selecionar imagem da biblioteca WP
     $(document).on('click', '.vitrine-aranha-select-icon', function (e) {
         e.preventDefault();
+        var $icContainer = $(this).closest('.vitrine-ic-icon-field');
+        if ($icContainer.length) {
+            var $slide = $icContainer.closest('.vitrine-ic-item');
+            var idx = $slide.data('ic-idx');
+            var frame = wp.media({ title: 'Selecionar Ícone', multiple: false, library: { type: 'image' } });
+            frame.on('select', function () {
+                var url = frame.state().get('selection').first().toJSON().url;
+                var item = findItemById(selectedId);
+                if (!item || !item.settings.items || !item.settings.items[idx]) return;
+                item.settings.items[idx].icon = url;
+                $icContainer.find('.vitrine-ic-field[data-ic-prop="icon"]').val(url);
+                $icContainer.find('.vitrine-icon-current').html(renderIconPreviewHtml(url));
+                $icContainer.find('.vitrine-icon-picker').hide();
+                if (!$icContainer.find('.vitrine-ic-remove-icon').length) {
+                    $icContainer.find('.vitrine-icon-actions').append(' <button type="button" class="button vitrine-ic-remove-icon">Remover</button>');
+                }
+                updateItemcarouselPreview();
+                updateItemcarouselItemHeader(idx);
+            });
+            frame.open();
+            return;
+        }
         var $container = $(this).closest('.vitrine-aranha-icon-field');
         var $input     = $container.find('.vitrine-aranha-field[data-aranha-prop="icon"]');
 
@@ -2212,7 +3159,7 @@
 
     // Fechar picker ao clicar fora
     $(document).on('click', function (e) {
-        if (!$(e.target).closest('.vitrine-aranha-icon-field').length) {
+        if (!$(e.target).closest('.vitrine-aranha-icon-field, .vitrine-ic-icon-field').length) {
             $('.vitrine-icon-picker').hide();
         }
     });
@@ -2272,6 +3219,274 @@
         }
     });
 
+    /* ──────────────────── Grade de Itens: eventos ──────────────────── */
+
+    $(document).on('click', '.vitrine-ig-item-header', function (e) {
+        if ($(e.target).closest('.vitrine-ig-item-remove, .vitrine-ig-drag').length) return;
+        var $item = $(this).closest('.vitrine-ig-item');
+        var idx = $item.data('ig-idx');
+        if (itemgridExpandedIdx === idx) {
+            itemgridExpandedIdx = null;
+            $item.removeClass('is-expanded');
+        } else {
+            $('.vitrine-ig-item').removeClass('is-expanded');
+            itemgridExpandedIdx = idx;
+            $item.addClass('is-expanded');
+            setTimeout(initItemgridMCE, 30);
+        }
+    });
+
+    $(document).on('click', '.vitrine-settings-main-tab', function (e) {
+        e.preventDefault();
+        var tab = $(this).data('settings-tab');
+        if (!tab || tab === settingsPanelTab) return;
+        settingsPanelTab = tab;
+        $('#vitrine-settings-panel .vitrine-settings-main-tab').removeClass('is-active');
+        $(this).addClass('is-active');
+        $('#vitrine-settings-panel .vitrine-settings-tab-pane').removeClass('is-active');
+        $('#vitrine-settings-panel .vitrine-settings-tab-pane[data-settings-pane="' + tab + '"]').addClass('is-active');
+        if (tab === 'content') {
+            setTimeout(initFieldMCE, 30);
+            setTimeout(initItemgridMCE, 30);
+            setTimeout(initItemcarouselMCE, 30);
+            setTimeout(initAranhaMCE, 30);
+            setTimeout(initToggleMCE, 30);
+        }
+    });
+
+    $(document).on('click', '.vitrine-ig-tab', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var tab = $(this).data('ig-tab');
+        var $item = $(this).closest('.vitrine-ig-item');
+        $item.find('.vitrine-ig-tab').removeClass('is-active');
+        $(this).addClass('is-active');
+        $item.find('.vitrine-ig-tab-panel').removeClass('is-active');
+        $item.find('.vitrine-ig-tab-panel[data-ig-panel="' + tab + '"]').addClass('is-active');
+        if (tab === 'content') {
+            setTimeout(initItemgridMCE, 30);
+        }
+    });
+
+    $(document).on('input change', '.vitrine-ig-field', function () {
+        syncItemgridField($(this));
+    });
+
+    $(document).on('change', '.vitrine-ig-field-check', function () {
+        syncItemgridField($(this));
+    });
+
+    $(document).on('click', '.vitrine-ig-add-btn', function (e) {
+        e.preventDefault();
+        if (!selectedId) return;
+        var item = findItemById(selectedId);
+        if (!item || item.type !== 'itemgrid') return;
+        if (!item.settings.items) item.settings.items = [];
+        item.settings.items.push(defaultItemgridItem());
+        itemgridExpandedIdx = item.settings.items.length - 1;
+        renderSettings();
+        updateItemgridPreview();
+    });
+
+    $(document).on('click', '.vitrine-ig-item-remove', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!selectedId) return;
+        var item = findItemById(selectedId);
+        if (!item || item.type !== 'itemgrid') return;
+        var $card = $(this).closest('.vitrine-ig-item');
+        var idx = $card.data('ig-idx');
+        if (!item.settings.items) return;
+        item.settings.items.splice(idx, 1);
+        if (itemgridExpandedIdx === idx) {
+            itemgridExpandedIdx = item.settings.items.length ? Math.min(idx, item.settings.items.length - 1) : null;
+        } else if (itemgridExpandedIdx !== null && itemgridExpandedIdx > idx) {
+            itemgridExpandedIdx--;
+        }
+        renderSettings();
+        updateItemgridPreview();
+    });
+
+    $(document).on('click', '.vitrine-ig-select-image', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!selectedId) return;
+        var $card = $(this).closest('.vitrine-ig-item');
+        var idx = $card.data('ig-idx');
+
+        var frame = wp.media({ title: 'Imagem do card', multiple: false, library: { type: 'image' } });
+        frame.on('select', function () {
+            var url = frame.state().get('selection').first().toJSON().url;
+            var item = findItemById(selectedId);
+            if (!item || !item.settings.items || !item.settings.items[idx]) return;
+            item.settings.items[idx].image = url;
+            renderSettings();
+            itemgridExpandedIdx = idx;
+            updateItemgridPreview();
+        });
+        frame.open();
+    });
+
+    $(document).on('click', '.vitrine-ig-remove-image', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $card = $(this).closest('.vitrine-ig-item');
+        var idx = $card.data('ig-idx');
+        var item = findItemById(selectedId);
+        if (!item || !item.settings.items || !item.settings.items[idx]) return;
+        item.settings.items[idx].image = '';
+        renderSettings();
+        itemgridExpandedIdx = idx;
+        updateItemgridPreview();
+    });
+
+    /* ──────────────────── Carrossel de Itens: eventos ──────────────────── */
+
+    $(document).on('click', '.vitrine-ic-item-header', function (e) {
+        if ($(e.target).closest('.vitrine-ic-item-remove, .vitrine-ic-drag').length) return;
+        var $item = $(this).closest('.vitrine-ic-item');
+        var idx = $item.data('ic-idx');
+        if (itemcarouselExpandedIdx === idx) {
+            itemcarouselExpandedIdx = null;
+            $item.removeClass('is-expanded');
+        } else {
+            $('.vitrine-ic-item').removeClass('is-expanded');
+            itemcarouselExpandedIdx = idx;
+            $item.addClass('is-expanded');
+            setTimeout(initItemcarouselMCE, 30);
+        }
+    });
+
+    $(document).on('click', '.vitrine-ic-tab', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var tab = $(this).data('ic-tab');
+        var $item = $(this).closest('.vitrine-ic-item');
+        $item.find('.vitrine-ic-tab').removeClass('is-active');
+        $(this).addClass('is-active');
+        $item.find('.vitrine-ic-tab-panel').removeClass('is-active');
+        $item.find('.vitrine-ic-tab-panel[data-ic-panel="' + tab + '"]').addClass('is-active');
+        if (tab === 'content') {
+            setTimeout(initItemcarouselMCE, 30);
+        }
+    });
+
+    $(document).on('click', '.vitrine-ic-type-btn', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var type = $(this).data('ic-type');
+        var $item = $(this).closest('.vitrine-ic-item');
+        var idx = $item.data('ic-idx');
+        var item = findItemById(selectedId);
+        if (!item || !item.settings.items || !item.settings.items[idx]) return;
+
+        item.settings.items[idx].item_type = type;
+        $item.find('.vitrine-ic-type-btn').removeClass('is-active');
+        $(this).addClass('is-active');
+        $item.find('.vitrine-ic-field[data-ic-prop="item_type"]').val(type);
+        $item.find('.vitrine-ic-type-panel--image').toggle(type === 'image');
+        $item.find('.vitrine-ic-type-panel--icon').toggle(type === 'icon');
+
+        updateItemcarouselPreview();
+        updateItemcarouselItemHeader(idx);
+    });
+
+    $(document).on('input change', '.vitrine-ic-field', function () {
+        syncItemcarouselField($(this));
+    });
+
+    $(document).on('change', '.vitrine-ic-field-check', function () {
+        syncItemcarouselField($(this));
+    });
+
+    $(document).on('click', '.vitrine-ic-add-btn', function (e) {
+        e.preventDefault();
+        if (!selectedId) return;
+        var item = findItemById(selectedId);
+        if (!item || item.type !== 'itemcarousel') return;
+        if (!item.settings.items) item.settings.items = [];
+        item.settings.items.push(defaultItemcarouselItem());
+        itemcarouselExpandedIdx = item.settings.items.length - 1;
+        renderSettings();
+        updateItemcarouselPreview();
+    });
+
+    $(document).on('click', '.vitrine-ic-item-remove', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!selectedId) return;
+        var item = findItemById(selectedId);
+        if (!item || item.type !== 'itemcarousel') return;
+        var $card = $(this).closest('.vitrine-ic-item');
+        var idx = $card.data('ic-idx');
+        if (!item.settings.items) return;
+        item.settings.items.splice(idx, 1);
+        if (itemcarouselExpandedIdx === idx) {
+            itemcarouselExpandedIdx = item.settings.items.length ? Math.min(idx, item.settings.items.length - 1) : null;
+        } else if (itemcarouselExpandedIdx !== null && itemcarouselExpandedIdx > idx) {
+            itemcarouselExpandedIdx--;
+        }
+        renderSettings();
+        updateItemcarouselPreview();
+    });
+
+    $(document).on('click', '.vitrine-ic-select-image', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!selectedId) return;
+        var $card = $(this).closest('.vitrine-ic-item');
+        var idx = $card.data('ic-idx');
+
+        var frame = wp.media({ title: 'Imagem do slide', multiple: false, library: { type: 'image' } });
+        frame.on('select', function () {
+            var url = frame.state().get('selection').first().toJSON().url;
+            var item = findItemById(selectedId);
+            if (!item || !item.settings.items || !item.settings.items[idx]) return;
+            item.settings.items[idx].image = url;
+            renderSettings();
+            itemcarouselExpandedIdx = idx;
+            updateItemcarouselPreview();
+        });
+        frame.open();
+    });
+
+    $(document).on('click', '.vitrine-ic-remove-image', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $card = $(this).closest('.vitrine-ic-item');
+        var idx = $card.data('ic-idx');
+        var item = findItemById(selectedId);
+        if (!item || !item.settings.items || !item.settings.items[idx]) return;
+        item.settings.items[idx].image = '';
+        renderSettings();
+        itemcarouselExpandedIdx = idx;
+        updateItemcarouselPreview();
+    });
+
+    $(document).on('click', '.vitrine-ic-open-picker', function (e) {
+        e.stopPropagation();
+        var $picker = $(this).closest('.vitrine-ic-icon-field').find('.vitrine-icon-picker');
+        $('.vitrine-icon-picker').not($picker).hide();
+        var willShow = !$picker.is(':visible');
+        $picker.toggle();
+        if (willShow) {
+            ensureIconGrid($picker, 'dashicons');
+        }
+    });
+
+    $(document).on('click', '.vitrine-ic-remove-icon', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $card = $(this).closest('.vitrine-ic-item');
+        var idx = $card.data('ic-idx');
+        var item = findItemById(selectedId);
+        if (!item || !item.settings.items || !item.settings.items[idx]) return;
+        item.settings.items[idx].icon = '';
+        renderSettings();
+        itemcarouselExpandedIdx = idx;
+        updateItemcarouselPreview();
+    });
+
     // Adicionar item ao toggle
     $(document).on('click', '.vitrine-toggle-add-item', function (e) {
         e.preventDefault();
@@ -2316,6 +3531,8 @@
 
     function saveLayout(onDone) {
         syncAllAranhaMCE();
+        syncAllItemgridMCE();
+        syncAllItemcarouselMCE();
         syncAllFieldMCE();
 
         return $.ajax({

@@ -25,6 +25,18 @@ $vitrine_hero_bold     = isset( $vitrine_page_settings['hero_text_bold'] ) && '0
 $vitrine_hero_italic   = ! empty( $vitrine_page_settings['hero_text_italic'] ) ? 'italic' : 'normal';
 $vitrine_hero_desc     = ! empty( $vitrine_page_settings['hero_description'] ) ? $vitrine_page_settings['hero_description'] : '';
 $vitrine_hero_desc_sz  = ! empty( $vitrine_page_settings['hero_desc_size'] ) ? intval( $vitrine_page_settings['hero_desc_size'] ) : 18;
+$vitrine_hero_desc_clr = ! empty( $vitrine_page_settings['hero_desc_color'] ) ? $vitrine_page_settings['hero_desc_color'] : $vitrine_hero_txt_clr;
+$vitrine_hero_desc_mw  = ! empty( $vitrine_page_settings['hero_desc_max_width'] ) ? intval( $vitrine_page_settings['hero_desc_max_width'] ) : 0;
+$vitrine_hero_desc_style = 'color:' . esc_attr( $vitrine_hero_desc_clr ) . ';font-size:' . esc_attr( $vitrine_hero_desc_sz ) . 'px;';
+if ( $vitrine_hero_desc_mw > 0 ) {
+    $vitrine_hero_desc_style .= '--vitrine-hero-desc-max-w:' . esc_attr( $vitrine_hero_desc_mw ) . 'px;max-width:' . esc_attr( $vitrine_hero_desc_mw ) . 'px;';
+}
+
+if ( $vitrine_bg_color ) {
+    add_action( 'wp_head', function () use ( $vitrine_bg_color ) {
+        echo '<style id="vitrine-page-bg">body{background:' . esc_attr( $vitrine_bg_color ) . ' !important;}</style>';
+    }, 99 );
+}
 
 $vitrine_hero_justify = 'center';
 if ( 'left' === $vitrine_hero_align ) {
@@ -67,7 +79,7 @@ $vitrine_body_style = $vitrine_bg_color ? ' style="background-color:' . esc_attr
                 <h1 class="vitrine-hero-text" style="color:<?php echo esc_attr( $vitrine_hero_txt_clr ); ?>;font-size:<?php echo esc_attr( $vitrine_hero_font_sz ); ?>px;font-weight:<?php echo esc_attr( $vitrine_hero_bold ); ?>;font-style:<?php echo esc_attr( $vitrine_hero_italic ); ?>;"><?php echo esc_html( $vitrine_hero_text ); ?></h1>
             <?php endif; ?>
             <?php if ( $vitrine_hero_desc ) : ?>
-                <div class="vitrine-hero-desc" style="color:<?php echo esc_attr( $vitrine_hero_txt_clr ); ?>;font-size:<?php echo esc_attr( $vitrine_hero_desc_sz ); ?>px;"><?php echo wp_kses_post( $vitrine_hero_desc ); ?></div>
+                <div class="vitrine-hero-desc" style="<?php echo esc_attr( $vitrine_hero_desc_style ); ?>"><?php echo wp_kses_post( $vitrine_hero_desc ); ?></div>
             <?php endif; ?>
         </div>
     </section>
