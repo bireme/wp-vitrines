@@ -49,6 +49,7 @@ class Vitrine_Element_Container extends Vitrine_Element {
 
     public function render( $settings, $children_html = '' ) {
         $s = wp_parse_args( $settings, $this->defaults() );
+        $is_nested = ! empty( $s['_nested'] ) && '1' === (string) $s['_nested'];
 
         $direction   = in_array( $s['direction'], array( 'column', 'row' ), true ) ? $s['direction'] : 'column';
         $align_items = in_array( $s['align_items'], array( 'stretch', 'flex-start', 'center', 'flex-end' ), true ) ? $s['align_items'] : 'stretch';
@@ -67,9 +68,42 @@ class Vitrine_Element_Container extends Vitrine_Element {
             $flex_wrap
         );
 
+        $width_constraint = $is_nested
+            ? 'width:100%;max-width:100%;margin-left:0;margin-right:0;'
+            : sprintf( 'max-width:%spx;margin:0 auto;', $max_width );
+
         $class = 'vitrine-el-container vitrine-container--reveal vitrine-el-container--' . esc_attr( $direction );
+        if ( $is_nested ) {
+            $class .= ' vitrine-el-container--nested';
+        }
         if ( $full_width ) {
             $class .= ' vitrine-el-container--full';
+            if ( $is_nested ) {
+                $class .= ' vitrine-el-container--full-contained';
+            }
+
+            if ( $is_nested ) {
+                $outer_style = sprintf(
+                    'background-color:%s;%swidth:100%%;max-width:100%%;padding:%spx 0;box-sizing:border-box;',
+                    esc_attr( $s['bg_color'] ),
+                    $bg_image_style,
+                    $padding
+                );
+
+                $inner_style = sprintf(
+                    'width:100%%;max-width:100%%;margin:0;padding:0 %spx;box-sizing:border-box;%s',
+                    $padding,
+                    $inner_flex
+                );
+
+                return sprintf(
+                    '<div class="%1$s"><div class="vitrine-container-full" style="%2$s"><div class="vitrine-container-inner" style="%3$s">%4$s</div></div></div>',
+                    $class,
+                    esc_attr( $outer_style ),
+                    esc_attr( $inner_style ),
+                    $children_html
+                );
+            }
 
             $outer_style = sprintf(
                 'background-color:%s;%spadding:%spx 0;box-sizing:border-box;',
@@ -95,11 +129,11 @@ class Vitrine_Element_Container extends Vitrine_Element {
         }
 
         $style = sprintf(
-            'background-color:%s;%spadding:%spx;max-width:%spx;margin:0 auto;box-sizing:border-box;%s',
+            'background-color:%s;%spadding:%spx;box-sizing:border-box;%s%s',
             esc_attr( $s['bg_color'] ),
             $bg_image_style,
             $padding,
-            $max_width,
+            $width_constraint,
             $inner_flex
         );
 

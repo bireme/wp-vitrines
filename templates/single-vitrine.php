@@ -31,6 +31,15 @@ $vitrine_hero_desc_style = 'color:' . esc_attr( $vitrine_hero_desc_clr ) . ';fon
 if ( $vitrine_hero_desc_mw > 0 ) {
     $vitrine_hero_desc_style .= '--vitrine-hero-desc-max-w:' . esc_attr( $vitrine_hero_desc_mw ) . 'px;max-width:' . esc_attr( $vitrine_hero_desc_mw ) . 'px;';
 }
+$vitrine_hero_date       = ! empty( $vitrine_page_settings['hero_date'] ) ? $vitrine_page_settings['hero_date'] : '';
+$vitrine_hero_date_label = $vitrine_hero_date ? Vitrine_Hero_Meta::format_hero_date( $vitrine_hero_date ) : '';
+$vitrine_hero_date_sz    = ! empty( $vitrine_page_settings['hero_date_size'] ) ? intval( $vitrine_page_settings['hero_date_size'] ) : 16;
+$vitrine_hero_date_clr   = ! empty( $vitrine_page_settings['hero_date_color'] ) ? $vitrine_page_settings['hero_date_color'] : $vitrine_hero_txt_clr;
+$vitrine_hero_date_align = ! empty( $vitrine_page_settings['hero_date_align'] ) ? $vitrine_page_settings['hero_date_align'] : 'right';
+if ( ! in_array( $vitrine_hero_date_align, array( 'left', 'center', 'right' ), true ) ) {
+    $vitrine_hero_date_align = 'right';
+}
+$vitrine_hero_date_style = 'color:' . esc_attr( $vitrine_hero_date_clr ) . ';font-size:' . esc_attr( $vitrine_hero_date_sz ) . 'px;';
 
 if ( $vitrine_bg_color ) {
     add_action( 'wp_head', function () use ( $vitrine_bg_color ) {
@@ -71,7 +80,7 @@ $vitrine_body_style = $vitrine_bg_color ? ' style="background-color:' . esc_attr
 ?>
 
 <main id="vitrine-single" class="vitrine-single-wrap vitrine-single-wrap--<?php echo esc_attr( get_the_ID() ); ?>"<?php echo $vitrine_body_style; ?>>
-    <?php if ( $vitrine_hero_image || $vitrine_hero_text || $vitrine_hero_desc ) : ?>
+    <?php if ( $vitrine_hero_image || $vitrine_hero_text || $vitrine_hero_desc || $vitrine_hero_date_label ) : ?>
     <section class="vitrine-hero" style="<?php echo esc_attr( $vitrine_hero_style ); ?>">
         <div class="vitrine-hero-overlay" style="background:rgba(0,0,0,<?php echo esc_attr( $vitrine_hero_opacity ); ?>);"></div>
         <div class="vitrine-hero-content" style="text-align:<?php echo esc_attr( $vitrine_hero_align ); ?>;">
@@ -82,6 +91,11 @@ $vitrine_body_style = $vitrine_bg_color ? ' style="background-color:' . esc_attr
                 <div class="vitrine-hero-desc" style="<?php echo esc_attr( $vitrine_hero_desc_style ); ?>"><?php echo wp_kses_post( $vitrine_hero_desc ); ?></div>
             <?php endif; ?>
         </div>
+        <?php if ( $vitrine_hero_date_label ) : ?>
+        <div class="vitrine-hero-date-wrap vitrine-hero-date-wrap--<?php echo esc_attr( $vitrine_hero_date_align ); ?>">
+            <time class="vitrine-hero-date" datetime="<?php echo esc_attr( $vitrine_hero_date ); ?>" style="<?php echo esc_attr( $vitrine_hero_date_style ); ?>"><?php echo esc_html( $vitrine_hero_date_label ); ?></time>
+        </div>
+        <?php endif; ?>
     </section>
     <?php endif; ?>
     <?php

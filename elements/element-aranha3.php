@@ -115,6 +115,7 @@ class Vitrine_Element_Aranha3 extends Vitrine_Element {
         $card_min_height    = max( 80, intval( isset( $s['card_min_height'] ) ? $s['card_min_height'] : 190 ) );
         $card_height        = $use_preset ? $card_min_height : $card_height;
         $wrapper_padding    = max( 0, intval( isset( $s['wrapper_padding'] ) ? $s['wrapper_padding'] : 28 ) );
+        $side_min_w         = $use_preset ? 260 : 220;
         $wrapper_border     = ( isset( $s['wrapper_border_style'] ) && 'solid' === $s['wrapper_border_style'] )
             ? 'border:1px solid #d0d0d0;'
             : 'border:none;';
@@ -147,7 +148,7 @@ class Vitrine_Element_Aranha3 extends Vitrine_Element {
         $output = '<div class="vitrine-el-aranha3 vitrine-a3--animate vitrine-card-style--' . esc_attr( $card_style ) . '" style="' . esc_attr( $wrap_style ) . '">';
 
         $frame_style = 'display:flex;align-items:flex-start;justify-content:center;gap:' . $gap . 'px;max-width:1100px;margin:0 auto;box-sizing:border-box;';
-        $side_style  = 'display:flex;flex-direction:column;align-items:stretch;align-self:flex-start;flex:0 1 280px;min-width:220px;gap:' . $gap . 'px;box-sizing:border-box;width:100%;';
+        $side_style  = 'display:flex;flex-direction:column;align-items:stretch;align-self:flex-start;flex:0 1 280px;min-width:' . $side_min_w . 'px;gap:' . $gap . 'px;box-sizing:border-box;width:100%;';
         $core_style  = 'display:flex;flex-direction:column;align-items:stretch;flex:1 1 ' . $core_max_width . 'px;min-width:220px;max-width:' . $core_max_width . 'px;align-self:flex-start;gap:' . $gap . 'px;box-sizing:border-box;';
         $band_style  = 'display:flex;flex-wrap:nowrap;align-items:stretch;justify-content:center;gap:' . $gap . 'px;width:100%;box-sizing:border-box;';
 
@@ -158,7 +159,7 @@ class Vitrine_Element_Aranha3 extends Vitrine_Element {
             $output .= $this->render_cards_group( $groups['right'], $card_bg, $title_color, $text_color, $card_border_radius, $card_border['css'], $icon_size, $icon_color, $card_height, $card_text_align, 'side', $card_style, $use_preset );
             $output .= '</div>';
         } else {
-            $grid_style = 'display:grid;grid-template-columns:minmax(220px,1fr) minmax(120px,320px) minmax(220px,1fr);'
+            $grid_style = 'display:grid;grid-template-columns:minmax(' . $side_min_w . 'px,1fr) minmax(120px,320px) minmax(' . $side_min_w . 'px,1fr);'
                 . 'grid-template-rows:auto auto auto;align-items:center;justify-content:center;'
                 . 'gap:' . $gap . 'px;max-width:1100px;margin:0 auto;width:100%;box-sizing:border-box;';
             $side_cell_style = 'display:flex;flex-direction:column;align-items:stretch;width:100%;min-width:0;gap:' . $gap . 'px;grid-row:2;align-self:center;box-sizing:border-box;';

@@ -20,6 +20,9 @@
     var itemgridSortInstances = [];
     var itemcarouselExpandedIdx = null;
     var itemcarouselSortInstances = [];
+    var aranhaExpandedIdx = null;
+    var toggleExpandedIdx = null;
+    var toggleSortInstances = [];
     var settingsPanelTab = 'content';
     var collapsedContainerIds = {};
     var rawPage = vitrineData.pageSettings || {};
@@ -248,10 +251,19 @@
         return name || 'Container';
     }
 
+    function getContainerDirectionUi(direction) {
+        var isRow = direction === 'row';
+        return {
+            label: isRow ? 'Linha' : 'Coluna',
+            previewLabel: isRow ? 'Linha (→)' : 'Coluna (↓)',
+            icon: isRow ? 'dashicons-arrow-right-alt2' : 'dashicons-arrow-down-alt2'
+        };
+    }
+
     function getContainerPreviewLabel(settings) {
-        var dirLabel = (settings.direction === 'row') ? 'Linha (→)' : 'Coluna (↓)';
+        var dirUi = getContainerDirectionUi(settings.direction || 'column');
         var cFull = settings.full_width_bg === '1' || settings.full_width_bg === 1;
-        return getContainerDisplayName(settings) + ' – ' + dirLabel + (cFull ? ' · Fundo largura total' : '');
+        return getContainerDisplayName(settings) + ' – ' + dirUi.previewLabel + (cFull ? ' · Fundo largura total' : '');
     }
 
     function getBlockToolbarLabel(item, elDef) {
@@ -366,23 +378,6 @@
                 { type: 'text', overrides: { content: '<p>Mais informações sobre o assunto...</p>' } },
                 { type: 'image' }
             ]
-        },
-        {
-            name: 'Texto + Imagem',
-            desc: 'Título + Texto + Imagem',
-            items: [
-                { type: 'title' },
-                { type: 'text' },
-                { type: 'image' }
-            ]
-        },
-        {
-            name: 'FAQ',
-            desc: 'Título + Toggle (accordion)',
-            items: [
-                { type: 'title', overrides: { text: 'Perguntas Frequentes' } },
-                { type: 'toggle' }
-            ]
         }
     ];
 
@@ -443,8 +438,8 @@
 
         if (!layout.length) {
             var tplHtml = '<div class="vitrine-template-picker">';
-            tplHtml += '<p class="vitrine-template-picker__title">Escolha um template para começar</p>';
-            tplHtml += '<div class="vitrine-template-picker__grid">';
+            tplHtml += '<p class="vitrine-template-picker__title">Modelo inicial</p>';
+            tplHtml += '<div class="vitrine-template-picker__grid vitrine-template-picker__grid--single">';
             vitrineTemplates.forEach(function (tpl, idx) {
                 tplHtml += '<button type="button" class="vitrine-template-picker__item" data-tpl-idx="' + idx + '">';
                 tplHtml += '<strong>' + escapeHtml(tpl.name) + '</strong>';
@@ -512,14 +507,13 @@
                         '<span class="vitrine-block-label">' + escapeHtml(getBlockToolbarLabel(item, elDef)) + '</span>' +
                         widthBadgeHtml +
                         (isContainer && !containerContainsAranha(item) ? (function() {
-                            var dir = settings.direction || 'column';
-                            var isRow = dir === 'row';
+                            var dirUi = getContainerDirectionUi(settings.direction || 'column');
                             return '<button type="button" class="vitrine-dir-toggle" title="Alternar layout do container" data-id="' + escapeAttr(item.id) + '">' +
-                                '<span class="dashicons ' + (isRow ? 'dashicons-grid-view' : 'dashicons-menu') + '"></span>' +
-                                '<span class="vitrine-dir-label">' + (isRow ? 'Linhas' : 'Colunas') + '</span>' +
+                                '<span class="dashicons ' + dirUi.icon + '"></span>' +
+                                '<span class="vitrine-dir-label">' + dirUi.label + '</span>' +
                             '</button>';
                         })() : '') +
-                        (isContainer ? '<button type="button" class="vitrine-block-collapse" title="Colapsar/Expandir"><span class="dashicons dashicons-arrow-down-alt2"></span></button>' : '') +
+                        (isContainer ? '<button type="button" class="vitrine-block-collapse" title="Colapsar/Expandir"><span class="dashicons dashicons-arrow-right-alt2"></span></button>' : '') +
                         '<button type="button" class="vitrine-block-duplicate" title="Duplicar">' +
                             '<span class="dashicons dashicons-admin-page"></span>' +
                         '</button>' +
@@ -802,6 +796,17 @@
                     + '<code style="display:block;font-size:11px;color:#1d2327;word-break:break-all;white-space:pre-wrap;">' + escapeHtml(scContent) + '</code>'
                     + '</div>';
             }
+            case 'html': {
+                var htmlContent = (settings.content || '').trim();
+                var htmlAlign   = escapeAttr(settings.align || 'left');
+                if (!htmlContent) {
+                    return '<div style="text-align:center;color:#999;font-size:12px;padding:12px;border:1px dashed #c3c4c7;border-radius:4px;">Cole HTML no painel</div>';
+                }
+                return '<div style="text-align:' + htmlAlign + ';padding:10px 12px;border:1px dashed #8c8f94;border-radius:4px;background:#f6f7f7;">'
+                    + '<div style="font-size:10px;color:#646970;margin-bottom:4px;">HTML (renderizado no frontend)</div>'
+                    + '<code style="display:block;font-size:11px;color:#1d2327;word-break:break-all;white-space:pre-wrap;">' + escapeHtml(htmlContent) + '</code>'
+                    + '</div>';
+            }
             case 'container':
                 var cBg = 'background-color:' + escapeAttr(settings.bg_color || '#f5f5f5') + ';';
                 if (settings.bg_image) {
@@ -827,23 +832,54 @@
                     tHtml += '</div>';
                 });
                 return '<div style="border:1px solid ' + escapeAttr(settings.border_color || '#dcdcde') + ';border-radius:4px;overflow:hidden;">' + tHtml + '</div>';
-            case 'video':
-                var vSrc = settings.source || 'youtube';
-                var vUrl = (vSrc === 'youtube') ? (settings.youtube_url || '') : (settings.local_url || '');
-                if (!vUrl) {
+            case 'video': {
+                var videoQty = Math.max(1, Math.min(3, parseInt(settings.qty || '1', 10)));
+                var videoHtml = '';
+                var hasAnyVideo = false;
+
+                for (var vi = 1; vi <= videoQty; vi++) {
+                    var vSrc = settings['source_' + vi] || 'youtube';
+                    var vUrl = settings['url_' + vi] || '';
+
+                    if (vi === 1 && !vUrl) {
+                        if (settings.youtube_url) {
+                            vSrc = 'youtube';
+                            vUrl = settings.youtube_url;
+                        } else if (settings.local_url) {
+                            vSrc = 'local';
+                            vUrl = settings.local_url;
+                        } else if (settings.source) {
+                            vSrc = settings.source;
+                        }
+                    }
+
+                    if (!vUrl) continue;
+                    hasAnyVideo = true;
+
+                    if (vSrc === 'youtube') {
+                        var ytId = extractYoutubeId(vUrl);
+                        if (ytId) {
+                            videoHtml += '<div style="flex:1;min-width:0;text-align:center;">';
+                            videoHtml += '<img src="https://img.youtube.com/vi/' + escapeAttr(ytId) + '/hqdefault.jpg" style="max-width:100%;height:auto;border-radius:4px;" alt="" />';
+                            videoHtml += '<div style="font-size:11px;color:#666;margin-top:4px;">YouTube: ' + escapeHtml(ytId) + '</div>';
+                            videoHtml += '</div>';
+                        } else {
+                            videoHtml += '<div style="flex:1;min-width:0;text-align:center;color:#d63638;font-size:12px;">URL do YouTube inv\u00e1lida</div>';
+                        }
+                    } else {
+                        videoHtml += '<div style="flex:1;min-width:0;text-align:center;padding:8px;">';
+                        videoHtml += '<video src="' + escapeAttr(vUrl) + '" style="max-width:100%;max-height:120px;border-radius:4px;" muted></video>';
+                        videoHtml += '<div style="font-size:11px;color:#666;margin-top:4px;">V\u00eddeo local</div>';
+                        videoHtml += '</div>';
+                    }
+                }
+
+                if (!hasAnyVideo) {
                     return '<div style="text-align:center;padding:16px;color:#999;font-size:12px;"><span class="dashicons dashicons-video-alt3" style="font-size:28px;display:block;margin:0 auto 4px;"></span>Nenhum v\u00eddeo selecionado</div>';
                 }
-                if (vSrc === 'youtube') {
-                    var ytId = '';
-                    var ytMatch = vUrl.match(/(?:youtube\.com\/watch\?v=|youtube\.com\/embed\/|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/);
-                    if (ytMatch) ytId = ytMatch[1];
-                    else if (/^[a-zA-Z0-9_-]{11}$/.test(vUrl)) ytId = vUrl;
-                    if (ytId) {
-                        return '<div style="text-align:center;"><img src="https://img.youtube.com/vi/' + escapeAttr(ytId) + '/hqdefault.jpg" style="max-width:100%;height:auto;border-radius:4px;" alt="" /><div style="font-size:11px;color:#666;margin-top:4px;">YouTube: ' + escapeHtml(ytId) + '</div></div>';
-                    }
-                    return '<div style="text-align:center;color:#d63638;font-size:12px;">URL do YouTube inv\u00e1lida</div>';
-                }
-                return '<div style="text-align:center;padding:8px;"><video src="' + escapeAttr(vUrl) + '" style="max-width:100%;max-height:120px;border-radius:4px;" muted></video><div style="font-size:11px;color:#666;margin-top:4px;">V\u00eddeo local</div></div>';
+
+                return '<div style="display:flex;gap:10px;align-items:flex-start;">' + videoHtml + '</div>';
+            }
 
             default:
                 return '<p>' + escapeHtml(type) + '</p>';
@@ -1241,6 +1277,180 @@
         });
     })();
 
+    /* ──────────────────── Redimensionamento dos painéis laterais ──────────────────── */
+
+    var SIDEBAR_WIDTHS_KEY = 'vitrine_editor_sidebar_widths';
+    var sidebarPanelLimits = {
+        left:  { min: 160, max: 420, defaultWidth: 210 },
+        right: { min: 260, max: 640, defaultWidth: 300 }
+    };
+    var sidebarPanelWidths = {
+        left: sidebarPanelLimits.left.defaultWidth,
+        right: sidebarPanelLimits.right.defaultWidth
+    };
+
+    function clampSidebarWidth(panel, width) {
+        var limits = sidebarPanelLimits[panel];
+        return Math.max(limits.min, Math.min(limits.max, Math.round(width)));
+    }
+
+    function loadSidebarPanelWidths() {
+        try {
+            var raw = localStorage.getItem(SIDEBAR_WIDTHS_KEY);
+            if (!raw) return;
+            var parsed = JSON.parse(raw);
+            if (parsed.left) {
+                sidebarPanelWidths.left = clampSidebarWidth('left', parsed.left);
+            }
+            if (parsed.right) {
+                sidebarPanelWidths.right = clampSidebarWidth('right', parsed.right);
+            }
+        } catch (err) { /* ignore */ }
+    }
+
+    function saveSidebarPanelWidths() {
+        try {
+            localStorage.setItem(SIDEBAR_WIDTHS_KEY, JSON.stringify(sidebarPanelWidths));
+        } catch (err) { /* ignore */ }
+    }
+
+    function applySidebarPanelWidths() {
+        var $root = $('#vitrine-editor');
+        if (!$root.length) return;
+        $root.css({
+            '--vitrine-sidebar-left-w': sidebarPanelWidths.left + 'px',
+            '--vitrine-sidebar-right-w': sidebarPanelWidths.right + 'px'
+        });
+    }
+
+    var SIDEBAR_COLLAPSED_KEY = 'vitrine_editor_sidebar_collapsed';
+    var sidebarCollapsed = {
+        left: false,
+        right: false
+    };
+
+    function loadSidebarCollapsed() {
+        try {
+            var raw = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
+            if (!raw) return;
+            var parsed = JSON.parse(raw);
+            if (typeof parsed.left === 'boolean') sidebarCollapsed.left = parsed.left;
+            if (typeof parsed.right === 'boolean') sidebarCollapsed.right = parsed.right;
+        } catch (err) { /* ignore */ }
+    }
+
+    function saveSidebarCollapsed() {
+        try {
+            localStorage.setItem(SIDEBAR_COLLAPSED_KEY, JSON.stringify(sidebarCollapsed));
+        } catch (err) { /* ignore */ }
+    }
+
+    function applySidebarCollapsed() {
+        var $top = $('#vitrine-editor-top');
+        if (!$top.length) return;
+        $top.toggleClass('is-left-collapsed', !!sidebarCollapsed.left);
+        $top.toggleClass('is-right-collapsed', !!sidebarCollapsed.right);
+    }
+
+    function setSidebarCollapsed(panel, collapsed) {
+        if (panel !== 'left' && panel !== 'right') return;
+        sidebarCollapsed[panel] = !!collapsed;
+        saveSidebarCollapsed();
+        applySidebarCollapsed();
+    }
+
+    loadSidebarCollapsed();
+    applySidebarCollapsed();
+
+    $(document).on('click', '.vitrine-sidebar-collapse', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        setSidebarCollapsed($(this).data('panel'), true);
+    });
+
+    $(document).on('click', '.vitrine-sidebar-expand', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        setSidebarCollapsed($(this).data('panel'), false);
+    });
+
+    function filterElementList(query) {
+        var q = String(query || '').trim().toLowerCase();
+        var $items = $('#vitrine-element-list .vitrine-element-item');
+        var visible = 0;
+
+        $items.each(function () {
+            var $item = $(this);
+            var label = String($item.data('label') || $item.find('span:last').text() || '').toLowerCase();
+            var type = String($item.data('type') || '').toLowerCase();
+            var match = !q || label.indexOf(q) !== -1 || type.indexOf(q) !== -1;
+            $item.toggleClass('is-filter-hidden', !match);
+            if (match) visible++;
+        });
+
+        var $empty = $('#vitrine-element-list-empty');
+        if (!$empty.length) return;
+        if (visible === 0 && q) {
+            $empty.removeAttr('hidden');
+        } else {
+            $empty.attr('hidden', 'hidden');
+        }
+    }
+
+    $(document).on('input', '#vitrine-element-search', function () {
+        filterElementList(this.value);
+    });
+
+    (function initSidebarPanelResize() {
+        var resizingPanel = null;
+        var startX = 0;
+        var startWidth = 0;
+        var $activeHandle = null;
+
+        loadSidebarPanelWidths();
+        applySidebarPanelWidths();
+
+        $(document).on('mousedown', '.vitrine-panel-resizer', function (e) {
+            if (e.button !== 0) return;
+            if (sidebarCollapsed.left && $(this).data('panel') === 'left') return;
+            if (sidebarCollapsed.right && $(this).data('panel') === 'right') return;
+            e.preventDefault();
+            e.stopPropagation();
+
+            resizingPanel = $(this).data('panel');
+            if (resizingPanel !== 'left' && resizingPanel !== 'right') return;
+            startX = e.pageX;
+            startWidth = sidebarPanelWidths[resizingPanel];
+            $activeHandle = $(this).addClass('is-dragging');
+            $('body').addClass('vitrine-resizing-sidebar');
+        });
+
+        $(document).on('mousemove', function (e) {
+            if (!resizingPanel) return;
+
+            var delta = e.pageX - startX;
+            var nextWidth = resizingPanel === 'left'
+                ? startWidth + delta
+                : startWidth - delta;
+
+            sidebarPanelWidths[resizingPanel] = clampSidebarWidth(resizingPanel, nextWidth);
+            applySidebarPanelWidths();
+        });
+
+        $(document).on('mouseup', function () {
+            if (!resizingPanel) return;
+            saveSidebarPanelWidths();
+            resizingPanel = null;
+            startX = 0;
+            startWidth = 0;
+            if ($activeHandle) {
+                $activeHandle.removeClass('is-dragging');
+                $activeHandle = null;
+            }
+            $('body').removeClass('vitrine-resizing-sidebar');
+        });
+    })();
+
     /* ──────────────────── Sidebar de Configurações ──────────────────── */
 
     function shouldSkipSettingsField(item, field) {
@@ -1269,7 +1479,65 @@
             }
         }
 
+        if (item.type === 'video') {
+            var videoQty = parseInt(item.settings.qty || '1', 10);
+            if (!videoQty || videoQty < 1) {
+                videoQty = 1;
+            }
+            var slotMatch = field.name.match(/^(source|url|width)_(\d+)$/);
+            if (slotMatch && parseInt(slotMatch[2], 10) > videoQty) {
+                return true;
+            }
+        }
+
         return false;
+    }
+
+    function extractYoutubeId(url) {
+        if (!url) return '';
+        var match = String(url).match(/(?:youtube\.com\/watch\?v=|youtube\.com\/embed\/|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/);
+        if (match) return match[1];
+        if (/^[a-zA-Z0-9_-]{11}$/.test(url)) return url;
+        return '';
+    }
+
+    function isLikelyVideoFileUrl(url) {
+        return /\.(mp4|webm|ogg|mov|m4v)(\?.*)?$/i.test(String(url || ''));
+    }
+
+    function buildVideoPreviewHtml(url, source) {
+        if (!url) return '';
+        if (source === 'local' || isLikelyVideoFileUrl(url)) {
+            return '<video src="' + escapeAttr(url) + '" class="vitrine-image-preview vitrine-video-preview" style="max-height:120px;" muted></video>';
+        }
+        var ytId = extractYoutubeId(url);
+        if (ytId) {
+            return '<img src="https://img.youtube.com/vi/' + escapeAttr(ytId) + '/hqdefault.jpg" class="vitrine-image-preview" alt="" />';
+        }
+        return '';
+    }
+
+    function buildVideoFieldInput(item, field, val) {
+        var slotMatch = field.name.match(/^url_(\d+)$/);
+        var slotNum = slotMatch ? slotMatch[1] : '1';
+        var source = item.settings['source_' + slotNum] || 'youtube';
+        var placeholder = source === 'local'
+            ? 'Cole a URL do arquivo ou selecione da biblioteca'
+            : 'https://youtube.com/watch?v=... ou ID do vídeo';
+        var previewHtml = buildVideoPreviewHtml(val, source);
+
+        return '<div class="vitrine-video-field vitrine-image-field">' +
+            previewHtml +
+            '<input type="hidden" class="vitrine-field" data-field="' + escapeAttr(field.name) + '" value="' + escapeAttr(val) + '" />' +
+            '<input type="text" class="vitrine-image-url-input widefat" placeholder="' + escapeAttr(placeholder) + '" value="' + escapeAttr(val) + '" />' +
+            '<div class="vitrine-video-field-actions">' +
+            '<button type="button" class="button vitrine-select-image">Selecionar da biblioteca</button>' +
+            (val ? ' <button type="button" class="button vitrine-remove-image">Remover</button>' : '') +
+            '</div>' +
+            '<p class="vitrine-field-hint">' + (source === 'youtube'
+                ? 'Cole o link do YouTube ou apenas o ID de 11 caracteres.'
+                : 'Formatos comuns: MP4, WebM. Também aceita URL externa.') + '</p>' +
+        '</div>';
     }
 
     function getFieldSettingsTab(itemType, field) {
@@ -1329,6 +1597,9 @@
                 if (field.name === 'content' && item.type === 'shortcode') {
                     inputHtml += '<p class="vitrine-field-hint">Cole o shortcode do WordPress ou de outro plugin. Será executado na página publicada.</p>';
                 }
+                if (field.name === 'content' && item.type === 'html') {
+                    inputHtml += '<p class="vitrine-field-hint">Cole HTML válido. Será renderizado na página publicada (scripts são removidos por segurança).</p>';
+                }
                 break;
             case 'number':
                 inputHtml = '<input type="number" class="vitrine-field" data-field="' + escapeAttr(field.name) + '" value="' + escapeAttr(val) + '" />';
@@ -1374,11 +1645,14 @@
                         '<input type="text" class="vitrine-image-url-input" placeholder="ou cole a URL da imagem" value="' + escapeAttr(val) + '" />' +
                     '</div>';
                 break;
+            case 'video':
+                inputHtml = buildVideoFieldInput(item, field, val);
+                break;
             default:
                 inputHtml = '<input type="text" class="vitrine-field" data-field="' + escapeAttr(field.name) + '" value="' + escapeAttr(val) + '" />';
         }
 
-        var extraClass = (field.type === 'textarea' || field.type === 'image') ? ' vitrine-field-group--full' : '';
+        var extraClass = (field.type === 'textarea' || field.type === 'plaintextarea' || field.type === 'image' || field.type === 'video') ? ' vitrine-field-group--full' : '';
         var fieldHint = '';
         if (item.type === 'container' && field.name === 'name') {
             fieldHint = '<p class="vitrine-field-hint">Aparece na barra do bloco no canvas para identificar cada container.</p>';
@@ -1442,6 +1716,12 @@
         }
         if (item.type !== 'itemcarousel') {
             itemcarouselExpandedIdx = null;
+        }
+        if (item.type !== 'aranha2' && item.type !== 'aranha3') {
+            aranhaExpandedIdx = null;
+        }
+        if (item.type !== 'toggle') {
+            toggleExpandedIdx = null;
         }
 
         var elDef = elements[item.type];
@@ -1561,40 +1841,120 @@
         // Inicializa TinyMCE nos campos do toggle
         if (item.type === 'toggle') {
             setTimeout(initToggleMCE, 50);
+            setTimeout(initToggleSort, 80);
         }
     }
 
     /**
      * Renderiza a seção de itens repetíveis do toggle.
      */
+    function buildRepeaterSectionToolsHtml() {
+        return '<div class="vitrine-repeater-section-tools">' +
+            '<button type="button" class="button-link vitrine-repeater-collapse-all">Recolher todos</button>' +
+            '</div>';
+    }
+
+    function clampRepeaterExpandedIdx(expandedIdx, length) {
+        if (expandedIdx === null || expandedIdx === undefined) return null;
+        if (!length) return null;
+        if (expandedIdx >= length) return length - 1;
+        if (expandedIdx < 0) return null;
+        return expandedIdx;
+    }
+
     function renderToggleRepeater($panel, item) {
         if (!item.settings.items || !Array.isArray(item.settings.items)) {
             item.settings.items = [];
         }
         var items = item.settings.items;
+        toggleExpandedIdx = clampRepeaterExpandedIdx(toggleExpandedIdx, items.length);
 
         var html = '<div class="vitrine-toggle-section">';
         html += '<hr style="border:none;border-top:1px solid #dcdcde;margin:14px 0 10px;" />';
+        html += '<div class="vitrine-repeater-section-head">';
         html += '<h4 class="vitrine-repeater-section-title">Itens do Toggle (' + items.length + ')</h4>';
+        html += buildRepeaterSectionToolsHtml();
+        html += '</div>';
+        html += '<p class="vitrine-field-hint vitrine-repeater-section-hint">Clique no cabeçalho para expandir ou recolher. Arraste pelo ícone <span class="dashicons dashicons-move" style="font-size:14px;width:14px;height:14px;vertical-align:middle;"></span> para reordenar.</p>';
+        html += '<div class="vitrine-toggle-items-list">';
 
         items.forEach(function (ti, idx) {
-            html += '<div class="vitrine-repeater-item vitrine-toggle-editor-item" data-toggle-idx="' + idx + '">';
-            html += '<div class="vitrine-repeater-item-header">';
+            var isExpanded = toggleExpandedIdx === idx;
+            var preview = stripHtmlPreview(ti.title) || ('Item ' + (idx + 1));
+            html += '<div class="vitrine-repeater-item vitrine-toggle-editor-item vitrine-repeater-collapse-item' + (isExpanded ? ' is-expanded' : '') + '" data-toggle-idx="' + idx + '">';
+            html += '<div class="vitrine-repeater-item-header vitrine-repeater-collapse-header">';
+            html += '<span class="vitrine-toggle-drag dashicons dashicons-move" title="Arrastar para reordenar"></span>';
             html += '<span class="vitrine-repeater-item-num">' + (idx + 1) + '</span>';
+            html += '<span class="vitrine-repeater-item-preview">' + escapeHtml(preview) + '</span>';
+            html += '<span class="vitrine-repeater-chevron dashicons dashicons-arrow-down-alt2"></span>';
             html += '<button type="button" class="button button-small vitrine-toggle-remove-item" title="Remover">&times;</button>';
             html += '</div>';
+            html += '<div class="vitrine-repeater-collapse-body">';
             html += '<div class="vitrine-field-group"><label>Título</label>';
             html += '<input type="text" class="vitrine-toggle-field" data-toggle-prop="title" value="' + escapeAttr(ti.title || '') + '" /></div>';
             html += '<div class="vitrine-field-group"><label>Conteúdo</label>';
             html += '<textarea id="vitrine-toggle-mce-' + idx + '" class="vitrine-toggle-mce" data-toggle-prop="content" rows="5">' + escapeHtml(ti.content || '') + '</textarea>';
             html += '</div>';
             html += '</div>';
+            html += '</div>';
         });
 
+        html += '</div>';
         html += '<button type="button" class="button vitrine-toggle-add-item">+ Adicionar Toggle</button>';
         html += '</div>';
 
         $panel.append(html);
+    }
+
+    function updateTogglePreview() {
+        if (!selectedId) return;
+        var item = findItemById(selectedId);
+        if (!item || item.type !== 'toggle') return;
+        var elDef = elements[item.type];
+        var $block = $('[data-id="' + selectedId + '"]').first().find('> .vitrine-block-preview');
+        if ($block.length && elDef) {
+            var s = $.extend(true, {}, elDef.defaults, item.settings);
+            refreshBlockPreview($block, item.type, s);
+        }
+    }
+
+    function initToggleSort() {
+        toggleSortInstances.forEach(function (inst) {
+            if (inst && inst.destroy) inst.destroy();
+        });
+        toggleSortInstances = [];
+
+        var $list = $('#vitrine-settings-panel .vitrine-toggle-items-list');
+        if (!$list.length || typeof Sortable === 'undefined') return;
+
+        var instance = Sortable.create($list[0], {
+            handle: '.vitrine-toggle-drag',
+            draggable: '.vitrine-toggle-editor-item',
+            animation: 150,
+            ghostClass: 'vitrine-toggle-ghost',
+            onEnd: function (evt) {
+                if (evt.oldIndex === evt.newIndex) return;
+                var current = findItemById(selectedId);
+                if (!current || !current.settings.items) return;
+
+                var moved = current.settings.items.splice(evt.oldIndex, 1)[0];
+                current.settings.items.splice(evt.newIndex, 0, moved);
+
+                if (toggleExpandedIdx === evt.oldIndex) {
+                    toggleExpandedIdx = evt.newIndex;
+                } else if (toggleExpandedIdx !== null) {
+                    if (evt.oldIndex < toggleExpandedIdx && evt.newIndex >= toggleExpandedIdx) {
+                        toggleExpandedIdx--;
+                    } else if (evt.oldIndex > toggleExpandedIdx && evt.newIndex <= toggleExpandedIdx) {
+                        toggleExpandedIdx++;
+                    }
+                }
+
+                renderSettings();
+                updateTogglePreview();
+            }
+        });
+        toggleSortInstances.push(instance);
     }
 
     /* ── TinyMCE helpers ── */
@@ -1639,6 +1999,7 @@
 
         if (item.type === 'aranha3') {
             syncAranha3ItemsFromDOM(item);
+            aranhaExpandedIdx = null;
             renderSettings();
             renderCanvas();
             return;
@@ -1668,6 +2029,10 @@
             if (inst && inst.destroy) inst.destroy();
         });
         itemcarouselSortInstances = [];
+        toggleSortInstances.forEach(function (inst) {
+            if (inst && inst.destroy) inst.destroy();
+        });
+        toggleSortInstances = [];
         _skipMCESync = true;
         $('.vitrine-aranha-mce, .vitrine-field-mce, .vitrine-toggle-mce, .vitrine-ig-mce, .vitrine-ic-mce').each(function () {
             var id = $(this).attr('id');
@@ -1958,16 +2323,19 @@
         html += '<div class="vitrine-a2-section-head">';
         html += '<div>';
         html += '<h4 class="vitrine-aranha-section-title">Itens Orbitais</h4>';
-        html += '<p class="vitrine-a2-section-hint">Arraste para reordenar a posição de cada card no círculo.</p>';
+        html += '<p class="vitrine-a2-section-hint">Clique no item para expandir. Arraste para reordenar no círculo.</p>';
+        html += buildRepeaterSectionToolsHtml();
         html += '</div>';
         html += '<span class="vitrine-a2-count-badge">' + items.length + '</span>';
         html += '</div>';
+
+        aranhaExpandedIdx = clampRepeaterExpandedIdx(aranhaExpandedIdx, items.length);
 
         // Lista de itens (drag-sortable)
         html += '<div class="vitrine-aranha-items-list vitrine-a2-items-list" data-aranha-key="items">';
 
         items.forEach(function (ai, idx) {
-            html += buildAranhaCardItemHtml(ai, idx, 'aranha2');
+            html += buildAranhaCardItemHtml(ai, idx, 'aranha2', aranhaExpandedIdx === idx);
         });
 
         html += '</div>'; // items-list
@@ -1982,24 +2350,26 @@
         $panel.append(html);
     }
 
-    function buildAranhaCardItemHtml(ai, idx, itemType) {
+    function buildAranhaCardItemHtml(ai, idx, itemType, isExpanded) {
         var isGrade = itemType === 'aranha3';
         var itemClass = isGrade ? 'vitrine-a3-item' : 'vitrine-a2-item';
         var hasIcon = !!ai.icon;
         var hasLink = !!ai.link;
         var previewLabel = stripHtmlPreview(ai.title) || (isGrade ? ('Card ' + (idx + 1)) : ('Item ' + (idx + 1)));
-        var html = '<div class="vitrine-aranha-item ' + itemClass + '" data-aranha-idx="' + idx + '">';
+        var expandedClass = isExpanded ? ' is-expanded' : '';
+        var html = '<div class="vitrine-aranha-item ' + itemClass + ' vitrine-repeater-collapse-item' + expandedClass + '" data-aranha-idx="' + idx + '">';
 
-        html += '<div class="vitrine-a2-item-header">';
+        html += '<div class="vitrine-a2-item-header vitrine-repeater-collapse-header">';
         html += '<span class="vitrine-aranha-drag dashicons dashicons-move" title="Arrastar para reordenar"></span>';
         html += '<span class="vitrine-aranha-item-num">' + (idx + 1) + '</span>';
-        html += '<span class="vitrine-a2-item-preview-text">' + escapeHtml(previewLabel) + '</span>';
+        html += '<span class="vitrine-a2-item-preview-text vitrine-repeater-item-preview">' + escapeHtml(previewLabel) + '</span>';
         if (hasIcon) { html += '<span class="vitrine-a2-badge vitrine-a2-badge--icon" title="Tem ícone"><span class="dashicons dashicons-format-image"></span></span>'; }
         if (hasLink) { html += '<span class="vitrine-a2-badge vitrine-a2-badge--link" title="Tem link"><span class="dashicons dashicons-admin-links"></span></span>'; }
+        html += '<span class="vitrine-repeater-chevron dashicons dashicons-arrow-down-alt2"></span>';
         html += '<button type="button" class="button button-small vitrine-aranha-remove-item" title="Remover">&times;</button>';
         html += '</div>';
 
-        html += '<div class="vitrine-a2-item-body vitrine-a3-item-body">';
+        html += '<div class="vitrine-a2-item-body vitrine-a3-item-body vitrine-repeater-collapse-body">';
 
         html += '<div class="vitrine-aranha-icon-field vitrine-a3-icon-row">';
         html += '<label class="vitrine-a3-icon-row-label">Ícone / Imagem do card</label>';
@@ -2068,7 +2438,7 @@
     }
 
     function buildAranha3ItemHtml(ai, idx) {
-        return buildAranhaCardItemHtml(ai, idx, 'aranha3');
+        return buildAranhaCardItemHtml(ai, idx, 'aranha3', aranhaExpandedIdx === idx);
     }
 
     /* ──────────────────────────────────────────────────────
@@ -2089,8 +2459,13 @@
 
         var html = '<div class="vitrine-aranha-section vitrine-a3-section" data-aranha-key="items">';
         html += '<hr style="border:none;border-top:1px solid #dcdcde;margin:14px 0 10px;" />';
+        html += '<div class="vitrine-repeater-section-head">';
         html += '<h4 class="vitrine-aranha-section-title" style="margin:0 0 4px;">Cards do Grid</h4>';
-        html += '<p class="vitrine-field-hint" style="margin:0 0 12px;">Arraste os cards entre as zonas para definir onde aparecem no layout. Total: ' + items.length + '.</p>';
+        html += buildRepeaterSectionToolsHtml();
+        html += '</div>';
+        html += '<p class="vitrine-field-hint vitrine-repeater-section-hint" style="margin:0 0 12px;">Clique no card para expandir. Arraste entre zonas. Total: ' + items.length + '.</p>';
+
+        aranhaExpandedIdx = clampRepeaterExpandedIdx(aranhaExpandedIdx, items.length);
 
         zones.forEach(function (zone) {
             var zoneItems = [];
@@ -2273,19 +2648,15 @@
             item.settings.items = [];
         }
         var items = item.settings.items;
-        if (itemgridExpandedIdx === null && items.length) {
-            itemgridExpandedIdx = 0;
-        }
-        if (itemgridExpandedIdx !== null && itemgridExpandedIdx >= items.length) {
-            itemgridExpandedIdx = items.length ? items.length - 1 : null;
-        }
+        itemgridExpandedIdx = clampRepeaterExpandedIdx(itemgridExpandedIdx, items.length);
 
         var html = '<div class="vitrine-ig-section" data-ig-key="items">';
         html += '<hr style="border:none;border-top:1px solid #dcdcde;margin:14px 0 12px;" />';
         html += '<div class="vitrine-ig-section-head">';
         html += '<div>';
         html += '<h4>Cards da Grade</h4>';
-        html += '<p class="vitrine-field-hint" style="margin:0;">Clique em um card para editar. Arraste para reordenar.</p>';
+        html += '<p class="vitrine-field-hint" style="margin:0;">Clique no cabeçalho para expandir ou recolher. Arraste para reordenar.</p>';
+        html += buildRepeaterSectionToolsHtml();
         html += '</div>';
         html += '<span class="vitrine-ig-count-badge">' + items.length + '</span>';
         html += '</div>';
@@ -2605,19 +2976,15 @@
             item.settings.items = [];
         }
         var items = item.settings.items;
-        if (itemcarouselExpandedIdx === null && items.length) {
-            itemcarouselExpandedIdx = 0;
-        }
-        if (itemcarouselExpandedIdx !== null && itemcarouselExpandedIdx >= items.length) {
-            itemcarouselExpandedIdx = items.length ? items.length - 1 : null;
-        }
+        itemcarouselExpandedIdx = clampRepeaterExpandedIdx(itemcarouselExpandedIdx, items.length);
 
         var html = '<div class="vitrine-ic-section vitrine-ig-section" data-ic-key="items">';
         html += '<hr style="border:none;border-top:1px solid #dcdcde;margin:14px 0 12px;" />';
         html += '<div class="vitrine-ic-section-head vitrine-ig-section-head">';
         html += '<div>';
         html += '<h4>Slides do Carrossel</h4>';
-        html += '<p class="vitrine-field-hint" style="margin:0;">Clique no slide para editar. Escolha imagem ou ícone em cada item.</p>';
+        html += '<p class="vitrine-field-hint" style="margin:0;">Clique no cabeçalho para expandir ou recolher. Escolha imagem ou ícone em cada slide.</p>';
+        html += buildRepeaterSectionToolsHtml();
         html += '</div>';
         html += '<span class="vitrine-ic-count-badge vitrine-ig-count-badge">' + items.length + '</span>';
         html += '</div>';
@@ -2828,6 +3195,11 @@
             return;
         }
 
+        if (item.type === 'video' && (field === 'qty' || /^source_\d+$/.test(field))) {
+            renderSettings();
+            return;
+        }
+
         if (item.type === 'container' && field === 'name') {
             var mergedSettings = $.extend({}, elDef.defaults, item.settings);
             var displayName = getContainerDisplayName(mergedSettings);
@@ -2900,10 +3272,10 @@
     // Seletor de imagem/vídeo (WordPress Media Library)
     $(document).on('click', '.vitrine-select-image', function (e) {
         e.preventDefault();
-        var $container = $(this).closest('.vitrine-image-field');
+        var $container = $(this).closest('.vitrine-image-field, .vitrine-video-field');
         var $input     = $container.find('.vitrine-field');
         var fieldName  = $input.data('field') || '';
-        var isVideo    = fieldName === 'local_url';
+        var isVideo    = fieldName === 'local_url' || /^url_\d+$/.test(fieldName);
         var mediaType  = isVideo ? 'video' : 'image';
 
         var frame = wp.media({
@@ -2917,10 +3289,19 @@
             $input.val(attachment.url).trigger('change');
             $container.find('.vitrine-image-url-input').val(attachment.url);
 
-            $container.find('.vitrine-image-preview').remove();
+            $container.find('.vitrine-image-preview, .vitrine-video-preview').remove();
             $container.find('.vitrine-remove-image').remove();
             if (isVideo) {
-                $container.prepend('<video src="' + escapeAttr(attachment.url) + '" class="vitrine-image-preview" style="max-height:120px;" muted></video>');
+                $container.prepend(buildVideoPreviewHtml(attachment.url, 'local'));
+                if (selectedId) {
+                    var currentItem = findItemById(selectedId);
+                    if (currentItem && currentItem.type === 'video') {
+                        var slotMatch = fieldName.match(/^url_(\d+)$/);
+                        if (slotMatch) {
+                            currentItem.settings['source_' + slotMatch[1]] = 'local';
+                        }
+                    }
+                }
             } else {
                 $container.prepend('<img src="' + escapeAttr(attachment.url) + '" class="vitrine-image-preview" />');
             }
@@ -2932,25 +3313,39 @@
 
     $(document).on('click', '.vitrine-remove-image', function (e) {
         e.preventDefault();
-        var $container = $(this).closest('.vitrine-image-field');
+        var $container = $(this).closest('.vitrine-image-field, .vitrine-video-field');
         $container.find('.vitrine-field').val('').trigger('change');
         $container.find('.vitrine-image-preview').remove();
         $container.find('.vitrine-image-url-input').val('');
         $(this).remove();
     });
 
-    // URL manual para campo de imagem
+    // URL manual para campo de imagem/vídeo
     $(document).on('change', '.vitrine-image-url-input', function () {
         var url = $.trim($(this).val());
-        var $container = $(this).closest('.vitrine-image-field');
+        var $container = $(this).closest('.vitrine-image-field, .vitrine-video-field');
         var $input = $container.find('.vitrine-field');
+        var fieldName = $input.data('field') || '';
+        var isVideoField = fieldName === 'local_url' || /^url_\d+$/.test(fieldName);
 
         $input.val(url).trigger('change');
-        $container.find('.vitrine-image-preview').remove();
+        $container.find('.vitrine-image-preview, .vitrine-video-preview').remove();
         $container.find('.vitrine-remove-image').remove();
 
         if (url) {
-            $container.prepend('<img src="' + escapeAttr(url) + '" class="vitrine-image-preview" />');
+            if (isVideoField) {
+                var source = 'youtube';
+                if (selectedId) {
+                    var currentItem = findItemById(selectedId);
+                    var slotMatch = fieldName.match(/^url_(\d+)$/);
+                    if (currentItem && slotMatch) {
+                        source = currentItem.settings['source_' + slotMatch[1]] || 'youtube';
+                    }
+                }
+                $container.prepend(buildVideoPreviewHtml(url, source));
+            } else {
+                $container.prepend('<img src="' + escapeAttr(url) + '" class="vitrine-image-preview" />');
+            }
             $container.find('.vitrine-select-image').after(' <button type="button" class="button vitrine-remove-image">Remover</button>');
         }
     });
@@ -3000,7 +3395,8 @@
         if (!item) return;
 
         var key = $(this).closest('.vitrine-aranha-section').data('aranha-key');
-        var zone = $(this).closest('.vitrine-aranha-section').data('aranha-zone');
+        var $zoneWrap = $(this).closest('[data-aranha-zone]');
+        var zone = $zoneWrap.length ? $zoneWrap.data('aranha-zone') : null;
         if (!item.settings[key]) item.settings[key] = [];
         if (item.type === 'aranha3') {
             item.settings[key].push({
@@ -3014,6 +3410,7 @@
             item.settings[key].push({ text: '', icon: '', link: '' });
         }
 
+        aranhaExpandedIdx = item.settings[key].length - 1;
         renderSettings();
         renderCanvas();
     });
@@ -3032,6 +3429,12 @@
 
         if (item.settings[key]) {
             item.settings[key].splice(idx, 1);
+        }
+
+        if (aranhaExpandedIdx === idx) {
+            aranhaExpandedIdx = null;
+        } else if (aranhaExpandedIdx !== null && aranhaExpandedIdx > idx) {
+            aranhaExpandedIdx--;
         }
 
         renderSettings();
@@ -3217,6 +3620,64 @@
             var s = $.extend(true, {}, elDef.defaults, item.settings);
             refreshBlockPreview($block, item.type, s);
         }
+    });
+
+    /* ──────────────────── Repeaters: colapsar / expandir itens ──────────────────── */
+
+    $(document).on('click', '.vitrine-repeater-collapse-header', function (e) {
+        if ($(e.target).closest('.vitrine-aranha-remove-item, .vitrine-toggle-remove-item, .vitrine-aranha-drag, .vitrine-toggle-drag').length) {
+            return;
+        }
+
+        var $item = $(this).closest('.vitrine-repeater-collapse-item');
+        if (!$item.length) return;
+
+        if ($item.hasClass('vitrine-toggle-editor-item')) {
+            var toggleIdx = $item.data('toggle-idx');
+            if (toggleExpandedIdx === toggleIdx) {
+                toggleExpandedIdx = null;
+                $item.removeClass('is-expanded');
+            } else {
+                $('.vitrine-toggle-editor-item').removeClass('is-expanded');
+                toggleExpandedIdx = toggleIdx;
+                $item.addClass('is-expanded');
+                setTimeout(initToggleMCE, 30);
+            }
+            return;
+        }
+
+        if (!$item.hasClass('vitrine-aranha-item')) return;
+
+        var aranhaIdx = $item.data('aranha-idx');
+        if (aranhaExpandedIdx === aranhaIdx) {
+            aranhaExpandedIdx = null;
+            $item.removeClass('is-expanded');
+        } else {
+            $('.vitrine-aranha-item.vitrine-repeater-collapse-item').removeClass('is-expanded');
+            aranhaExpandedIdx = aranhaIdx;
+            $item.addClass('is-expanded');
+            setTimeout(initAranhaMCE, 30);
+        }
+    });
+
+    $(document).on('click', '.vitrine-repeater-collapse-all', function (e) {
+        e.preventDefault();
+        var $section = $(this).closest('.vitrine-aranha-section, .vitrine-toggle-section, .vitrine-ig-section, .vitrine-ic-section');
+        if ($section.hasClass('vitrine-ic-section')) {
+            itemcarouselExpandedIdx = null;
+        } else if ($section.hasClass('vitrine-ig-section')) {
+            itemgridExpandedIdx = null;
+        } else if ($section.hasClass('vitrine-toggle-section')) {
+            toggleExpandedIdx = null;
+        } else if ($section.hasClass('vitrine-aranha-section')) {
+            aranhaExpandedIdx = null;
+        }
+        $section.find('.vitrine-repeater-collapse-item, .vitrine-ig-item').removeClass('is-expanded');
+    });
+
+    $(document).on('input', '.vitrine-toggle-field[data-toggle-prop="title"]', function () {
+        var preview = $(this).val() || 'Item ' + (parseInt($(this).closest('.vitrine-toggle-editor-item').data('toggle-idx'), 10) + 1);
+        $(this).closest('.vitrine-toggle-editor-item').find('.vitrine-repeater-item-preview').text(preview);
     });
 
     /* ──────────────────── Grade de Itens: eventos ──────────────────── */
@@ -3497,6 +3958,7 @@
         if (!item.settings.items) item.settings.items = [];
         item.settings.items.push({ title: '', content: '' });
 
+        toggleExpandedIdx = item.settings.items.length - 1;
         renderSettings();
         renderCanvas();
     });
@@ -3512,6 +3974,12 @@
         var idx = $(this).closest('.vitrine-toggle-editor-item').data('toggle-idx');
         if (item.settings.items) {
             item.settings.items.splice(idx, 1);
+        }
+
+        if (toggleExpandedIdx === idx) {
+            toggleExpandedIdx = null;
+        } else if (toggleExpandedIdx !== null && toggleExpandedIdx > idx) {
+            toggleExpandedIdx--;
         }
 
         renderSettings();
