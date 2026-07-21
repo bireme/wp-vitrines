@@ -36,12 +36,43 @@ class Vitrine_Element_Video extends Vitrine_Element {
     }
 
     public function fields() {
-        return array(
-            array( 'name' => 'qty',      'label' => 'Quantidade de vídeos', 'type' => 'select', 'options' => array( '1' => '1 vídeo', '2' => '2 vídeos lado a lado', '3' => '3 vídeos lado a lado' ) ),
-            array( 'name' => 'aspect',   'label' => 'Proporção',            'type' => 'select', 'options' => array( '16-9' => '16:9', '4-3' => '4:3', '1-1' => '1:1' ) ),
-            array( 'name' => 'autoplay', 'label' => 'Autoplay',             'type' => 'select', 'options' => array( '0' => 'Não', '1' => 'Sim' ) ),
-            array( 'name' => 'controls', 'label' => 'Controles',            'type' => 'select', 'options' => array( '1' => 'Sim', '0' => 'Não' ) ),
+        $fields = array(
+            array(
+                'name'    => 'qty',
+                'label'   => 'Quantidade de vídeos',
+                'type'    => 'select',
+                'options' => array(
+                    '1' => '1 vídeo',
+                    '2' => '2 vídeos lado a lado',
+                    '3' => '3 vídeos lado a lado',
+                ),
+            ),
         );
+
+        for ( $i = 1; $i <= 3; $i++ ) {
+            $fields[] = array(
+                'name'    => "source_{$i}",
+                'label'   => "Vídeo {$i} — origem",
+                'type'    => 'select',
+                'options' => array(
+                    'youtube' => 'YouTube',
+                    'local'   => 'Arquivo / biblioteca',
+                ),
+            );
+            $fields[] = array(
+                'name'  => "url_{$i}",
+                'label' => "Vídeo {$i} — URL",
+                'type'  => 'video',
+            );
+        }
+
+        $fields[] = array( 'name' => 'aspect',   'label' => 'Proporção',            'type' => 'select', 'options' => array( '16-9' => '16:9', '4-3' => '4:3', '1-1' => '1:1' ) );
+        $fields[] = array( 'name' => 'autoplay', 'label' => 'Autoplay',             'type' => 'select', 'options' => array( '0' => 'Não', '1' => 'Sim' ) );
+        $fields[] = array( 'name' => 'controls', 'label' => 'Controles',            'type' => 'select', 'options' => array( '1' => 'Sim', '0' => 'Não' ) );
+        $fields[] = array( 'name' => 'width_2',  'label' => 'Largura do vídeo 2 (%)', 'type' => 'number' );
+        $fields[] = array( 'name' => 'width_3',  'label' => 'Largura do vídeo 3 (%)', 'type' => 'number' );
+
+        return $fields;
     }
 
     public function render( $settings, $children_html = '' ) {

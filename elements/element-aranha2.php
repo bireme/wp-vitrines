@@ -80,8 +80,9 @@ class Vitrine_Element_Aranha2 extends Vitrine_Element {
         $card_style      = $this->sanitize_card_style( $s['card_style'] );
         $use_preset      = 'default' !== $card_style;
         $card_min_height = max( 80, intval( isset( $s['card_min_height'] ) ? $s['card_min_height'] : 190 ) );
+        $orbit_radius    = $this->resolve_orbit_radius( $radius, $center_size, $use_preset, $card_min_height );
 
-        $stage       = $this->compute_stage_size( $center_size, $radius, $n, $use_preset, $card_min_height );
+        $stage       = $this->compute_stage_size( $center_size, $orbit_radius, $n, $use_preset, $card_min_height );
         $stage_w     = $stage['w'];
         $stage_h     = $stage['h'];
         $r_pct_w     = $stage['r_pct_w'];
@@ -92,6 +93,7 @@ class Vitrine_Element_Aranha2 extends Vitrine_Element {
             . ';--a2-accent:' . $accent
             . ';--a2-stage-w:' . $stage_w . 'px'
             . ';--a2-stage-h:' . $stage_h . 'px'
+            . ';--a2-orbit-r:' . $orbit_radius . 'px'
             . ';--a2-card-min-h:' . $card_min_height . 'px;';
 
         if ( $use_preset ) {
@@ -190,37 +192,68 @@ class Vitrine_Element_Aranha2 extends Vitrine_Element {
         return $output;
     }
 
+    private function resolve_orbit_radius( $radius, $center_size, $use_preset, $card_min_height = 190 ) {
+        $radius = max( 80, intval( $radius ) );
+
+        if ( ! $use_preset ) {
+            return $radius;
+        }
+
+        $card_half_w = 140;
+        $card_half_h = max( 95, $card_min_height / 2 );
+        $card_diag   = sqrt( ( $card_half_w * $card_half_w ) + ( $card_half_h * $card_half_h ) );
+        $clearance   = 56;
+        $min_radius  = (int) ceil( $card_diag + ( $center_size / 2 ) + $clearance );
+
+        return max( $radius, $min_radius );
+    }
+
     private function compute_stage_size( $center_size, $radius, $n_items, $use_preset, $card_min_height = 190 ) {
-        $pad_w = $use_preset ? 64 : 40;
-        $pad_h = $use_preset ? 48 : 28;
+        $card_max_w  = $use_preset ? 280 : 220;
+        $card_half_w = $card_max_w / 2;
+        $card_half_h = $use_preset ? max( 95, $card_min_height / 2 ) : 50;
+
+        $pad_w = $use_preset ? (int) ceil( $card_half_w + 56 ) : 40;
+        $pad_h = $use_preset ? (int) ceil( $card_half_h + 56 ) : 28;
 
         $stage_w = $center_size + 2 * $radius + 2 * $pad_w;
         $stage_h = $stage_w;
 
-        $r_pct_h  = $radius / max( 1, $stage_h ) * 100;
-        $cs_pct_h = $center_size / max( 1, $stage_h ) * 100;
+        for ( $pass = 0; $pass < 3; $pass++ ) {
+            $r_pct_w  = $radius / max( 1, $stage_w ) * 100;
+            $r_pct_h  = $radius / max( 1, $stage_h ) * 100;
+            $cs_pct_w = $center_size / max( 1, $stage_w ) * 100;
+            $cs_pct_h = $center_size / max( 1, $stage_h ) * 100;
 
-        if ( $use_preset ) {
-            $card_half_h_pct = min( 22, max( 8, ( $card_min_height / 2 ) / max( 1, $stage_h ) * 100 ) );
-        } else {
-            $card_half_h_pct = 9;
-        }
+            $half_w_pct = ( $card_half_w / max( 1, $stage_w ) ) * 100;
+            $half_h_pct = ( $card_half_h / max( 1, $stage_h ) ) * 100;
 
-        $y_min = 50 - ( $cs_pct_h / 2 );
-        $y_max = 50 + ( $cs_pct_h / 2 );
+            $x_min = 50 - ( $cs_pct_w / 2 );
+            $x_max = 50 + ( $cs_pct_w / 2 );
+            $y_min = 50 - ( $cs_pct_h / 2 );
+            $y_max = 50 + ( $cs_pct_h / 2 );
 
-        if ( $n_items > 0 ) {
-            for ( $i = 0; $i < $n_items; $i++ ) {
-                $angle = - M_PI / 2 + $i * ( 2 * M_PI / max( 1, $n_items ) );
-                $y     = 50 + $r_pct_h * sin( $angle );
-                $y_min = min( $y_min, $y - $card_half_h_pct );
-                $y_max = max( $y_max, $y + $card_half_h_pct );
+            if ( $n_items > 0 ) {
+                for ( $i = 0; $i < $n_items; $i++ ) {
+                    $angle = - M_PI / 2 + $i * ( 2 * M_PI / max( 1, $n_items ) );
+                    $x     = 50 + $r_pct_w * cos( $angle );
+                    $y     = 50 + $r_pct_h * sin( $angle );
+                    $x_min = min( $x_min, $x - $half_w_pct );
+                    $x_max = max( $x_max, $x + $half_w_pct );
+                    $y_min = min( $y_min, $y - $half_h_pct );
+                    $y_max = max( $y_max, $y + $half_h_pct );
+                }
             }
-        }
 
-        $span_pct = max( 38, $y_max - $y_min );
-        $stage_h  = (int) ceil( $stage_w * $span_pct / 100 );
-        $stage_h  = max( $stage_h, $center_size + 2 * $pad_h );
+            $span_w = max( 58, $x_max - $x_min );
+            $span_h = max( 48, $y_max - $y_min );
+
+            $need_w = (int) ceil( $stage_w * ( $span_w / 100 ) );
+            $need_h = (int) ceil( $stage_w * ( $span_h / 100 ) );
+
+            $stage_w = max( $stage_w, $need_w );
+            $stage_h = max( $need_h, $center_size + 2 * $pad_h + (int) ceil( $card_half_h * 0.5 ) );
+        }
 
         return array(
             'w'        => $stage_w,

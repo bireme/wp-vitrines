@@ -36,6 +36,10 @@ class Vitrine_Hero_Meta {
             'hero_text_italic'     => '0',
             'hero_desc_bold'       => '0',
             'hero_desc_italic'     => '0',
+            'hero_date'            => '',
+            'hero_date_size'       => '16',
+            'hero_date_color'      => '',
+            'hero_date_align'      => 'right',
             'custom_css'           => '',
         );
     }
@@ -73,6 +77,10 @@ class Vitrine_Hero_Meta {
             'hero_text_italic',
             'hero_desc_bold',
             'hero_desc_italic',
+            'hero_date',
+            'hero_date_size',
+            'hero_date_color',
+            'hero_date_align',
         );
     }
 
@@ -91,6 +99,18 @@ class Vitrine_Hero_Meta {
             $align = 'center';
         }
 
+        $date_align = isset( $input['hero_date_align'] ) ? sanitize_key( $input['hero_date_align'] ) : 'right';
+        if ( ! in_array( $date_align, array( 'left', 'center', 'right' ), true ) ) {
+            $date_align = 'right';
+        }
+
+        $hero_date = isset( $input['hero_date'] ) ? sanitize_text_field( $input['hero_date'] ) : '';
+        if ( $hero_date && ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', $hero_date ) ) {
+            $hero_date = '';
+        }
+
+        $hero_date_color = isset( $input['hero_date_color'] ) ? sanitize_hex_color( $input['hero_date_color'] ) : '';
+
         return array(
             'hero_image'           => isset( $input['hero_image'] ) ? esc_url_raw( $input['hero_image'] ) : '',
             'hero_text'            => isset( $input['hero_text'] ) ? sanitize_text_field( $input['hero_text'] ) : '',
@@ -107,7 +127,27 @@ class Vitrine_Hero_Meta {
             'hero_text_italic'     => ! empty( $input['hero_text_italic'] ) ? '1' : '0',
             'hero_desc_bold'       => ! empty( $input['hero_desc_bold'] ) ? '1' : '0',
             'hero_desc_italic'     => ! empty( $input['hero_desc_italic'] ) ? '1' : '0',
+            'hero_date'            => $hero_date,
+            'hero_date_size'       => isset( $input['hero_date_size'] ) ? max( 10, min( 72, absint( $input['hero_date_size'] ) ) ) : 16,
+            'hero_date_color'      => $hero_date_color ? $hero_date_color : '',
+            'hero_date_align'      => $date_align,
         );
+    }
+
+    /**
+     * Formata a data do hero para exibição no front.
+     */
+    public static function format_hero_date( $date_str ) {
+        if ( empty( $date_str ) ) {
+            return '';
+        }
+
+        $timestamp = strtotime( $date_str . ' 12:00:00' );
+        if ( ! $timestamp ) {
+            return sanitize_text_field( $date_str );
+        }
+
+        return date_i18n( get_option( 'date_format' ), $timestamp );
     }
 
     public function add_meta_box() {
@@ -155,93 +195,147 @@ class Vitrine_Hero_Meta {
         $s = self::get_settings( $post->ID );
         ?>
         <div id="vitrine-hero-meta-box" class="vitrine-hero-metabox">
-            <p class="description" style="margin-top:0;">Banner no topo da vitrine publicada. Salve ou atualize a vitrine para aplicar.</p>
-            <div class="vitrine-hero-fields">
-                <div class="vitrine-hero-field">
-                    <label for="vitrine-hero-image">Imagem de fundo</label>
-                    <div class="vitrine-image-field vitrine-hero-image-field">
-                        <?php if ( ! empty( $s['hero_image'] ) ) : ?>
-                            <img src="<?php echo esc_url( $s['hero_image'] ); ?>" class="vitrine-image-preview" alt="" />
-                        <?php endif; ?>
-                        <input type="hidden" name="vitrine_hero[hero_image]" id="vitrine-hero-image" value="<?php echo esc_attr( $s['hero_image'] ); ?>" />
-                        <button type="button" class="button" id="vitrine-hero-select-image">Selecionar</button>
-                        <?php if ( ! empty( $s['hero_image'] ) ) : ?>
-                            <button type="button" class="button" id="vitrine-hero-remove-image">Remover</button>
-                        <?php endif; ?>
-                    </div>
+            <p class="vitrine-hero-metabox__intro description">Banner no topo da vitrine publicada. Salve ou atualize a vitrine para aplicar.</p>
+
+            <div class="vitrine-hero-metabox__layout">
+                <div class="vitrine-hero-metabox__form">
+
+                    <section class="vitrine-hero-section">
+                        <h4 class="vitrine-hero-section__title">Fundo</h4>
+                        <div class="vitrine-hero-section__body">
+                            <div class="vitrine-hero-field vitrine-hero-field--full">
+                                <label for="vitrine-hero-image">Imagem de fundo</label>
+                                <div class="vitrine-image-field vitrine-hero-image-field">
+                                    <?php if ( ! empty( $s['hero_image'] ) ) : ?>
+                                        <img src="<?php echo esc_url( $s['hero_image'] ); ?>" class="vitrine-image-preview" alt="" />
+                                    <?php endif; ?>
+                                    <input type="hidden" name="vitrine_hero[hero_image]" id="vitrine-hero-image" value="<?php echo esc_attr( $s['hero_image'] ); ?>" />
+                                    <div class="vitrine-hero-image-field__actions">
+                                        <button type="button" class="button" id="vitrine-hero-select-image">Selecionar</button>
+                                        <?php if ( ! empty( $s['hero_image'] ) ) : ?>
+                                            <button type="button" class="button" id="vitrine-hero-remove-image">Remover</button>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="vitrine-hero-section__grid vitrine-hero-section__grid--2">
+                                <div class="vitrine-hero-field">
+                                    <label for="vitrine-hero-height">Altura (px)</label>
+                                    <input type="number" name="vitrine_hero[hero_height]" id="vitrine-hero-height" value="<?php echo esc_attr( $s['hero_height'] ); ?>" min="100" max="1000" step="10" class="small-text" />
+                                </div>
+                                <div class="vitrine-hero-field">
+                                    <label for="vitrine-hero-opacity">Opacidade do fade <span id="vitrine-hero-opacity-val"><?php echo esc_html( $s['hero_overlay_opacity'] ); ?>%</span></label>
+                                    <input type="range" name="vitrine_hero[hero_overlay_opacity]" id="vitrine-hero-opacity" min="0" max="100" value="<?php echo esc_attr( $s['hero_overlay_opacity'] ); ?>" />
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="vitrine-hero-section">
+                        <h4 class="vitrine-hero-section__title">Título</h4>
+                        <div class="vitrine-hero-section__body">
+                            <div class="vitrine-hero-field vitrine-hero-field--full">
+                                <label for="vitrine-hero-text">Frase de destaque</label>
+                                <input type="text" name="vitrine_hero[hero_text]" id="vitrine-hero-text" value="<?php echo esc_attr( $s['hero_text'] ); ?>" placeholder="Título do hero" class="widefat" />
+                                <div class="vitrine-hero-format">
+                                    <button type="button" class="vitrine-format-btn<?php echo '1' === $s['hero_text_bold'] ? ' is-active' : ''; ?>" data-target="text" data-prop="bold" title="Negrito"><b>B</b></button>
+                                    <button type="button" class="vitrine-format-btn<?php echo '1' === $s['hero_text_italic'] ? ' is-active' : ''; ?>" data-target="text" data-prop="italic" title="Itálico"><i>I</i></button>
+                                    <input type="hidden" name="vitrine_hero[hero_text_bold]" id="vitrine-hero-text-bold" value="<?php echo esc_attr( $s['hero_text_bold'] ); ?>" />
+                                    <input type="hidden" name="vitrine_hero[hero_text_italic]" id="vitrine-hero-text-italic" value="<?php echo esc_attr( $s['hero_text_italic'] ); ?>" />
+                                </div>
+                            </div>
+                            <div class="vitrine-hero-section__grid vitrine-hero-section__grid--3">
+                                <div class="vitrine-hero-field">
+                                    <label for="vitrine-hero-font-size">Tamanho (px)</label>
+                                    <input type="number" name="vitrine_hero[hero_font_size]" id="vitrine-hero-font-size" value="<?php echo esc_attr( $s['hero_font_size'] ); ?>" min="12" max="120" step="2" class="small-text" />
+                                </div>
+                                <div class="vitrine-hero-field">
+                                    <label for="vitrine-hero-text-color">Cor</label>
+                                    <input type="color" name="vitrine_hero[hero_text_color]" id="vitrine-hero-text-color" value="<?php echo esc_attr( $s['hero_text_color'] ?: '#ffffff' ); ?>" />
+                                </div>
+                                <div class="vitrine-hero-field">
+                                    <label for="vitrine-hero-text-align">Alinhamento</label>
+                                    <select name="vitrine_hero[hero_text_align]" id="vitrine-hero-text-align">
+                                        <option value="left"<?php selected( $s['hero_text_align'], 'left' ); ?>>Esquerda</option>
+                                        <option value="center"<?php selected( $s['hero_text_align'], 'center' ); ?>>Centro</option>
+                                        <option value="right"<?php selected( $s['hero_text_align'], 'right' ); ?>>Direita</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="vitrine-hero-section">
+                        <h4 class="vitrine-hero-section__title">Descrição</h4>
+                        <div class="vitrine-hero-section__body">
+                            <div class="vitrine-hero-field vitrine-hero-field--full">
+                                <label for="vitrine-hero-description">Texto</label>
+                                <div class="vitrine-wysiwyg-toolbar" id="vitrine-hero-desc-toolbar">
+                                    <button type="button" class="vitrine-wysiwyg-btn" data-cmd="bold" title="Negrito"><b>B</b></button>
+                                    <button type="button" class="vitrine-wysiwyg-btn" data-cmd="italic" title="Itálico"><i>I</i></button>
+                                    <button type="button" class="vitrine-wysiwyg-btn" data-cmd="underline" title="Sublinhado"><u>U</u></button>
+                                    <button type="button" class="vitrine-wysiwyg-btn" data-cmd="removeFormat" title="Limpar formatação">&#10005;</button>
+                                </div>
+                                <div id="vitrine-hero-description" class="vitrine-aranha-wysiwyg" contenteditable="true"><?php echo wp_kses_post( $s['hero_description'] ); ?></div>
+                                <textarea name="vitrine_hero[hero_description]" id="vitrine-hero-description-input" class="hidden" style="display:none;"><?php echo esc_textarea( $s['hero_description'] ); ?></textarea>
+                            </div>
+                            <div class="vitrine-hero-section__grid vitrine-hero-section__grid--3">
+                                <div class="vitrine-hero-field">
+                                    <label for="vitrine-hero-desc-size">Tamanho (px)</label>
+                                    <input type="number" name="vitrine_hero[hero_desc_size]" id="vitrine-hero-desc-size" value="<?php echo esc_attr( $s['hero_desc_size'] ); ?>" min="10" max="60" step="1" class="small-text" />
+                                </div>
+                                <div class="vitrine-hero-field">
+                                    <label for="vitrine-hero-desc-color">Cor</label>
+                                    <input type="color" name="vitrine_hero[hero_desc_color]" id="vitrine-hero-desc-color" value="<?php echo esc_attr( ! empty( $s['hero_desc_color'] ) ? $s['hero_desc_color'] : ( $s['hero_text_color'] ?: '#ffffff' ) ); ?>" />
+                                </div>
+                                <div class="vitrine-hero-field">
+                                    <label for="vitrine-hero-desc-max-width">Largura máx. (px)</label>
+                                    <input type="number" name="vitrine_hero[hero_desc_max_width]" id="vitrine-hero-desc-max-width" value="<?php echo esc_attr( $s['hero_desc_max_width'] ); ?>" min="0" max="1400" step="10" class="small-text" placeholder="auto" />
+                                    <p class="description">0 = sem limite.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="vitrine-hero-section">
+                        <h4 class="vitrine-hero-section__title">Data</h4>
+                        <div class="vitrine-hero-section__body">
+                            <p class="description vitrine-hero-section__hint">Exibida na parte inferior do hero.</p>
+                            <div class="vitrine-hero-section__grid vitrine-hero-section__grid--2">
+                                <div class="vitrine-hero-field">
+                                    <label for="vitrine-hero-date">Data da vitrine</label>
+                                    <input type="date" name="vitrine_hero[hero_date]" id="vitrine-hero-date" value="<?php echo esc_attr( $s['hero_date'] ); ?>" />
+                                </div>
+                                <div class="vitrine-hero-field">
+                                    <label for="vitrine-hero-date-size">Tamanho (px)</label>
+                                    <input type="number" name="vitrine_hero[hero_date_size]" id="vitrine-hero-date-size" value="<?php echo esc_attr( $s['hero_date_size'] ); ?>" min="10" max="72" step="1" class="small-text" />
+                                </div>
+                            </div>
+                            <div class="vitrine-hero-section__grid vitrine-hero-section__grid--2">
+                                <div class="vitrine-hero-field">
+                                    <label for="vitrine-hero-date-color">Cor</label>
+                                    <input type="color" name="vitrine_hero[hero_date_color]" id="vitrine-hero-date-color" value="<?php echo esc_attr( ! empty( $s['hero_date_color'] ) ? $s['hero_date_color'] : ( $s['hero_text_color'] ?: '#ffffff' ) ); ?>" />
+                                </div>
+                                <div class="vitrine-hero-field">
+                                    <label for="vitrine-hero-date-align">Alinhamento</label>
+                                    <select name="vitrine_hero[hero_date_align]" id="vitrine-hero-date-align">
+                                        <option value="left"<?php selected( $s['hero_date_align'], 'left' ); ?>>Esquerda</option>
+                                        <option value="center"<?php selected( $s['hero_date_align'], 'center' ); ?>>Centro</option>
+                                        <option value="right"<?php selected( $s['hero_date_align'], 'right' ); ?>>Direita</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
                 </div>
 
-                <div class="vitrine-hero-field">
-                    <label for="vitrine-hero-text">Frase de destaque</label>
-                    <input type="text" name="vitrine_hero[hero_text]" id="vitrine-hero-text" value="<?php echo esc_attr( $s['hero_text'] ); ?>" placeholder="Título do hero" class="widefat" />
-                    <div class="vitrine-hero-format">
-                        <button type="button" class="vitrine-format-btn<?php echo '1' === $s['hero_text_bold'] ? ' is-active' : ''; ?>" data-target="text" data-prop="bold" title="Negrito"><b>B</b></button>
-                        <button type="button" class="vitrine-format-btn<?php echo '1' === $s['hero_text_italic'] ? ' is-active' : ''; ?>" data-target="text" data-prop="italic" title="Itálico"><i>I</i></button>
-                        <input type="hidden" name="vitrine_hero[hero_text_bold]" id="vitrine-hero-text-bold" value="<?php echo esc_attr( $s['hero_text_bold'] ); ?>" />
-                        <input type="hidden" name="vitrine_hero[hero_text_italic]" id="vitrine-hero-text-italic" value="<?php echo esc_attr( $s['hero_text_italic'] ); ?>" />
-                    </div>
-                </div>
-
-                <div class="vitrine-hero-field vitrine-hero-field--row">
-                    <div>
-                        <label for="vitrine-hero-font-size">Tamanho do texto (px)</label>
-                        <input type="number" name="vitrine_hero[hero_font_size]" id="vitrine-hero-font-size" value="<?php echo esc_attr( $s['hero_font_size'] ); ?>" min="12" max="120" step="2" class="small-text" />
-                    </div>
-                    <div>
-                        <label for="vitrine-hero-text-align">Alinhamento</label>
-                        <select name="vitrine_hero[hero_text_align]" id="vitrine-hero-text-align">
-                            <option value="left"<?php selected( $s['hero_text_align'], 'left' ); ?>>Esquerda</option>
-                            <option value="center"<?php selected( $s['hero_text_align'], 'center' ); ?>>Centro</option>
-                            <option value="right"<?php selected( $s['hero_text_align'], 'right' ); ?>>Direita</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="vitrine-hero-field vitrine-hero-field--wide">
-                    <label>Descrição</label>
-                    <div class="vitrine-wysiwyg-toolbar" id="vitrine-hero-desc-toolbar">
-                        <button type="button" class="vitrine-wysiwyg-btn" data-cmd="bold" title="Negrito"><b>B</b></button>
-                        <button type="button" class="vitrine-wysiwyg-btn" data-cmd="italic" title="Itálico"><i>I</i></button>
-                        <button type="button" class="vitrine-wysiwyg-btn" data-cmd="underline" title="Sublinhado"><u>U</u></button>
-                        <button type="button" class="vitrine-wysiwyg-btn" data-cmd="removeFormat" title="Limpar formatação">&#10005;</button>
-                    </div>
-                    <div id="vitrine-hero-description" class="vitrine-aranha-wysiwyg" contenteditable="true"><?php echo wp_kses_post( $s['hero_description'] ); ?></div>
-                    <textarea name="vitrine_hero[hero_description]" id="vitrine-hero-description-input" class="hidden" style="display:none;"><?php echo esc_textarea( $s['hero_description'] ); ?></textarea>
-                </div>
-
-                <div class="vitrine-hero-field">
-                    <label for="vitrine-hero-desc-size">Tamanho da descrição (px)</label>
-                    <input type="number" name="vitrine_hero[hero_desc_size]" id="vitrine-hero-desc-size" value="<?php echo esc_attr( $s['hero_desc_size'] ); ?>" min="10" max="60" step="1" class="small-text" />
-                </div>
-
-                <div class="vitrine-hero-field vitrine-hero-field--row">
-                    <div>
-                        <label for="vitrine-hero-desc-color">Cor da descrição</label>
-                        <input type="color" name="vitrine_hero[hero_desc_color]" id="vitrine-hero-desc-color" value="<?php echo esc_attr( ! empty( $s['hero_desc_color'] ) ? $s['hero_desc_color'] : ( $s['hero_text_color'] ?: '#ffffff' ) ); ?>" />
-                        <p class="description">Deixe igual à cor do título ou escolha outra.</p>
-                    </div>
-                    <div>
-                        <label for="vitrine-hero-desc-max-width">Largura máxima da descrição (px)</label>
-                        <input type="number" name="vitrine_hero[hero_desc_max_width]" id="vitrine-hero-desc-max-width" value="<?php echo esc_attr( $s['hero_desc_max_width'] ); ?>" min="0" max="1400" step="10" class="small-text" placeholder="auto" />
-                    </div>
-                </div>
-
-                <div class="vitrine-hero-field">
-                    <label for="vitrine-hero-text-color">Cor do texto</label>
-                    <input type="color" name="vitrine_hero[hero_text_color]" id="vitrine-hero-text-color" value="<?php echo esc_attr( $s['hero_text_color'] ?: '#ffffff' ); ?>" />
-                </div>
-
-                <div class="vitrine-hero-field">
-                    <label for="vitrine-hero-opacity">Opacidade do fade <span id="vitrine-hero-opacity-val"><?php echo esc_html( $s['hero_overlay_opacity'] ); ?>%</span></label>
-                    <input type="range" name="vitrine_hero[hero_overlay_opacity]" id="vitrine-hero-opacity" min="0" max="100" value="<?php echo esc_attr( $s['hero_overlay_opacity'] ); ?>" />
-                </div>
-
-                <div class="vitrine-hero-field">
-                    <label for="vitrine-hero-height">Altura (px)</label>
-                    <input type="number" name="vitrine_hero[hero_height]" id="vitrine-hero-height" value="<?php echo esc_attr( $s['hero_height'] ); ?>" min="100" max="1000" step="10" class="small-text" />
-                </div>
+                <aside class="vitrine-hero-metabox__aside">
+                    <h4 class="vitrine-hero-section__title">Pré-visualização</h4>
+                    <div id="vitrine-hero-preview" class="vitrine-hero-preview"></div>
+                    <p class="description vitrine-hero-preview__empty">Preencha imagem, título, descrição ou data para ver a prévia.</p>
+                </aside>
             </div>
-            <div id="vitrine-hero-preview"></div>
         </div>
         <?php
     }

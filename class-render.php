@@ -35,7 +35,7 @@ class Vitrine_Render {
     /**
      * Renderiza itens do layout recursivamente (suporta containers com filhos).
      */
-    private function render_items( $items, $elements ) {
+    private function render_items( $items, $elements, $depth = 0 ) {
         $output = '';
 
         foreach ( $items as $item ) {
@@ -47,6 +47,10 @@ class Vitrine_Render {
             $height   = isset( $item['height'] ) ? absint( $item['height'] ) : 0;
             $width    = isset( $item['width'] ) ? $item['width'] : '';
 
+            if ( $depth > 0 && 'container' === $type ) {
+                $settings['_nested'] = '1';
+            }
+
             $inline_styles = array();
             if ( $height ) {
                 $inline_styles[] = 'min-height:' . $height . 'px';
@@ -54,6 +58,11 @@ class Vitrine_Render {
             if ( $width ) {
                 $inline_styles[] = 'flex:0 1 ' . esc_attr( $width );
                 $inline_styles[] = 'max-width:' . esc_attr( $width );
+                $inline_styles[] = 'min-width:0';
+                $inline_styles[] = 'box-sizing:border-box';
+            } elseif ( $depth > 0 && 'container' === $type ) {
+                $inline_styles[] = 'width:100%';
+                $inline_styles[] = 'max-width:100%';
                 $inline_styles[] = 'min-width:0';
                 $inline_styles[] = 'box-sizing:border-box';
             }
@@ -76,7 +85,7 @@ class Vitrine_Render {
             // Renderiza filhos (para containers)
             $children_html = '';
             if ( ! empty( $item['children'] ) && is_array( $item['children'] ) ) {
-                $children_html = $this->render_items( $item['children'], $elements );
+                $children_html = $this->render_items( $item['children'], $elements, $depth + 1 );
             }
 
             $output .= '<div class="vitrine-block vitrine-block--' . esc_attr( $type ) . '"' . $style . '>';

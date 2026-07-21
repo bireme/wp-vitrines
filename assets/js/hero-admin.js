@@ -40,17 +40,30 @@
         var descMw = parseInt($('#vitrine-hero-desc-max-width').val() || '0', 10);
         var textBold = $('#vitrine-hero-text-bold').val() !== '0' ? '700' : '400';
         var textItal = $('#vitrine-hero-text-italic').val() === '1' ? 'italic' : 'normal';
+        var heroDate = $('#vitrine-hero-date').val() || '';
+        var dateFs = parseInt($('#vitrine-hero-date-size').val() || '16', 10);
+        var dateColor = $('#vitrine-hero-date-color').val() || color;
+        var dateAlign = $('#vitrine-hero-date-align').val() || 'right';
 
-        if (!img && !text && !desc) {
-            $prev.empty().hide();
+        if (!img && !text && !desc && !heroDate) {
+            $prev.empty();
             return;
+        }
+
+        var dateLabel = heroDate;
+        if (heroDate && heroDate.indexOf('-') !== -1) {
+            var p = heroDate.split('-');
+            if (p.length === 3) {
+                dateLabel = p[2] + '/' + p[1] + '/' + p[0];
+            }
         }
 
         var justifyMap = { left: 'flex-start', center: 'center', right: 'flex-end' };
         var justifyContent = justifyMap[align] || 'center';
+        var dateJustify = justifyMap[dateAlign] || 'flex-end';
         var bgStyle = img ? 'background:url(' + escapeAttr(img) + ') center/cover no-repeat;' : 'background:#333;';
 
-        var html = '<div style="position:relative;' + bgStyle + 'height:' + h + 'px;border-radius:6px;overflow:hidden;display:flex;flex-direction:column;align-items:' + justifyContent + ';justify-content:center;gap:10px;margin-top:10px;padding:0 20px;">';
+        var html = '<div style="position:relative;' + bgStyle + 'height:' + h + 'px;border-radius:6px;overflow:hidden;display:flex;flex-direction:column;align-items:' + justifyContent + ';justify-content:center;gap:10px;padding:0 20px;">';
         html += '<div style="position:absolute;inset:0;background:rgba(0,0,0,' + opa + ');"></div>';
         if (text) {
             html += '<span style="position:relative;z-index:1;font-size:' + fs + 'px;font-weight:' + textBold + ';font-style:' + textItal + ';color:' + escapeAttr(color) + ';text-align:' + escapeAttr(align) + ';text-shadow:0 2px 8px rgba(0,0,0,.5);">' + escapeHtml(text) + '</span>';
@@ -62,9 +75,12 @@
             }
             html += '<span style="' + descStyle + '">' + desc + '</span>';
         }
+        if (heroDate) {
+            html += '<span style="position:absolute;z-index:2;left:20px;right:20px;bottom:16px;display:flex;justify-content:' + dateJustify + ';"><time style="font-size:' + dateFs + 'px;color:' + escapeAttr(dateColor) + ';font-weight:600;text-shadow:0 2px 8px rgba(0,0,0,.5);">' + escapeHtml(dateLabel) + '</time></span>';
+        }
         html += '</div>';
 
-        $prev.html(html).show();
+        $prev.html(html);
     }
 
     $(function () {
@@ -81,8 +97,13 @@
                 var $wrap = $('.vitrine-hero-image-field');
                 $wrap.find('.vitrine-image-preview').remove();
                 $wrap.prepend('<img src="' + escapeAttr(url) + '" class="vitrine-image-preview" alt="" />');
+                var $actions = $wrap.find('.vitrine-hero-image-field__actions');
+                if (!$actions.length) {
+                    $wrap.append('<div class="vitrine-hero-image-field__actions"><button type="button" class="button" id="vitrine-hero-select-image">Selecionar</button></div>');
+                    $actions = $wrap.find('.vitrine-hero-image-field__actions');
+                }
                 if (!$('#vitrine-hero-remove-image').length) {
-                    $('#vitrine-hero-select-image').after(' <button type="button" class="button" id="vitrine-hero-remove-image">Remover</button>');
+                    $actions.append(' <button type="button" class="button" id="vitrine-hero-remove-image">Remover</button>');
                 }
                 renderHeroPreview();
             });
@@ -96,7 +117,7 @@
             renderHeroPreview();
         });
 
-        $('#vitrine-hero-meta-box').on('input change', '#vitrine-hero-text, #vitrine-hero-text-color, #vitrine-hero-opacity, #vitrine-hero-height, #vitrine-hero-font-size, #vitrine-hero-text-align, #vitrine-hero-desc-size, #vitrine-hero-desc-color, #vitrine-hero-desc-max-width', function () {
+        $('#vitrine-hero-meta-box').on('input change', '#vitrine-hero-text, #vitrine-hero-text-color, #vitrine-hero-opacity, #vitrine-hero-height, #vitrine-hero-font-size, #vitrine-hero-text-align, #vitrine-hero-desc-size, #vitrine-hero-desc-color, #vitrine-hero-desc-max-width, #vitrine-hero-date, #vitrine-hero-date-size, #vitrine-hero-date-color, #vitrine-hero-date-align', function () {
             if (this.id === 'vitrine-hero-opacity') {
                 $('#vitrine-hero-opacity-val').text($(this).val() + '%');
             }

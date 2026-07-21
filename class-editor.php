@@ -261,16 +261,34 @@ class Vitrine_Editor {
             <div id="vitrine-editor-top">
                 <!-- Sidebar esquerda: elementos disponíveis -->
                 <aside id="vitrine-sidebar-left" class="vitrine-sidebar">
-                    <h3>Elementos</h3>
-                    <div id="vitrine-element-list">
-                        <?php foreach ( $elements as $slug => $el ) : ?>
-                            <div class="vitrine-element-item" data-type="<?php echo esc_attr( $slug ); ?>">
-                                <span class="dashicons <?php echo esc_attr( $el->icon() ); ?>"></span>
-                                <span><?php echo esc_html( $el->label() ); ?></span>
-                            </div>
-                        <?php endforeach; ?>
+                    <div class="vitrine-sidebar-header">
+                        <h3>Elementos</h3>
+                        <button type="button" class="vitrine-sidebar-collapse" data-panel="left" title="Recolher painel de elementos">
+                            <span class="dashicons dashicons-arrow-left-alt2"></span>
+                        </button>
                     </div>
+                    <div class="vitrine-sidebar-body">
+                        <div class="vitrine-element-search-wrap">
+                            <span class="dashicons dashicons-search" aria-hidden="true"></span>
+                            <input type="search" id="vitrine-element-search" placeholder="Buscar elemento..." autocomplete="off" spellcheck="false" aria-label="Buscar elemento">
+                        </div>
+                        <div id="vitrine-element-list">
+                            <?php foreach ( $elements as $slug => $el ) : ?>
+                                <div class="vitrine-element-item" data-type="<?php echo esc_attr( $slug ); ?>" data-label="<?php echo esc_attr( $el->label() ); ?>">
+                                    <span class="dashicons <?php echo esc_attr( $el->icon() ); ?>"></span>
+                                    <span><?php echo esc_html( $el->label() ); ?></span>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                        <p id="vitrine-element-list-empty" class="vitrine-element-list-empty" hidden>Nenhum elemento encontrado.</p>
+                    </div>
+                    <button type="button" class="vitrine-sidebar-expand" data-panel="left" title="Mostrar painel de elementos">
+                        <span class="dashicons dashicons-arrow-right-alt2"></span>
+                        <span class="vitrine-sidebar-expand-text">Elementos</span>
+                    </button>
                 </aside>
+
+                <div class="vitrine-panel-resizer" data-panel="left" title="Arrastar para redimensionar"></div>
 
                 <!-- Canvas central -->
                 <main id="vitrine-canvas-wrapper">
@@ -279,6 +297,8 @@ class Vitrine_Editor {
                     </div>
                 </main>
 
+                <div class="vitrine-panel-resizer" data-panel="right" title="Arrastar para redimensionar"></div>
+
                 <!-- Sidebar direita: configurações do elemento selecionado -->
                 <aside id="vitrine-settings-sidebar">
                     <div id="vitrine-settings-sidebar-header">
@@ -286,6 +306,9 @@ class Vitrine_Editor {
                             <span id="vitrine-settings-el-icon" class="dashicons dashicons-admin-settings"></span>
                             <span id="vitrine-settings-el-label">Configurações</span>
                         </div>
+                        <button type="button" class="vitrine-sidebar-collapse" data-panel="right" title="Recolher painel de configurações">
+                            <span class="dashicons dashicons-arrow-right-alt2"></span>
+                        </button>
                         <button type="button" id="vitrine-settings-sidebar-close" title="Fechar painel">
                             <span class="dashicons dashicons-no-alt"></span>
                         </button>
@@ -296,6 +319,10 @@ class Vitrine_Editor {
                             <p>Clique em um elemento no canvas para editar as suas configurações.</p>
                         </div>
                     </div>
+                    <button type="button" class="vitrine-sidebar-expand" data-panel="right" title="Mostrar painel de configurações">
+                        <span class="dashicons dashicons-arrow-left-alt2"></span>
+                        <span class="vitrine-sidebar-expand-text">Configurações</span>
+                    </button>
                 </aside>
             </div>
         </div>
@@ -401,6 +428,11 @@ class Vitrine_Editor {
                     }
                     return sanitize_text_field( (string) $v );
                 }, $item['settings'] );
+
+                if ( 'html' === $clean_item['type'] && isset( $item['settings']['content'] ) ) {
+                    Vitrine_Plugin::load_elements();
+                    $clean_item['settings']['content'] = Vitrine_Element_Html::sanitize_html_content( $item['settings']['content'] );
+                }
             } else {
                 $clean_item['settings'] = array();
             }
